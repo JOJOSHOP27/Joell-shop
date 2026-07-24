@@ -2787,9 +2787,81 @@
         .order-chat-messages .msg img {
             max-width: 100%;
             border-radius: 8px;
-            margin-top: 6px;
             display: block;
             cursor: pointer;
+        }
+        .chat-img-container {
+            position: relative;
+            margin-top: 6px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .chat-download-overlay {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 32px;
+            height: 32px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-decoration: none;
+            opacity: 0;
+            transition: 0.3s;
+            border: 1px solid rgba(255,255,255,0.2);
+            z-index: 5;
+        }
+        .chat-img-container:hover .chat-download-overlay {
+            opacity: 1;
+        }
+        .chat-file-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+        .chat-file-box:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--accent-light);
+        }
+        .chat-file-box .file-icon {
+            font-size: 1.5rem;
+            color: var(--accent-light);
+        }
+        .chat-file-box .file-info {
+            flex: 1;
+            overflow: hidden;
+        }
+        .chat-file-box .file-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+        .chat-file-box .file-download-link {
+            font-size: 0.7rem;
+            color: var(--accent-light);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .chat-file-box .file-download-link:hover {
+            color: #fff;
+            text-decoration: underline;
         }
 
         /* ===== ORDERS PAGE ===== */
@@ -3661,7 +3733,10 @@
                 <div class="tracking-detail-box" style="margin-bottom:16px;">
                     <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                         <div>
-                            <h2><i class="fas fa-shield-alt" style="color:var(--accent-light);"></i> Admin Dashboard</h2>
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <h2><i class="fas fa-shield-alt" style="color:var(--accent-light);"></i> Admin Dashboard</h2>
+                                <span class="badge" id="adminChatBadge" style="display:none;position:static;padding:2px 10px;font-size:0.8rem;">0</span>
+                            </div>
                             <p class="subtitle">Kelola pesanan dan chat pelanggan</p>
                         </div>
                         <button onclick="refreshAdminOrders()" class="header-btn" title="Refresh Data" id="btnRefreshAdmin">
@@ -4035,7 +4110,7 @@
     <!-- BOTTOM NAV -->
     <nav class="bottom-nav" id="bottomNav">
         <button class="nav-item active" data-page="home" id="navHome"><i class="fas fa-home"></i> Beranda</button>
-        <button class="nav-item" data-page="orders" id="navOrders"><i class="fas fa-shopping-bag"></i> Pesanan</button>
+        <button class="nav-item" data-page="orders" id="navOrders"><i class="fas fa-shopping-bag"></i> Pesanan <span class="badge" id="navOrdersBadge" style="display:none;">0</span></button>
         <button class="nav-item" id="navCart" data-page="cart"><i class="fas fa-shopping-cart"></i> Keranjang <span class="badge" id="navCartBadge">0</span></button>
         <button class="nav-item" data-page="tracking" id="navTracking"><i class="fas fa-shipping-fast"></i> Lacak</button>
         <button class="nav-item" data-page="profile" id="navProfile"><i class="fas fa-user"></i> Profil</button>
@@ -4224,6 +4299,7 @@
                         }
                         if (currentOrderChatId) renderOrderChatMessages();
                         if (currentAdminChatId) renderAdminChatMessages();
+                        updateUnreadBadges();
                         
                         // Notifikasi pesan baru
                         if (document.hidden) {
@@ -4263,6 +4339,7 @@
         }
 
         initCloudSync();
+        updateUnreadBadges();
 
         let bc;
         try {
@@ -4293,6 +4370,55 @@
         function broadcastChat(orderId) {
             syncOrdersToCloud();
             if (bc) bc.postMessage({ type: 'chat_updated', orderId });
+            updateUnreadBadges();
+        }
+
+        function updateUnreadBadges() {
+            if (!orders || !Array.isArray(orders)) return;
+            
+            let totalUnreadUser = 0;
+            let totalUnreadAdmin = 0;
+
+            orders.forEach(order => {
+                if (!order.chat || !Array.isArray(order.chat)) return;
+                
+                // Cari pesan terakhir
+                const lastMsg = order.chat[order.chat.length - 1];
+                if (!lastMsg) return;
+
+                // Jika pesan terakhir dari admin, berarti user (pelanggan) belum baca/balas
+                if (lastMsg.from === 'admin') {
+                    if (currentUser && order.userId === currentUser.id) {
+                        totalUnreadUser++;
+                    }
+                } 
+                // Jika pesan terakhir dari user, berarti admin belum balas
+                else if (lastMsg.from === 'user') {
+                    totalUnreadAdmin++;
+                }
+            });
+
+            // Update badge di bottom nav untuk user
+            const navBadge = document.getElementById('navOrdersBadge');
+            if (navBadge) {
+                if (totalUnreadUser > 0) {
+                    navBadge.textContent = totalUnreadUser;
+                    navBadge.style.display = 'block';
+                } else {
+                    navBadge.style.display = 'none';
+                }
+            }
+
+            // Update badge di dashboard admin
+            const adminBadge = document.getElementById('adminChatBadge');
+            if (adminBadge) {
+                if (totalUnreadAdmin > 0) {
+                    adminBadge.textContent = totalUnreadAdmin;
+                    adminBadge.style.display = 'block';
+                } else {
+                    adminBadge.style.display = 'none';
+                }
+            }
         }
 
         // ============================================================
@@ -4918,13 +5044,21 @@
             const container = document.getElementById('orderChatMessages');
             container.innerHTML = order.chat.map(c => {
                 const payBtnHtml = c.paymentBtn ? `<a href="https://joell-payment.vercel.app" target="_blank" class="chat-payment-btn"><i class="fas fa-credit-card"></i> PAYMENT</a>` : '';
-                const imgHtml = c.image ? `<img src="${c.image}" alt="chat-img" onclick="window.open('${c.image}', '_blank')">` : '';
+                const imgHtml = c.image ? `
+                    <div class="chat-img-container">
+                        <img src="${c.image}" alt="chat-img" onclick="window.open('${c.image}', '_blank')">
+                        <a href="${c.image}" download="image_${Date.now()}.png" target="_blank" class="chat-download-overlay" title="Download Gambar">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>` : '';
                 const fileHtml = c.file ? `
-                    <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:8px;margin-top:5px;display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,0.1);">
-                        <i class="fas fa-file-download" style="font-size:1.5rem;color:#25d366;"></i>
-                        <div style="flex:1;overflow:hidden;">
-                            <div style="font-size:0.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.fileName || 'File'}</div>
-                            <a href="${c.file}" target="_blank" style="font-size:0.75rem;color:var(--accent-light);text-decoration:none;">Download File</a>
+                    <div class="chat-file-box">
+                        <i class="fas fa-file-alt file-icon"></i>
+                        <div class="file-info">
+                            <div class="file-name">${c.fileName || 'File Terlampir'}</div>
+                            <a href="${c.file}" download="${c.fileName || 'file'}" target="_blank" class="file-download-link">
+                                <i class="fas fa-cloud-download-alt"></i> Download
+                            </a>
                         </div>
                     </div>` : '';
                 return `
@@ -5145,7 +5279,10 @@
                                 <button onclick="deleteOrder('${o.id}')" style="background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;gap:6px;">
                                     <i class="fas fa-trash-alt"></i> Hapus
                                 </button>
-                                <button class="admin-chat-btn" onclick="openAdminChat('${o.id}')"><i class="fas fa-comments"></i> Balas Chat</button>
+                                <button class="admin-chat-btn" onclick="openAdminChat('${o.id}')" style="position:relative;">
+                                    <i class="fas fa-comments"></i> Balas Chat
+                                    ${(o.chat && o.chat.length > 0 && o.chat[o.chat.length-1].from === 'user') ? '<span style="position:absolute;top:-8px;right:-8px;background:var(--red);color:#fff;width:18px;height:18px;border-radius:50%;font-size:0.65rem;display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(239,68,68,0.5);border:2px solid var(--bg-card-solid);">!</span>' : ''}
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -5182,8 +5319,14 @@
                 userImg.innerHTML = `<img src="https://ui-avatars.com/api/?name=${encodeURIComponent(order.userName)}&background=random" style="width:100%;height:100%;border-radius:50%;">`;
             }
 
+            // Tandai pesan user sebagai dibaca oleh admin
+            if (order.chat.length > 0 && order.chat[order.chat.length - 1].from === 'user') {
+                broadcastChat(orderId); // Memicu update badge di perangkat lain
+            }
+
             renderAdminChatMessages();
             document.getElementById('adminChatOverlay').classList.add('open');
+            updateUnreadBadges();
         }
 
         function renderAdminChatMessages() {
@@ -5192,13 +5335,21 @@
             const container = document.getElementById('adminChatMessages');
             container.innerHTML = order.chat.map(c => {
                 const payBtnHtml = c.paymentBtn ? `<a href="https://joell-payment.vercel.app" target="_blank" class="chat-payment-btn"><i class="fas fa-credit-card"></i> PAYMENT</a>` : '';
-                const imgHtml = c.image ? `<img src="${c.image}" alt="chat-img" onclick="window.open('${c.image}', '_blank')">` : '';
+                const imgHtml = c.image ? `
+                    <div class="chat-img-container">
+                        <img src="${c.image}" alt="chat-img" onclick="window.open('${c.image}', '_blank')">
+                        <a href="${c.image}" download="image_${Date.now()}.png" target="_blank" class="chat-download-overlay" title="Download Gambar">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>` : '';
                 const fileHtml = c.file ? `
-                    <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:8px;margin-top:5px;display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,0.1);">
-                        <i class="fas fa-file-download" style="font-size:1.5rem;color:#25d366;"></i>
-                        <div style="flex:1;overflow:hidden;">
-                            <div style="font-size:0.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.fileName || 'File'}</div>
-                            <a href="${c.file}" target="_blank" style="font-size:0.75rem;color:var(--accent-light);text-decoration:none;">Download File</a>
+                    <div class="chat-file-box">
+                        <i class="fas fa-file-alt file-icon"></i>
+                        <div class="file-info">
+                            <div class="file-name">${c.fileName || 'File Terlampir'}</div>
+                            <a href="${c.file}" download="${c.fileName || 'file'}" target="_blank" class="file-download-link">
+                                <i class="fas fa-cloud-download-alt"></i> Download
+                            </a>
                         </div>
                     </div>` : '';
                 return `
@@ -5245,8 +5396,8 @@
             formData.append('file', file);
             
             try {
-                // file.io is a simple ephemeral file sharing service
-                const response = await fetch('https://file.io', {
+                // file.io requires a specific form of request or might have changed
+                const response = await fetch('https://file.io/?expires=1w', {
                     method: 'POST',
                     body: formData
                 });
@@ -5281,7 +5432,7 @@
                 }
             } catch (error) {
                 console.error("File Upload Error:", error);
-                showToast('Error', 'Gagal upload file. Coba gunakan koneksi lain atau file lebih kecil.', 'error');
+                showToast('Error', 'Gagal upload file: ' + error.message, 'error');
             } finally {
                 input.value = '';
             }
