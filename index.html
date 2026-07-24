@@ -13,13 +13,13 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <!-- Security Scripts -->
     <script>
-        // Domain Locking - Allow joell-payment and joell-official
+        // Domain Locking - Allow joell-payment and nanz-officialstore
         (function() {
-            var allowedDomains = ["joell-payment.vercel.app", "joell-official.vercel.app", "localhost", "127.0.0.1"];
+            var allowedDomains = ["joell-payment.vercel.app", "nanz-officialstore.vercel.app", "localhost", "127.0.0.1"];
             if (!allowedDomains.includes(window.location.hostname)) {
                 document.documentElement.innerHTML = ""; // Wipe out content
                 alert("Unauthorized Domain: This website is protected. Cloning is strictly prohibited.");
-                window.location.href = "https://joell-official.vercel.app";
+                window.location.href = "https://nanz-officialstore.vercel.app";
                 return;
             }
         })();
