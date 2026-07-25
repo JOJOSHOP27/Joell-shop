@@ -2955,6 +2955,89 @@
             font-weight: 800;
             color: var(--text-primary);
         }
+
+        /* ===== ORDER MESSAGE NOTIFICATION BADGE (PREMIUM) ===== */
+        .order-msg-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: #fff;
+            font-size: 0.78rem;
+            font-weight: 800;
+            padding: 8px 16px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin: 10px 0 6px;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4), 0 0 0 1px rgba(255,255,255,0.08);
+            animation: msgBadgePulse 2.5s ease-in-out infinite;
+            width: fit-content;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .order-msg-badge::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255,255,255,0.1) 50%,
+                transparent 70%
+            );
+            animation: badgeShimmer 3s infinite;
+        }
+        @keyframes badgeShimmer {
+            0% { transform: translateX(-100%) translateY(-100%); }
+            100% { transform: translateX(100%) translateY(100%); }
+        }
+        .order-msg-badge i {
+            font-size: 0.85rem;
+            filter: drop-shadow(0 0 4px rgba(255,255,255,0.5));
+            animation: msgIconBounce 1.5s ease-in-out infinite;
+        }
+        @keyframes msgIconBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        @keyframes msgBadgePulse {
+            0%, 100% { 
+                box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4), 0 0 0 1px rgba(255,255,255,0.08);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 4px 30px rgba(99, 102, 241, 0.6), 0 0 20px rgba(168, 85, 247, 0.3), 0 0 0 1px rgba(255,255,255,0.12);
+                transform: scale(1.02);
+            }
+        }
+        .order-card:hover .order-msg-badge {
+            animation: none;
+            transform: scale(1.03) translateY(-1px);
+            box-shadow: 0 6px 30px rgba(99, 102, 241, 0.5), 0 0 30px rgba(168, 85, 247, 0.2);
+        }
+        .order-card:hover .order-msg-badge i {
+            animation: none;
+        }
+        /* Dot indicator for unread messages */
+        .order-msg-badge .msg-dot {
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255,255,255,0.8);
+            animation: msgDotBlink 1s ease-in-out infinite;
+        }
+        @keyframes msgDotBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
         .empty-orders {
             text-align: center;
             padding: 60px 20px;
