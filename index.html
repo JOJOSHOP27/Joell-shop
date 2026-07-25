@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NANZ SHOP · Next-Gen Digital Store</title>
+    <title>JOELL SHOP · Next-Gen Digital Store</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -89,7 +89,7 @@
         <header class="top-header">
             <div class="logo-area" id="logoArea" title="Klik 5x untuk Mode Admin">
                 <img src="https://files.catbox.moe/ijemcy.png" alt="logo" loading="lazy">
-                <span>NANZ SHOP</span>
+                <span>JOELL SHOP</span>
             </div>
             <div class="header-actions">
                 <button class="header-btn" id="themeToggle" title="Toggle Dark/Light Mode">
@@ -141,7 +141,7 @@
 
             <div class="store-header">
                 <div class="store-name">
-                    NANZ SHOP
+                    JOELL SHOP
                     <span class="rating"><i class="fas fa-star"></i> 4.9 <span style="font-weight:400;opacity:0.7">(1,234 Reviews)</span></span>
                     <span class="badge-free"><i class="fas fa-check-circle"></i> Free Fee Admin</span>
                 </div>
@@ -698,7 +698,7 @@
                 </ul>
 
                 <div id="g_id_onload"
-                     data-client_id="598453625335-uj2bv61q9cd3pe94396ruqfma2kfo4jo.apps.googleusercontent.com"
+                     data-client_id=""
                      data-context="signin"
                      data-ux_mode="popup"
                      data-callback="handleGoogleLogin"
@@ -812,13 +812,46 @@
 
     <!-- BOTTOM NAV -->
     <nav class="bottom-nav" id="bottomNav">
-        <button class="nav-item active" data-page="home" id="navHome"><i class="fas fa-home"></i> Beranda</button>
-        <button class="nav-item" data-page="orders" id="navOrders"><i class="fas fa-shopping-bag"></i> Pesanan <span class="badge" id="navOrdersBadge" style="display:none;">0</span></button>
-        <button class="nav-item" id="navCart" data-page="cart"><i class="fas fa-shopping-cart"></i> Keranjang <span class="badge" id="navCartBadge">0</span></button>
-        <button class="nav-item" data-page="tracking" id="navTracking"><i class="fas fa-shipping-fast"></i> Lacak</button>
-        <button class="nav-item" data-page="profile" id="navProfile"><i class="fas fa-user"></i> Profil</button>
+        <a href="index.html" class="nav-item active" data-page="home" id="navHome"><i class="fas fa-home"></i> Beranda</a>
+        <a href="pesanan.html" class="nav-item" data-page="orders" id="navOrders"><i class="fas fa-shopping-bag"></i> Pesanan <span class="badge" id="navOrdersBadge" style="display:none;">0</span></a>
+        <button class="nav-item" id="navCart" data-page="cart" onclick="document.getElementById('cartOverlay').classList.toggle('open')"><i class="fas fa-shopping-cart"></i> Keranjang <span class="badge" id="navCartBadge">0</span></button>
+        <a href="index.html#tracking" class="nav-item" data-page="tracking" id="navTracking"><i class="fas fa-shipping-fast"></i> Lacak</a>
+        <a href="profil.html" class="nav-item" data-page="profile" id="navProfile"><i class="fas fa-user"></i> Profil</a>
     </nav>
 
+    <script src="config.js"></script>
+    <script>
+        // Set Google Client ID dynamically from config
+        document.addEventListener('DOMContentLoaded', function() {
+            var gIdLoad = document.getElementById('g_id_onload');
+            if (gIdLoad && typeof GOOGLE_CLIENT_ID !== 'undefined') {
+                gIdLoad.setAttribute('data-client_id', GOOGLE_CLIENT_ID);
+            }
+        });
+    </script>
+    <script>
+        // Set Google Client ID dynamically from config
+        document.addEventListener('DOMContentLoaded', function() {
+            var gIdLoad = document.getElementById('g_id_onload');
+            if (gIdLoad && typeof GOOGLE_CLIENT_ID !== 'undefined') {
+                gIdLoad.setAttribute('data-client_id', GOOGLE_CLIENT_ID);
+            }
+            var gIdSignin = document.querySelector('.g_id_signin');
+            if (gIdSignin && typeof GOOGLE_CLIENT_ID !== 'undefined') {
+                gIdSignin.setAttribute('data-client_id', GOOGLE_CLIENT_ID);
+            }
+        });
+    </script>
+    <script src="config.js"></script>
+    <script>
+        // Set Google Client ID dynamically from config
+        document.addEventListener('DOMContentLoaded', function() {
+            var gIdLoad = document.getElementById('g_id_onload');
+            if (gIdLoad && typeof GOOGLE_CLIENT_ID !== 'undefined') {
+                gIdLoad.setAttribute('data-client_id', GOOGLE_CLIENT_ID);
+            }
+        });
+    </script>
     <script src="script.js"></script>
     <script>
         // Ensure home page is active on load
@@ -834,4 +867,4 @@
         });
     </script>
 </body>
-                                                                                                                                                     </html>
+</html>
