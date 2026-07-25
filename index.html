@@ -318,6 +318,29 @@
             text-overflow: ellipsis;
         }
 
+        /* Profile Page Styles */
+        .profile-header-new { position: relative; margin-bottom: 60px; }
+        .profile-cover-new { width: 100%; height: 140px; object-fit: cover; border-radius: 0 0 20px 20px; }
+        .profile-avatar-wrap { position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); }
+        .profile-avatar-wrap img { width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--bg-primary); box-shadow: 0 4px 20px rgba(0,0,0,0.5); object-fit: cover; }
+        .edit-profile-btn { position: absolute; bottom: 0; right: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg-primary); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8rem; }
+        .profile-info-new { text-align: center; padding: 0 20px; }
+        .profile-info-new h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 4px; color: #fff; }
+        .profile-info-new p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+        .profile-stats-new { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; }
+        .stat-box { text-align: center; }
+        .stat-num { display: block; font-size: 1.2rem; font-weight: 800; color: var(--accent-light); }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .profile-menu-list { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; }
+        .profile-menu-list .menu-item { display: flex; align-items: center; gap: 15px; padding: 16px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .profile-menu-list .menu-item:hover { border-color: var(--accent); background: rgba(99,102,241,0.05); transform: translateX(5px); }
+        .profile-menu-list .menu-item i:first-child { width: 20px; color: var(--accent-light); font-size: 1.1rem; }
+        .profile-menu-list .menu-item span { flex: 1; font-weight: 600; font-size: 0.95rem; color: var(--text-primary); }
+        .profile-menu-list .menu-item i:last-child { font-size: 0.8rem; color: var(--text-muted); }
+        .profile-menu-list .menu-item.logout { margin-top: 10px; border-color: rgba(239, 68, 68, 0.2); }
+        .profile-menu-list .menu-item.logout i { color: var(--red); }
+        .profile-menu-list .menu-item.logout:hover { background: rgba(239, 68, 68, 0.1); border-color: var(--red); }
+
         /* Profile Settings Styles */
         .profile-settings-box { text-align: center; }
         .profile-avatar-edit { position: relative; display: inline-block; margin-bottom: 24px; }
@@ -3687,45 +3710,63 @@
         <!-- PROFILE -->
         <div class="page" id="page-profile">
             <div class="profile-page">
-                <img class="profile-cover" src="https://files.catbox.moe/iai8aa.png" alt="cover" loading="lazy">
-                <div class="profile-body">
-                    <div class="profile-logo">
-                        <img src="https://files.catbox.moe/ijemcy.png" alt="logo profil" loading="lazy">
-                    </div>
-                    <h2>JOELL SHOP</h2>
-                    <p class="owner-label">Digital Solutions Provider</p>
-                    <div class="profile-section">
-                        <h3><i class="fas fa-user-tie"></i> Tentang Kami</h3>
-                        <p class="bio">JOELL SHOP adalah solusi digital terlengkap untuk kebutuhan bot WhatsApp, hosting game, dan topup. Dengan pengalaman 3+ tahun, kami telah melayani ribuan pelanggan dengan kualitas premium dan harga terjangkau. Support 24/7 siap membantu kapan saja!</p>
-                    </div>
-                    <div class="profile-section">
-                        <h3><i class="fas fa-address-card"></i> Kontak</h3>
-                        <div class="contact-box">
-                            <div class="contact-item" onclick="window.open('https://maps.google.com/?q=Jakarta,Indonesia','_blank')"><i class="fas fa-map-marker-alt"></i><span>Jl. Soekarno, Jakarta, Indonesia</span></div>
-                            <div class="contact-item" onclick="window.open('https://wa.me/6287751755160','_blank')"><i class="fab fa-whatsapp"></i><span>0877-5175-5160</span></div>
-                            <div class="contact-item" onclick="window.location.href='mailto:joellshop@gmail.com'"><i class="fas fa-envelope"></i><span>joellshop@gmail.com</span></div>
-                            <div class="contact-item"><i class="fas fa-clock"></i><span>09:00 - 21:00 WIB</span></div>
+                <!-- User Profile View -->
+                <div id="userProfileView" style="display:none;">
+                    <div class="profile-header-new">
+                        <img class="profile-cover-new" src="https://files.catbox.moe/iai8aa.png" alt="cover">
+                        <div class="profile-avatar-wrap">
+                            <img id="userProfileImg" src="https://ui-avatars.com/api/?name=User" alt="avatar">
+                            <button class="edit-profile-btn" onclick="openProfileSettings()"><i class="fas fa-edit"></i></button>
                         </div>
                     </div>
-                    <div class="profile-section">
-                        <h3><i class="fas fa-share-alt"></i> Media Sosial</h3>
-                        <div class="social-icons">
-                            <a href="#" class="social-icon" title="Instagram"><i class="fab fa-instagram"></i></a>
-                            <a href="#" class="social-icon" title="YouTube"><i class="fab fa-youtube"></i></a>
-                            <a href="#" class="social-icon" title="TikTok"><i class="fab fa-tiktok"></i></a>
-                            <a href="#" class="social-icon" title="GitHub"><i class="fab fa-github"></i></a>
-                            <a href="#" class="social-icon" title="Telegram"><i class="fab fa-telegram"></i></a>
+                    <div class="profile-info-new">
+                        <h2 id="userProfileName">User Name</h2>
+                        <p id="userProfileEmail">user@example.com</p>
+                        <div class="profile-stats-new">
+                            <div class="stat-box">
+                                <span class="stat-num" id="statOrderCount">0</span>
+                                <span class="stat-label">Pesanan</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-num">Verified</span>
+                                <span class="stat-label">Status</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="profile-section">
-                        <h3><i class="fas fa-paper-plane"></i> Kirim Pesan</h3>
-                        <form class="contact-form" id="contactForm">
-                            <div class="form-group"><label>Nama Lengkap</label><input type="text" placeholder="Nama Anda" required></div>
-                            <div class="form-group"><label>Email</label><input type="email" placeholder="email@example.com" required></div>
-                            <div class="form-group"><label>Pesan</label><textarea rows="4" placeholder="Tulis pesan Anda..." required></textarea></div>
-                            <button type="submit" class="btn-send"><i class="fas fa-paper-plane"></i> Kirim Pesan</button>
-                        </form>
+                    <div class="profile-menu-list">
+                        <div class="menu-item" onclick="navigateTo('orders')">
+                            <i class="fas fa-history"></i>
+                            <span>Riwayat Pesanan</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                        <div class="menu-item" onclick="openProfileSettings()">
+                            <i class="fas fa-user-cog"></i>
+                            <span>Edit Profil</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                        <div class="menu-item" onclick="window.open('https://wa.me/6287751755160','_blank')">
+                            <i class="fab fa-whatsapp"></i>
+                            <span>Bantuan Support</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                        <div class="menu-item logout" id="btnProfileLogoutPage">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Keluar Akun</span>
+                        </div>
                     </div>
+                </div>
+
+                <!-- Guest Profile View (Login Prompt) -->
+                <div id="guestProfileView" class="cart-empty" style="padding: 60px 20px;">
+                    <i class="fas fa-user-circle" style="font-size: 4rem; color: var(--accent); margin-bottom: 20px;"></i>
+                    <h3>Belum Login</h3>
+                    <p>Silakan login untuk melihat dan mengatur profil Anda.</p>
+                    <button class="btn-checkout" onclick="document.getElementById('loginOverlay').classList.add('open')" style="margin-top:20px; width:auto; padding: 12px 40px;">LOGIN SEKARANG</button>
+                </div>
+
+                <!-- Footer Info (Tetap ada di bawah) -->
+                <div class="profile-footer-info" style="margin-top: 40px; padding: 20px; border-top: 1px solid var(--border-subtle); text-align: center;">
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">JOELL SHOP v2.4.0 • Digital Solutions</p>
                 </div>
             </div>
         </div>
@@ -4580,6 +4621,7 @@
             currentUser.name = newName;
             localStorage.setItem('joellUser', JSON.stringify(currentUser));
             updateUserUI();
+            renderProfilePage();
             if (currentOrderChatId) renderOrderChatMessages();
             document.getElementById('profileOverlay').classList.remove('open');
             showToast('Berhasil', 'Profil Anda telah diperbarui!', 'success');
@@ -5966,6 +6008,29 @@
             document.getElementById('bottomNav').style.display = 'flex';
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if (page === 'orders') renderOrdersList();
+            if (page === 'profile') renderProfilePage();
+        }
+
+        function renderProfilePage() {
+            const userView = document.getElementById('userProfileView');
+            const guestView = document.getElementById('guestProfileView');
+            if (currentUser) {
+                userView.style.display = 'block'; guestView.style.display = 'none';
+                document.getElementById('userProfileImg').src = currentUser.picture;
+                document.getElementById('userProfileName').textContent = currentUser.name;
+                document.getElementById('userProfileEmail').textContent = currentUser.email;
+                const userOrders = orders.filter(o => o.userId === currentUser.id);
+                document.getElementById('statOrderCount').textContent = userOrders.length;
+                document.getElementById('btnProfileLogoutPage').onclick = () => {
+                    if (confirm('Apakah Anda yakin ingin keluar?')) {
+                        currentUser = null; localStorage.removeItem('joellUser');
+                        updateUserUI(); renderProfilePage();
+                        showToast('Logout', 'Anda telah keluar', 'info');
+                    }
+                };
+            } else {
+                userView.style.display = 'none'; guestView.style.display = 'block';
+            }
         }
 
         function doSearch() {
