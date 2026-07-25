@@ -867,7 +867,7 @@
         function renderOrdersList() {
             const container = document.getElementById('ordersListContainer');
             const myOrders = currentUser ? orders.filter(o => o.userId === currentUser.id) : [];
-            
+
             if (!myOrders.length) {
                 container.innerHTML = `
                     <div class="empty-orders">
@@ -877,7 +877,7 @@
                     </div>`;
                 return;
             }
-            
+
             const statusClass = {
                 'pending': 'pending',
                 'read': 'read',
@@ -892,9 +892,28 @@
                 'shipped': 'Dikirim',
                 'completed': 'Selesai'
             };
-            
+
+            // Helper: count unread messages for a specific order (for user view)
+            function getUnreadCount(order) {
+                if (!order.chat || !Array.isArray(order.chat) || order.chat.length === 0) return 0;
+                let count = 0;
+                // Count consecutive admin messages from the end until we hit a user message
+                for (let i = order.chat.length - 1; i >= 0; i--) {
+                    if (order.chat[i].from === 'admin') {
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
+                return count;
+            }
+
             container.innerHTML = '<div class="orders-list">' + myOrders.map(o => {
                 const itemsText = o.items.map(i => `${i.name} (${i.variant})`).join(', ');
+                const unreadCount = getUnreadCount(o);
+                const unreadBadge = unreadCount > 0 
+                    ? `<span class="order-msg-badge"><i class="fas fa-comment-dots"></i> ${unreadCount} pesan belum dibalas</span>` 
+                    : '';
                 return `
                     <div class="order-card" onclick="openOrderChat('${o.id}')">
                         <div class="order-card-header">
@@ -912,6 +931,7 @@
                             </div>
                         </div>
                         <div class="order-products">${itemsText}</div>
+                        ${unreadBadge}
                         <div class="order-meta">
                             <div style="display:flex;flex-direction:column;gap:2px;">
                                 <span class="realtime-time" data-time="${o.createdAt}" style="font-weight:600;color:var(--text-primary);">${getRelativeTime(o.createdAt)}</span>
@@ -924,7 +944,7 @@
             }).join('') + '</div>';
         }
 
-        function deleteOrder(orderId) {
+function deleteOrder(orderId) {
             Swal.fire({
                 title: 'Hapus Riwayat?',
                 text: "Data pesanan ini akan dihapus permanen dari riwayat Anda.",
