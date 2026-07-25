@@ -3605,6 +3605,15 @@
                 </div>
             </div>
 
+            <!-- SEARCH BAR -->
+            <div class="search-wrap">
+                <div class="search-box">
+                    <i class="fas fa-search" style="color:var(--text-muted);margin-right:10px;"></i>
+                    <input type="text" id="searchInput" placeholder="Cari produk digital..." onkeyup="if(event.key==='Enter') doSearch()">
+                    <button onclick="doSearch()">Cari</button>
+                </div>
+            </div>
+
             <div class="server-status-bar">
                 <div class="server-status-header">
                     <h3><i class="fas fa-server"></i> Server Status</h3>
@@ -6034,7 +6043,9 @@
         }
 
         function doSearch() {
-            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+            const searchInput = document.getElementById('searchInput');
+            if (!searchInput) return;
+            const keyword = searchInput.value.toLowerCase().trim();
             const cats = ['hosting', 'script', 'topup'];
             cats.forEach(cat => {
                 const filtered = products.filter(p => {
@@ -6130,11 +6141,14 @@
             });
         });
 
-        document.getElementById('contactForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            showToast('Pesan Terkirim', 'Kami akan menghubungi Anda segera!', 'success');
-            e.target.reset();
-        });
+        const contactForm = document.getElementById('contactForm');
+        if (contactForm) {
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                showToast('Pesan Terkirim', 'Kami akan menghubungi Anda segera!', 'success');
+                e.target.reset();
+            });
+        }
 
         // Video hero
         (function() {
