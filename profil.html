@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JOELL SHOP · Profil</title>
+    <title>NANZ SHOP · Profil</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
     <!-- Security Scripts -->
     <script>
         (function() {
-            var allowedDomains = ["joell-payment.vercel.app", "nanz-officialstore.vercel.app", "localhost", "127.0.0.1"];
+            var allowedDomains = ["nanz-payment.vercel.app", "nanz-officialstore.vercel.app", "localhost", "127.0.0.1"];
             if (!allowedDomains.includes(window.location.hostname)) {
                 document.documentElement.innerHTML = "";
                 alert("Unauthorized Domain: This website is protected. Cloning is strictly prohibited.");
@@ -59,8 +59,8 @@
         <!-- HEADER -->
         <header class="top-header">
             <div class="logo-area" id="logoArea" title="Klik 5x untuk Mode Admin">
-                <img src="https://files.catbox.moe/ijemcy.png" alt="logo" loading="lazy">
-                <span>JOELL SHOP</span>
+                <img src="logo.png" alt="logo" loading="lazy">
+                <span>NANZ SHOP</span>
             </div>
             <div class="header-actions">
                 <button class="header-btn" id="themeToggle" title="Toggle Dark/Light Mode">
@@ -112,7 +112,7 @@
 
             <div class="store-header">
                 <div class="store-name">
-                    JOELL SHOP
+                    NANZ SHOP
                     <span class="rating"><i class="fas fa-star"></i> 4.9 <span style="font-weight:400;opacity:0.7">(1,234 Reviews)</span></span>
                     <span class="badge-free"><i class="fas fa-check-circle"></i> Free Fee Admin</span>
                 </div>
@@ -192,7 +192,7 @@
                             <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
                         </div>
                     </div>
-                    <p class="testimonial-text">"Topup game cepat banget, langsung masuk. Harga juga paling murah dibanding yang lain. Mantap Joell Shop!"</p>
+                    <p class="testimonial-text">"Topup game cepat banget, langsung masuk. Harga juga paling murah dibanding yang lain. Mantap Nanz Shop!"</p>
                     <div class="testimonial-date"><i class="fas fa-clock"></i> 1 hari yang lalu</div>
                 </div>
                 <div class="testimonial-card">
@@ -229,7 +229,7 @@
             <div class="profile-page">
                 <div id="userProfileView" style="display:none;">
                     <div class="profile-header-new">
-                        <img class="profile-cover-new" src="https://files.catbox.moe/iai8aa.png" alt="cover">
+                        <img class="profile-cover-new" src="logo.png" alt="cover">
                         <div class="profile-avatar-wrap">
                             <img id="userProfileImg" src="https://ui-avatars.com/api/?name=User" alt="avatar">
                             <button class="edit-profile-btn" onclick="openProfileSettings()"><i class="fas fa-edit"></i></button>
@@ -280,7 +280,7 @@
                 </div>
 
                 <div class="profile-footer-info" style="margin-top: 40px; padding: 20px; border-top: 1px solid var(--border-subtle); text-align: center;">
-                    <p style="font-size: 0.8rem; color: var(--text-muted);">JOELL SHOP v2.4.0 • Digital Solutions</p>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">NANZ SHOP v2.4.0 • Digital Solutions</p>
                 </div>
             </div>
         </div>
@@ -291,13 +291,13 @@
                 <h2><i class="fas fa-shipping-fast" style="color:var(--accent-light);"></i> Lacak Pesanan</h2>
                 <p class="subtitle">Masukkan ID pesanan untuk melihat status detail</p>
                 <div style="display:flex;gap:10px;margin-bottom:24px;">
-                    <input type="text" id="trackInput" placeholder="JOELL-XXXX-XXXX" style="flex:1;padding:12px 16px;border-radius:60px;border:1px solid var(--border-subtle);background:var(--bg-primary);color:var(--text-primary);font-size:0.9rem;outline:none;font-family:var(--font-mono);">
+                    <input type="text" id="trackInput" placeholder="NANZ-XXXX-XXXX" style="flex:1;padding:12px 16px;border-radius:60px;border:1px solid var(--border-subtle);background:var(--bg-primary);color:var(--text-primary);font-size:0.9rem;outline:none;font-family:var(--font-mono);">
                     <button id="trackBtn" style="padding:12px 24px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;border:none;border-radius:60px;font-weight:700;cursor:pointer;white-space:nowrap;"><i class="fas fa-search"></i> Lacak</button>
                 </div>
                 <div id="trackResult" style="display:none;">
                     <div style="background:var(--bg-primary);border-radius:var(--radius-xs);padding:16px;border:1px solid var(--border-subtle);margin-bottom:20px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-                            <span style="font-weight:700;font-family:var(--font-mono);color:var(--accent-light);" id="trackOrderId">#JOELL-0000-0000</span>
+                            <span style="font-weight:700;font-family:var(--font-mono);color:var(--accent-light);" id="trackOrderId">#NANZ-0000-0000</span>
                             <span id="trackStatusBadge" style="background:rgba(16,185,129,0.15);color:var(--green);padding:4px 12px;border-radius:30px;font-size:0.75rem;font-weight:700;"><i class="fas fa-check-circle"></i> Selesai</span>
                         </div>
                         <div id="trackProducts" style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:8px;">Panel Pterodactyl 4GB RAM × 1</div>
@@ -655,7 +655,7 @@
                     <li><i class="fas fa-bell"></i> <span><strong>Smart Alert:</strong> Notifikasi real-time via browser & email.</span></li>
                 </ul>
                 <div id="g_id_onload"
-                     data-client_id="598453625335-uj2bv61q9cd3pe94396ruqfma2kfo4jo.apps.googleusercontent.com"
+                     data-client_id=""
                      data-context="signin"
                      data-ux_mode="popup"
                      data-callback="handleGoogleLogin"
@@ -682,10 +682,10 @@
         <div class="modal-box order-chat-modal">
             <div class="order-chat-header">
                 <button onclick="document.getElementById('orderChatOverlay').classList.remove('open')" style="background:none;border:none;color:#8696a0;font-size:1.2rem;margin-right:10px;cursor:pointer;"><i class="fas fa-arrow-left"></i></button>
-                <img src="https://files.catbox.moe/ijemcy.png" alt="admin">
+                <img src="logo.png" alt="admin">
                 <div class="info">
-                    <h3>Admin JOELL SHOP</h3>
-                    <p id="orderChatOrderId">Order: #JOELL-0000-0000</p>
+                    <h3>Admin NANZ SHOP</h3>
+                    <p id="orderChatOrderId">Order: #NANZ-0000-0000</p>
                 </div>
                 <button class="modal-close" id="orderChatCloseBtn" style="position:static;color:#8696a0;font-size:1.2rem;margin-left:auto;"><i class="fas fa-times"></i></button>
             </div>
@@ -709,7 +709,7 @@
                 <div class="testimonial-avatar" id="adminChatUserImg" style="width:44px;height:44px;font-size:1.2rem;background:linear-gradient(135deg,var(--green),var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i class="fas fa-user"></i></div>
                 <div class="info">
                     <h3 id="adminChatUserName">Chat Pelanggan</h3>
-                    <p id="adminChatOrderId">Order: #JOELL-0000-0000</p>
+                    <p id="adminChatOrderId">Order: #NANZ-0000-0000</p>
                 </div>
                 <button class="modal-close" id="adminChatCloseBtn" style="position:static;color:#8696a0;font-size:1.2rem;margin-left:auto;"><i class="fas fa-times"></i></button>
             </div>
@@ -764,13 +764,46 @@
 
     <!-- BOTTOM NAV -->
     <nav class="bottom-nav" id="bottomNav">
-        <button class="nav-item" data-page="home" id="navHome"><i class="fas fa-home"></i> Beranda</button>
-        <button class="nav-item" data-page="orders" id="navOrders"><i class="fas fa-shopping-bag"></i> Pesanan <span class="badge" id="navOrdersBadge" style="display:none;">0</span></button>
-        <button class="nav-item" id="navCart" data-page="cart"><i class="fas fa-shopping-cart"></i> Keranjang <span class="badge" id="navCartBadge">0</span></button>
-        <button class="nav-item" data-page="tracking" id="navTracking"><i class="fas fa-shipping-fast"></i> Lacak</button>
-        <button class="nav-item active" data-page="profile" id="navProfile"><i class="fas fa-user"></i> Profil</button>
+        <a href="index.html" class="nav-item" data-page="home" id="navHome"><i class="fas fa-home"></i> Beranda</a>
+        <a href="pesanan.html" class="nav-item" data-page="orders" id="navOrders"><i class="fas fa-shopping-bag"></i> Pesanan <span class="badge" id="navOrdersBadge" style="display:none;">0</span></a>
+        <button class="nav-item" id="navCart" data-page="cart" onclick="document.getElementById('cartOverlay').classList.toggle('open')"><i class="fas fa-shopping-cart"></i> Keranjang <span class="badge" id="navCartBadge">0</span></button>
+        <a href="index.html#tracking" class="nav-item" data-page="tracking" id="navTracking"><i class="fas fa-shipping-fast"></i> Lacak</a>
+        <a href="profil.html" class="nav-item active" data-page="profile" id="navProfile"><i class="fas fa-user"></i> Profil</a>
     </nav>
 
+    <script src="config.js"></script>
+    <script>
+        // Set Google Client ID dynamically from config
+        document.addEventListener('DOMContentLoaded', function() {
+            var gIdLoad = document.getElementById('g_id_onload');
+            if (gIdLoad && typeof GOOGLE_CLIENT_ID !== 'undefined') {
+                gIdLoad.setAttribute('data-client_id', GOOGLE_CLIENT_ID);
+            }
+        });
+    </script>
+    <script>
+        // Set Google Client ID dynamically from config
+        document.addEventListener('DOMContentLoaded', function() {
+            var gIdLoad = document.getElementById('g_id_onload');
+            if (gIdLoad && typeof GOOGLE_CLIENT_ID !== 'undefined') {
+                gIdLoad.setAttribute('data-client_id', GOOGLE_CLIENT_ID);
+            }
+            var gIdSignin = document.querySelector('.g_id_signin');
+            if (gIdSignin && typeof GOOGLE_CLIENT_ID !== 'undefined') {
+                gIdSignin.setAttribute('data-client_id', GOOGLE_CLIENT_ID);
+            }
+        });
+    </script>
+    <script src="config.js"></script>
+    <script>
+        // Set Google Client ID dynamically from config
+        document.addEventListener('DOMContentLoaded', function() {
+            var gIdLoad = document.getElementById('g_id_onload');
+            if (gIdLoad && typeof GOOGLE_CLIENT_ID !== 'undefined') {
+                gIdLoad.setAttribute('data-client_id', GOOGLE_CLIENT_ID);
+            }
+        });
+    </script>
     <script src="script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
