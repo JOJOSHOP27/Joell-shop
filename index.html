@@ -318,6 +318,54 @@
             text-overflow: ellipsis;
         }
 
+        /* Profile Settings Styles */
+        .profile-settings-box { text-align: center; }
+        .profile-avatar-edit { position: relative; display: inline-block; margin-bottom: 24px; }
+        .profile-avatar-edit img {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        .profile-avatar-edit .edit-badge {
+            position: absolute; bottom: 0; right: 0;
+            width: 32px; height: 32px;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid var(--bg-card-solid);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .profile-avatar-edit .edit-badge:hover { transform: scale(1.1); background: var(--accent-light); }
+        .profile-input-group { text-align: left; margin-bottom: 20px; }
+        .profile-input-group label {
+            display: block; font-size: 0.8rem; color: var(--text-muted);
+            margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .profile-input-group input {
+            width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-subtle); border-radius: 12px;
+            color: #fff; font-size: 1rem; outline: none; transition: 0.3s;
+        }
+        .profile-input-group input:focus { border-color: var(--accent); background: rgba(99,102,241,0.05); }
+        .profile-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px; }
+        .btn-profile-save {
+            background: var(--accent); color: #fff; border: none;
+            padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s;
+        }
+        .btn-profile-logout {
+            background: rgba(239, 68, 68, 0.1); color: var(--red);
+            border: 1px solid rgba(239, 68, 68, 0.2); padding: 12px;
+            border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s;
+        }
+        .btn-profile-save:hover { box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-2px); }
+        .btn-profile-logout:hover { background: var(--red); color: #fff; }
+
         /* ===== HERO SECTION ===== */
         .hero-section {
             position: relative;
@@ -4135,6 +4183,33 @@
         </div>
     </div>
 
+    <!-- PROFILE SETTINGS MODAL -->
+    <div class="modal-overlay" id="profileOverlay">
+        <div class="modal-box" style="max-width:400px; border: 1px solid rgba(99, 102, 241, 0.3);">
+            <button class="modal-close" id="profileCloseBtn"><i class="fas fa-times"></i></button>
+            <div class="profile-settings-box">
+                <h2 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 24px; color: #fff;">PENGATURAN PROFIL</h2>
+                <div class="profile-avatar-edit">
+                    <img id="profilePreview" src="https://ui-avatars.com/api/?name=User" alt="avatar">
+                    <div class="edit-badge" onclick="document.getElementById('profilePhotoInput').click()"><i class="fas fa-camera"></i></div>
+                    <input type="file" id="profilePhotoInput" accept="image/*" style="display:none;" onchange="handleProfilePhotoUpload(this)">
+                </div>
+                <div class="profile-input-group">
+                    <label>Nama Tampilan</label>
+                    <input type="text" id="profileNameInput" placeholder="Masukkan nama Anda...">
+                </div>
+                <div class="profile-input-group">
+                    <label>Email (Read-only)</label>
+                    <input type="email" id="profileEmailInput" readonly style="opacity:0.6; cursor:not-allowed;">
+                </div>
+                <div class="profile-actions">
+                    <button class="btn-profile-logout" id="profileLogoutBtn">LOGOUT</button>
+                    <button class="btn-profile-save" id="profileSaveBtn">SIMPAN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- TOAST CONTAINER -->
     <div class="toast-container" id="toastContainer"></div>
 
@@ -4476,6 +4551,53 @@
             showToast('Login Berhasil', `Selamat datang, ${currentUser.name}!`, 'success');
         }
 
+        // PROFILE SETTINGS LOGIC
+        function openProfileSettings() {
+            if (!currentUser) return;
+            document.getElementById('profileNameInput').value = currentUser.name;
+            document.getElementById('profileEmailInput').value = currentUser.email;
+            document.getElementById('profilePreview').src = currentUser.picture;
+            document.getElementById('profileOverlay').classList.add('open');
+        }
+
+        document.getElementById('profileCloseBtn').addEventListener('click', () => {
+            document.getElementById('profileOverlay').classList.remove('open');
+        });
+
+        document.getElementById('profileLogoutBtn').addEventListener('click', () => {
+            if (confirm('Apakah Anda yakin ingin keluar?')) {
+                currentUser = null;
+                localStorage.removeItem('joellUser');
+                updateUserUI();
+                document.getElementById('profileOverlay').classList.remove('open');
+                showToast('Logout', 'Anda telah keluar', 'info');
+            }
+        });
+
+        document.getElementById('profileSaveBtn').addEventListener('click', () => {
+            const newName = document.getElementById('profileNameInput').value.trim();
+            if (!newName) { showToast('Error', 'Nama tidak boleh kosong', 'error'); return; }
+            currentUser.name = newName;
+            localStorage.setItem('joellUser', JSON.stringify(currentUser));
+            updateUserUI();
+            if (currentOrderChatId) renderOrderChatMessages();
+            document.getElementById('profileOverlay').classList.remove('open');
+            showToast('Berhasil', 'Profil Anda telah diperbarui!', 'success');
+        });
+
+        function handleProfilePhotoUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) { showToast('Error', 'Ukuran file maksimal 2MB', 'error'); return; }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                document.getElementById('profilePreview').src = base64;
+                currentUser.picture = base64;
+            };
+            reader.readAsDataURL(file);
+        }
+
         function updateUserUI() {
             const section = document.getElementById('userSection');
             if (currentUser) {
@@ -4485,14 +4607,7 @@
                         <span class="user-name">${currentUser.name.split(' ')[0]}</span>
                     </div>
                 `;
-                document.getElementById('userChip').addEventListener('click', () => {
-                    if (confirm('Keluar dari akun?')) {
-                        currentUser = null;
-                        localStorage.removeItem('joellUser');
-                        updateUserUI();
-                        showToast('Logout', 'Anda telah keluar', 'info');
-                    }
-                });
+                document.getElementById('userChip').addEventListener('click', openProfileSettings);
             } else {
                 section.innerHTML = `
                     <button class="header-btn" id="loginBtn" title="Login">
