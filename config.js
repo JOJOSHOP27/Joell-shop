@@ -4,7 +4,7 @@
 // ============================================================
 
 // --- Google OAuth Client ID ---
-const GOOGLE_CLIENT_ID = "598453625335-uj2bv61q9cd3pe94396ruqfma2kfo4jo.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "598453625335-dkemherie6kqphd7boebc7soj048p97o.apps.googleusercontent.com";
 
 // --- Admin Password (GANTI SEBELUM DEPLOY!) ---
 const ADMIN_PASSWORD = "nanzadmin2026";
