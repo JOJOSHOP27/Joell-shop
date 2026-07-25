@@ -1309,13 +1309,6 @@
             const file = input.files[0];
             if (!file) return;
             
-            // Limit size to 20MB for file.io
-            if (file.size > 20 * 1024 * 1024) { 
-                showToast('Error', 'File terlalu besar (Maks 20MB)', 'error'); 
-                input.value = '';
-                return; 
-            }
-            
             const orderId = currentAdminChatId;
             if (!orderId) {
                 showToast('Error', 'ID Pesanan tidak ditemukan. Silakan buka chat ulang.', 'error');
@@ -1330,27 +1323,78 @@
                 return;
             }
 
+            // For small files (< 500KB), use base64 fallback directly to avoid CORS issues
+            if (file.size <= 500 * 1024) {
+                showToast('Admin', 'Mengkonversi file ke base64...', 'info');
+                try {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const base64 = e.target.result;
+                        const newMessage = {
+                            from: 'admin',
+                            text: `📄 File: ${file.name}`,
+                            file: base64,
+                            fileName: file.name,
+                            time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+                        };
+                        
+                        if (!orders[orderIndex].chat) orders[orderIndex].chat = [];
+                        orders[orderIndex].chat.push(newMessage);
+                        
+                        localStorage.setItem('joellOrders', JSON.stringify(orders));
+                        broadcastChat(orderId);
+                        renderAdminChatMessages();
+                        showToast('Berhasil', 'File berhasil dikirim (Base64)!', 'success');
+                    };
+                    reader.onerror = function() {
+                        showToast('Error', 'Gagal membaca file.', 'error');
+                    };
+                    reader.readAsDataURL(file);
+                } catch (err) {
+                    showToast('Error', 'Gagal memproses file: ' + err.message, 'error');
+                } finally {
+                    input.value = '';
+                }
+                return;
+            }
+
+            // For larger files, try file.io API first
+            if (file.size > 20 * 1024 * 1024) {
+                showToast('Error', 'File terlalu besar. Maksimal 20MB untuk upload eksternal.', 'error');
+                input.value = '';
+                return;
+            }
+
             showToast('Admin', 'Sedang mengupload file ke server...', 'info');
             
             const formData = new FormData();
             formData.append('file', file);
             
             try {
-                // file.io requires a specific form of request or might have changed
-                const response = await fetch('https://file.io/?expires=1w', {
-                    method: 'POST',
-                    body: formData
-                });
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000);
                 
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const response = await fetch('https://file.io/?expires=1w&autoDelete=false', {
+                    method: 'POST',
+                    body: formData,
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
                 
                 const result = await response.json();
                 
-                if (result.success) {
+                if (result.success || result.link) {
+                    const fileUrl = result.link || result.url || result.file;
+                    if (!fileUrl) throw new Error('URL file tidak ditemukan dalam response.');
+                    
                     const newMessage = {
                         from: 'admin',
                         text: `📄 File: ${file.name}`,
-                        file: result.link,
+                        file: fileUrl,
                         fileName: file.name,
                         time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
                     };
@@ -1358,95 +1402,46 @@
                     if (!orders[orderIndex].chat) orders[orderIndex].chat = [];
                     orders[orderIndex].chat.push(newMessage);
                     
-                    // Save locally
                     localStorage.setItem('joellOrders', JSON.stringify(orders));
-                    
-                    // Sync to Cloud
                     broadcastChat(orderId);
-                    
-                    // UI Update
                     renderAdminChatMessages();
                     showToast('Berhasil', 'File berhasil dikirim!', 'success');
                 } else {
-                    throw new Error(result.message || 'Gagal mengunggah file.');
+                    throw new Error(result.message || 'Gagal mengunggah file ke server.');
                 }
             } catch (error) {
                 console.error("File Upload Error:", error);
-                showToast('Error', 'Gagal upload file: ' + error.message, 'error');
-            } finally {
-                input.value = '';
-            }
-        }
-
-        async function handleChatFileUpload(input, senderType) {
-            const file = input.files[0];
-            if (!file) return;
-            
-            // Imgur limit is 10MB for anonymous, let's set to 10MB
-            if (file.size > 10 * 1024 * 1024) { 
-                showToast('Error', 'Gambar terlalu besar (Maks 10MB)', 'error'); 
-                input.value = '';
-                return; 
-            }
-            
-            const orderId = senderType === 'user' ? currentOrderChatId : currentAdminChatId;
-            if (!orderId) {
-                showToast('Error', 'Sesi chat tidak ditemukan.', 'error');
-                input.value = '';
-                return;
-            }
-            
-            const orderIndex = orders.findIndex(o => o.id === orderId);
-            if (orderIndex === -1) {
-                showToast('Error', 'Data pesanan tidak ditemukan.', 'error');
-                input.value = '';
-                return;
-            }
-
-            showToast('Chat', 'Sedang mengirim gambar...', 'info');
-            
-            const formData = new FormData();
-            formData.append('image', file);
-            
-            try {
-                const response = await fetch('https://api.imgur.com/3/image', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Client-ID ' + CONFIG.imgurClientId },
-                    body: formData
-                });
                 
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                
-                const result = await response.json();
-                
-                if (result.success && result.data?.link) {
-                    const newMessage = {
-                        from: senderType,
-                        text: '',
-                        image: result.data.link,
-                        time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
-                    };
-                    
-                    if (!orders[orderIndex].chat) orders[orderIndex].chat = [];
-                    orders[orderIndex].chat.push(newMessage);
-                    
-                    // Save locally
-                    localStorage.setItem('joellOrders', JSON.stringify(orders));
-                    
-                    // Sync to Cloud
-                    broadcastChat(orderId);
-                    
-                    // UI Update
-                    if (senderType === 'user') renderOrderChatMessages();
-                    else renderAdminChatMessages();
-                    
-                    showToast('Berhasil', 'Gambar berhasil dikirim!', 'success');
-                } else { 
-                    throw new Error('Gagal mendapatkan link gambar.'); 
+                // If CORS or network error, fallback to base64 for files < 2MB
+                if (file.size <= 2 * 1024 * 1024) {
+                    showToast('Info', 'Server upload gagal, mencoba base64 fallback...', 'warning');
+                    try {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const base64 = e.target.result;
+                            const newMessage = {
+                                from: 'admin',
+                                text: `📄 File: ${file.name}`,
+                                file: base64,
+                                fileName: file.name,
+                                time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+                            };
+                            
+                            if (!orders[orderIndex].chat) orders[orderIndex].chat = [];
+                            orders[orderIndex].chat.push(newMessage);
+                            
+                            localStorage.setItem('joellOrders', JSON.stringify(orders));
+                            broadcastChat(orderId);
+                            renderAdminChatMessages();
+                            showToast('Berhasil', 'File berhasil dikirim (Base64 Fallback)!', 'success');
+                        };
+                        reader.readAsDataURL(file);
+                    } catch (fbErr) {
+                        showToast('Error', 'Fallback juga gagal: ' + fbErr.message, 'error');
+                    }
+                } else {
+                    showToast('Error', 'Gagal upload: ' + error.message + '. File >2MB tidak bisa fallback ke base64.', 'error', 5000);
                 }
-            } catch (error) { 
-                console.error("Image Upload Error:", error);
-                showToast('Error', 'Gagal kirim gambar. Coba lagi nanti.', 'error'); 
             } finally {
                 input.value = '';
             }
@@ -1484,6 +1479,113 @@
         // ============================================================
         //  ANIME
         // ============================================================
+        async function handleChatFileUpload(input, senderType) {
+            const file = input.files[0];
+            if (!file) return;
+
+            if (file.size > 10 * 1024 * 1024) {
+                showToast('Error', 'Gambar terlalu besar (Maks 10MB)', 'error');
+                input.value = '';
+                return;
+            }
+
+            const orderId = senderType === 'user' ? currentOrderChatId : currentAdminChatId;
+            if (!orderId) {
+                showToast('Error', 'Sesi chat tidak ditemukan.', 'error');
+                input.value = '';
+                return;
+            }
+
+            const orderIndex = orders.findIndex(o => o.id === orderId);
+            if (orderIndex === -1) {
+                showToast('Error', 'Data pesanan tidak ditemukan.', 'error');
+                input.value = '';
+                return;
+            }
+
+            showToast('Chat', 'Sedang mengirim gambar...', 'info');
+
+            // Try Imgur first
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+                const response = await fetch('https://api.imgur.com/3/image', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Client-ID ' + CONFIG.imgurClientId },
+                    body: formData,
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const result = await response.json();
+
+                if (result.success && result.data && result.data.link) {
+                    const newMessage = {
+                        from: senderType,
+                        text: '',
+                        image: result.data.link,
+                        time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+                    };
+
+                    if (!orders[orderIndex].chat) orders[orderIndex].chat = [];
+                    orders[orderIndex].chat.push(newMessage);
+
+                    localStorage.setItem('joellOrders', JSON.stringify(orders));
+                    broadcastChat(orderId);
+
+                    if (senderType === 'user') renderOrderChatMessages();
+                    else renderAdminChatMessages();
+
+                    showToast('Berhasil', 'Gambar berhasil dikirim!', 'success');
+                } else {
+                    throw new Error('Gagal mendapatkan link gambar dari Imgur.');
+                }
+            } catch (error) {
+                console.error("Image Upload Error:", error);
+
+                // Fallback to base64 for images < 2MB
+                if (file.size <= 2 * 1024 * 1024) {
+                    showToast('Info', 'Imgur gagal, mencoba base64 fallback...', 'warning');
+                    try {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const base64 = e.target.result;
+                            const newMessage = {
+                                from: senderType,
+                                text: '',
+                                image: base64,
+                                time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+                            };
+
+                            if (!orders[orderIndex].chat) orders[orderIndex].chat = [];
+                            orders[orderIndex].chat.push(newMessage);
+
+                            localStorage.setItem('joellOrders', JSON.stringify(orders));
+                            broadcastChat(orderId);
+
+                            if (senderType === 'user') renderOrderChatMessages();
+                            else renderAdminChatMessages();
+
+                            showToast('Berhasil', 'Gambar berhasil dikirim (Base64)!', 'success');
+                        };
+                        reader.readAsDataURL(file);
+                    } catch (fbErr) {
+                        showToast('Error', 'Fallback juga gagal: ' + fbErr.message, 'error');
+                    }
+                } else {
+                    showToast('Error', 'Gagal kirim gambar: ' + error.message + '. Gambar >2MB tidak bisa fallback.', 'error', 5000);
+                }
+            } finally {
+                input.value = '';
+            }
+        }
+
         async function getLatestAnime() {
             try {
                 const res = await fetch('https://api.jikan.moe/v4/seasons/now?limit=10');
