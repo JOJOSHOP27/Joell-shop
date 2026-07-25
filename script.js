@@ -912,7 +912,7 @@
                 const itemsText = o.items.map(i => `${i.name} (${i.variant})`).join(', ');
                 const unreadCount = getUnreadCount(o);
                 const unreadBadge = unreadCount > 0 
-                    ? `<span class="order-msg-badge"><i class="fas fa-comment-dots"></i> ${unreadCount} pesan belum dibalas</span>` 
+                    ? `<span class="order-msg-badge"><span class="msg-dot"></span><i class="fas fa-comment-alt"></i> ${unreadCount} PESAN BARU</span>` 
                     : '';
                 return `
                     <div class="order-card" onclick="openOrderChat('${o.id}')">
