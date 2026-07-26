@@ -823,15 +823,29 @@
     <script>
         // Ensure orders page is active on load
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-orders').classList.add('active');
-            document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
-                item.classList.remove('active');
-                if (item.dataset.page === 'orders') item.classList.add('active');
-            });
-            document.getElementById('bottomNav').style.display = 'flex';
-            document.getElementById('page-admin').classList.remove('active');
-            renderOrdersList();
+            const savedPage = localStorage.getItem('joellCurrentPage');
+            if (savedPage && savedPage !== 'orders' && document.getElementById('page-' + savedPage)) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-' + savedPage).classList.add('active');
+                document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.page === savedPage) item.classList.add('active');
+                });
+                document.getElementById('bottomNav').style.display = 'flex';
+                document.getElementById('page-admin').classList.remove('active');
+                if (savedPage === 'orders') renderOrdersList();
+                if (savedPage === 'profile') renderProfilePage();
+            } else {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-orders').classList.add('active');
+                document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.page === 'orders') item.classList.add('active');
+                });
+                document.getElementById('bottomNav').style.display = 'flex';
+                document.getElementById('page-admin').classList.remove('active');
+                renderOrdersList();
+            }
         });
     </script>
 </body>
