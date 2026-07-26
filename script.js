@@ -1128,6 +1128,7 @@ function deleteOrder(orderId) {
         });
 
         function enterAdminMode() {
+            localStorage.setItem('joellCurrentPage', 'admin');
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('page-admin').classList.add('active');
             document.getElementById('bottomNav').style.display = 'none';
@@ -1137,6 +1138,7 @@ function deleteOrder(orderId) {
         }
 
         document.getElementById('adminBackBtn').addEventListener('click', () => {
+            localStorage.removeItem('joellCurrentPage');
             document.getElementById('page-admin').classList.remove('active');
             document.getElementById('page-home').classList.add('active');
             document.getElementById('bottomNav').style.display = 'flex';
@@ -1848,6 +1850,9 @@ function deleteOrder(orderId) {
                 enterAdminMode();
                 return;
             }
+            // Save current page to localStorage
+            localStorage.setItem('joellCurrentPage', page);
+
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
             const target = document.getElementById('page-' + page);
@@ -1909,7 +1914,10 @@ function deleteOrder(orderId) {
                 e.preventDefault();
                 const page = btn.dataset.page;
                 if (page === 'cart') { document.getElementById('cartOverlay').classList.toggle('open'); return; }
-                if (page) navigateTo(page);
+                if (page) {
+                    localStorage.setItem('joellCurrentPage', page);
+                    navigateTo(page);
+                }
             });
         });
 
