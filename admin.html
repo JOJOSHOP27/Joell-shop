@@ -172,11 +172,25 @@
     <script src="script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-admin').classList.add('active');
-            document.getElementById('bottomNav').style.display = 'none';
-            enterAdminMode();
+            const savedPage = localStorage.getItem('joellCurrentPage');
+            if (savedPage && savedPage !== 'admin' && document.getElementById('page-' + savedPage)) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-' + savedPage).classList.add('active');
+                document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.page === savedPage) item.classList.add('active');
+                });
+                document.getElementById('bottomNav').style.display = 'flex';
+                if (savedPage === 'orders') renderOrdersList();
+                if (savedPage === 'profile') renderProfilePage();
+            } else {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-admin').classList.add('active');
+                document.getElementById('bottomNav').style.display = 'none';
+                enterAdminMode();
+            }
         });
     </script>
 </body>
