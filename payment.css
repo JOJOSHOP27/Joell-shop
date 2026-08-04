@@ -1,5 +1,5 @@
 /* ============================================================
-   PAYMENT SYSTEM STYLES
+   PAYMENT SYSTEM STYLES (FIXED)
    ============================================================ */
 
 /* Payment Modal */
@@ -40,24 +40,78 @@
     box-shadow: 0 0 20px var(--accent-glow);
 }
 
-/* QRIS Container */
+/* ============================================================
+   QRIS CONTAINER - DIPERBAIKI
+   ============================================================ */
 .payment-qris-container {
     text-align: center;
     margin: 16px 0;
-    padding: 20px;
+    padding: 24px 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 2px dashed var(--border-subtle);
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.payment-qris-container .qris-placeholder {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.payment-qris-container .qris-placeholder i {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 12px;
+    color: var(--accent-light);
+}
+
+.payment-qris-container .qris-placeholder small {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* QRIS Image Wrapper */
+#qrisImageWrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+}
+
+#qrisImageWrapper img {
+    max-width: 280px;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
     background: #fff;
-    border-radius: 8px;
-    border: 1px solid var(--border-subtle);
-    min-height: 120px;
+    padding: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    border: 1px solid #e5e7eb;
 }
 
-.payment-qris-container img {
-    max-width: 100%;
-    max-height: 300px;
-    border-radius: 8px;
+#qrisImageWrapper .qris-success-text {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: var(--green);
+    font-weight: 600;
 }
 
-/* Payment Details */
+#qrisImageWrapper .qris-success-text i {
+    margin-right: 4px;
+}
+
+/* ============================================================
+   PAYMENT DETAILS
+   ============================================================ */
 .payment-details {
     background: var(--bg-primary);
     border-radius: 8px;
@@ -366,6 +420,10 @@
 }
 
 /* Section Label */
+.payment-section {
+    margin-bottom: 20px;
+}
+
 .payment-section .section-label {
     font-size: 0.85rem;
     font-weight: 700;
@@ -380,6 +438,14 @@
 
 .payment-section .section-label i {
     color: var(--accent-light);
+}
+
+.withdraw-section {
+    background: rgba(99,102,241,0.03);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    border: 1px solid var(--border-subtle);
+    margin-top: 8px;
 }
 
 .withdraw-section .section-label {
@@ -407,4 +473,8 @@
     .payment-actions .btn-pay {
         width: 100%;
     }
-       }
+    
+    #qrisImageWrapper img {
+        max-width: 200px;
+    }
+}
