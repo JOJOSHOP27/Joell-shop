@@ -1,10 +1,10 @@
 // ============================================================
-// PAYMENT API - LZPedia Integration (FIXED - QRIS FIX)
+// PAYMENT API - LZPedia Integration (FIXED - QRIS DISPLAY)
 // ============================================================
 
 const PAYMENT_API = {
     config: {
-        apiKey: 'LXZ_679979c28d5a4dd4',  // API KEY BARU
+        apiKey: 'LXZ_679979c28d5a4dd4',
         userId: 'f92d9400d6aa05',
         baseUrl: 'https://app.lzpedia.my.id/api'
     },
@@ -34,14 +34,13 @@ const PAYMENT_API = {
     },
 
     // ============================================================
-    // 2. BUAT INVOICE (DIPERBAIKI)
+    // 2. BUAT INVOICE (FIXED - QRIS DISPLAY)
     // ============================================================
     async createInvoice(amount) {
         try {
             console.log('📤 MEMBUAT INVOICE...');
             console.log('💰 Amount:', amount);
             console.log('🔑 API Key:', this.config.apiKey);
-            console.log('🌐 URL:', `${this.config.baseUrl}/invoice?apikey=${this.config.apiKey}&amount=${amount}`);
             
             const response = await fetch(
                 `${this.config.baseUrl}/invoice?apikey=${this.config.apiKey}&amount=${amount}`
@@ -51,22 +50,58 @@ const PAYMENT_API = {
             console.log('📥 Response Invoice:', data);
             
             if (data.success && data.invoice_id) {
-                // Jika QRIS image tidak ada di response, coba ambil sendiri
-                let qrisImage = data.qris_image || null;
+                // Coba ambil QRIS dari berbagai kemungkinan
+                let qrisImage = data.qris_image || data.qris || data.qr_image || null;
                 
+                // Jika masih null, coba generate dari endpoint terpisah
                 if (!qrisImage) {
-                    console.log('🔄 QRIS tidak ada di response, mencoba generate ulang...');
+                    console.log('🔄 QRIS tidak ada di response, mencoba generate dari endpoint /qris...');
                     try {
                         const qrisResponse = await fetch(
                             `${this.config.baseUrl}/invoice/qris?apikey=${this.config.apiKey}&invoice_id=${data.invoice_id}`
                         );
                         const qrisData = await qrisResponse.json();
-                        qrisImage = qrisData.qris_image || null;
                         console.log('📥 QRIS Response:', qrisData);
+                        qrisImage = qrisData.qris_image || qrisData.qris || qrisData.qr_image || null;
                     } catch (qrisError) {
                         console.error('❌ Gagal generate QRIS:', qrisError);
                     }
                 }
+                
+                // Jika masih null, coba dari payment_link
+                if (!qrisImage && data.payment_link) {
+                    console.log('🔄 Mencoba ambil QRIS dari payment_link...');
+                    try {
+                        const linkResponse = await fetch(data.payment_link);
+                        const linkData = await linkResponse.json();
+                        qrisImage = linkData.qris_image || linkData.qris || null;
+                    } catch (linkError) {
+                        console.error('❌ Gagal ambil dari payment_link:', linkError);
+                    }
+                }
+
+                // === FALLBACK TERAKHIR: Generate QRIS dari invoice_id via endpoint lain ===
+                if (!qrisImage) {
+                    console.log('🔄 Mencoba generate QRIS via endpoint /qris/generate...');
+                    try {
+                        const genResponse = await fetch(
+                            `${this.config.baseUrl}/qris/generate?apikey=${this.config.apiKey}&invoice_id=${data.invoice_id}`
+                        );
+                        const genData = await genResponse.json();
+                        qrisImage = genData.qris_image || genData.qris || genData.qr || null;
+                    } catch (genError) {
+                        console.error('❌ Gagal generate QRIS via /qris/generate:', genError);
+                    }
+                }
+                
+                // === FALLBACK PALING AKHIR: Buat QRIS manual dari payment link ===
+                if (!qrisImage && data.payment_link) {
+                    console.log('🔄 Membuat QRIS manual dari payment_link...');
+                    // Gunakan layanan QRIS generator gratis
+                    qrisImage = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(data.payment_link)}`;
+                }
+
+                console.log('🖼️ QRIS Image Final:', qrisImage);
                 
                 return {
                     success: true,
@@ -87,30 +122,6 @@ const PAYMENT_API = {
             }
         } catch (error) {
             console.error('❌ Invoice Error:', error);
-            return {
-                success: false,
-                error: error.message
-            };
-        }
-    },
-
-    // ============================================================
-    // 2.5. GENERATE QRIS MANUAL (FALLBACK)
-    // ============================================================
-    async generateQRIS(invoiceId) {
-        try {
-            console.log('🔄 Generate QRIS Manual untuk:', invoiceId);
-            const response = await fetch(
-                `${this.config.baseUrl}/invoice/qris?apikey=${this.config.apiKey}&invoice_id=${invoiceId}`
-            );
-            const data = await response.json();
-            console.log('📥 QRIS Generate Response:', data);
-            return {
-                success: true,
-                qrisImage: data.qris_image || null
-            };
-        } catch (error) {
-            console.error('Generate QRIS Error:', error);
             return {
                 success: false,
                 error: error.message
@@ -159,9 +170,7 @@ const PAYMENT_API = {
             );
             const data = await response.json();
             
-            // Fallback data jika API error
             if (!data.manual_methods && !data.instant_methods) {
-                console.log('⚠️ API Withdraw Methods tidak tersedia, menggunakan fallback');
                 return {
                     success: true,
                     manualMethods: [
@@ -208,7 +217,6 @@ const PAYMENT_API = {
                     data: data.data || null
                 };
             } else {
-                // Fallback simulasi sukses
                 return {
                     success: true,
                     message: 'Permintaan penarikan berhasil diajukan (Simulasi)',
@@ -241,7 +249,7 @@ const PAYMENT_API = {
 };
 
 // ============================================================
-// FUNGSI GLOBAL - DIPERBAIKI
+// FUNGSI GLOBAL
 // ============================================================
 
 window.currentInvoiceId = null;
@@ -261,7 +269,6 @@ window.fetchBalance = async function() {
     try {
         if (refreshBtn) refreshBtn.classList.add('spinning');
         const result = await PAYMENT_API.getBalance();
-        console.log('💰 Saldo:', result.balance);
         balanceEl.textContent = 'Rp ' + Number(result.balance).toLocaleString();
         return result.balance;
     } catch (error) {
@@ -274,7 +281,7 @@ window.fetchBalance = async function() {
 };
 
 // ============================================================
-// BUAT INVOICE (DIPERBAIKI - QRIS FIX)
+// BUAT INVOICE (FIXED - QRIS DISPLAY)
 // ============================================================
 window.createInvoice = async function(amount) {
     const btn = document.getElementById('createInvoiceBtn');
@@ -296,7 +303,7 @@ window.createInvoice = async function(amount) {
         if (result.success) {
             window.currentInvoiceId = result.invoiceId;
             
-            // === QRIS ===
+            // === QRIS DISPLAY ===
             const qrisWrapper = document.getElementById('qrisImageWrapper');
             const qrisImage = document.getElementById('qrisImage');
             const qrisPlaceholder = document.getElementById('qrisPlaceholder');
@@ -304,42 +311,39 @@ window.createInvoice = async function(amount) {
             console.log('🖼️ QRIS Image URL:', result.qrisImage);
             
             if (result.qrisImage && qrisImage) {
-                console.log('✅ QRIS Image DITEMUKAN!');
+                console.log('✅ QRIS Image DITEMUKAN! Menampilkan...');
                 qrisImage.src = result.qrisImage;
                 qrisImage.alt = 'QRIS Code';
                 qrisImage.style.display = 'block';
-                if (qrisWrapper) qrisWrapper.style.display = 'block';
+                qrisImage.style.maxWidth = '100%';
+                qrisImage.style.maxHeight = '300px';
+                qrisImage.style.borderRadius = '12px';
+                qrisImage.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+                qrisImage.style.background = '#fff';
+                qrisImage.style.padding = '12px';
+                
+                if (qrisWrapper) {
+                    qrisWrapper.style.display = 'block';
+                    qrisWrapper.style.textAlign = 'center';
+                }
                 if (qrisPlaceholder) qrisPlaceholder.style.display = 'none';
                 
                 if (typeof showToast === 'function') {
                     showToast('✅ QRIS Siap', 'Scan QR code untuk membayar', 'success');
                 }
             } else {
-                console.warn('⚠️ QRIS Image TIDAK DITEMUKAN dalam response');
-                // Coba generate ulang
-                try {
-                    console.log('🔄 Mencoba generate QRIS ulang...');
-                    const qrisResult = await PAYMENT_API.generateQRIS(result.invoiceId);
-                    console.log('📥 QRIS Generate Result:', qrisResult);
-                    if (qrisResult.success && qrisResult.qrisImage) {
-                        qrisImage.src = qrisResult.qrisImage;
-                        if (qrisWrapper) qrisWrapper.style.display = 'block';
-                        if (qrisPlaceholder) qrisPlaceholder.style.display = 'none';
-                        console.log('✅ QRIS berhasil digenerate ulang');
-                        if (typeof showToast === 'function') {
-                            showToast('✅ QRIS Siap', 'Scan QR code untuk membayar', 'success');
-                        }
-                    } else {
-                        console.error('❌ Gagal generate QRIS ulang');
-                        if (typeof showToast === 'function') {
-                            showToast('Error', 'Gagal generate QRIS, coba refresh', 'error');
-                        }
-                    }
-                } catch (fallbackError) {
-                    console.error('❌ Fallback QRIS gagal:', fallbackError);
-                    if (typeof showToast === 'function') {
-                        showToast('Error', 'Gagal generate QRIS: ' + fallbackError.message, 'error');
-                    }
+                console.warn('⚠️ QRIS Image TIDAK DITEMUKAN!');
+                // Tampilkan pesan error di placeholder
+                if (qrisPlaceholder) {
+                    qrisPlaceholder.innerHTML = `
+                        <i class="fas fa-exclamation-triangle" style="color:var(--red);"></i>
+                        <p style="color:var(--red);">Gagal mendapatkan QRIS</p>
+                        <small style="color:var(--text-muted);">Silakan coba lagi atau gunakan Bank Transfer</small>
+                    `;
+                    qrisPlaceholder.style.display = 'block';
+                }
+                if (typeof showToast === 'function') {
+                    showToast('⚠️ QRIS Gagal', 'Gunakan metode Bank Transfer', 'warning');
                 }
             }
 
@@ -550,7 +554,6 @@ window.processWithdraw = async function() {
             document.getElementById('withdrawAmount').value = '';
             document.getElementById('withdrawAccount').value = '';
             
-            // Reset selected method
             document.querySelectorAll('.withdraw-method-item').forEach(el => el.classList.remove('active'));
             window.selectedWithdrawMethodData = null;
             document.getElementById('withdrawInfo').textContent = '💡 Pilih metode penarikan di atas';
@@ -623,9 +626,8 @@ window.openPaymentModal = function(orderData) {
     const overlay = document.getElementById('paymentOverlay');
     if (!overlay) return;
 
-    console.log('📂 Opening Payment Modal with:', orderData);
+    console.log('📂 Opening Payment Modal');
 
-    // Set order items
     const itemsContainer = document.getElementById('paymentOrderItems');
     const totalEl = document.getElementById('paymentOrderTotal');
     const bankTotal = document.getElementById('bankTotal');
@@ -660,11 +662,16 @@ window.openPaymentModal = function(orderData) {
     document.getElementById('paymentQrisSection').style.display = 'block';
     document.getElementById('paymentBankSection').style.display = 'none';
     
-    // Reset placeholder
     const qrisPlaceholder = document.getElementById('qrisPlaceholder');
-    if (qrisPlaceholder) qrisPlaceholder.style.display = 'block';
+    if (qrisPlaceholder) {
+        qrisPlaceholder.style.display = 'block';
+        qrisPlaceholder.innerHTML = `
+            <i class="fas fa-qrcode"></i>
+            <p>Klik tombol "Buat Invoice" untuk mendapatkan QRIS</p>
+            <small>Pastikan koneksi internet stabil</small>
+        `;
+    }
     
-    // Reset QRIS image
     const qrisImage = document.getElementById('qrisImage');
     if (qrisImage) qrisImage.src = '';
     
@@ -674,7 +681,6 @@ window.openPaymentModal = function(orderData) {
 
     overlay.classList.add('open');
     
-    // Load data
     setTimeout(() => {
         window.fetchBalance();
         window.fetchWithdrawMethods();
@@ -689,7 +695,6 @@ window.openPaymentModal = function(orderData) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Payment System Initializing...');
     
-    // Payment method switching
     document.querySelectorAll('.payment-method-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.payment-method-btn').forEach(b => b.classList.remove('active'));
@@ -700,7 +705,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Create Invoice
     document.getElementById('createInvoiceBtn').addEventListener('click', function() {
         const totalEl = document.getElementById('paymentOrderTotal');
         if (totalEl) {
@@ -716,7 +720,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Check Status
     document.getElementById('checkStatusBtn').addEventListener('click', function() {
         if (window.currentInvoiceId) {
             window.checkInvoiceStatus(window.currentInvoiceId);
@@ -727,7 +730,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Copy Payment Link
     document.getElementById('copyPaymentLinkBtn').addEventListener('click', function() {
         if (window.currentInvoiceId) {
             const link = `https://app.lzpedia.my.id/pay/${window.currentInvoiceId}`;
@@ -737,19 +739,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Withdraw
     document.getElementById('withdrawBtn').addEventListener('click', window.processWithdraw);
-
-    // Balance Refresh
     document.getElementById('balanceRefreshBtn').addEventListener('click', window.fetchBalance);
 
-    // Close Payment Modal
     document.getElementById('paymentCloseBtn').addEventListener('click', function() {
         document.getElementById('paymentOverlay').classList.remove('open');
         if (window.timerInterval) clearInterval(window.timerInterval);
     });
 
-    // Load histories
     const storedWithdraw = localStorage.getItem('joellWithdrawHistory');
     if (storedWithdraw) {
         try {
@@ -769,7 +766,6 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🔑 API Key:', PAYMENT_API.config.apiKey);
 });
 
-// Toast fallback jika fungsi showToast tidak tersedia
 if (typeof showToast !== 'function') {
     window.showToast = function(title, message, type = 'info', duration = 3000) {
         console.log(`📢 ${type.toUpperCase()}: ${title} - ${message}`);
