@@ -759,7 +759,7 @@
 </div>
 
 <!-- ============================================================ -->
-<!-- PAYMENT MODAL - VERSI DIPERBAIKI -->
+<!-- PAYMENT MODAL - VERSI DIPERBAIKI DENGAN QRIS FIX -->
 <!-- ============================================================ -->
 <div class="modal-overlay" id="paymentOverlay">
     <div class="modal-box payment-modal">
@@ -811,14 +811,19 @@
                 </button>
             </div>
 
-            <!-- QRIS Section -->
+            <!-- QRIS Section - DIPERBAIKI -->
             <div id="paymentQrisSection">
                 <div class="payment-qris-container" id="qrisContainer">
-                    <p style="color:var(--text-muted);font-size:0.85rem;">
-                        <i class="fas fa-info-circle"></i> Klik tombol "Buat Invoice" untuk mendapatkan QRIS
-                    </p>
+                    <div class="qris-placeholder" id="qrisPlaceholder">
+                        <i class="fas fa-qrcode"></i>
+                        <p>Klik tombol "Buat Invoice" untuk mendapatkan QRIS</p>
+                        <small>Pastikan koneksi internet stabil</small>
+                    </div>
                     <div id="qrisImageWrapper" style="display:none;">
                         <img id="qrisImage" src="" alt="QRIS Code" loading="lazy">
+                        <p class="qris-success-text">
+                            <i class="fas fa-check-circle"></i> Scan QRIS untuk membayar
+                        </p>
                     </div>
                 </div>
                 
@@ -884,26 +889,23 @@
         </div>
 
         <!-- ========================================================== -->
-        <!-- BAGIAN 4: TARIK SALDO (WITHDRAW) - DIPISAHKAN -->
+        <!-- BAGIAN 4: TARIK SALDO (WITHDRAW) -->
         <!-- ========================================================== -->
         <div class="payment-section withdraw-section" id="withdrawSection">
             <div class="section-label"><i class="fas fa-money-bill-wave"></i> Tarik Saldo</div>
             
-            <!-- Metode Withdraw -->
             <div style="font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">Pilih Metode Penarikan</div>
             <div class="withdraw-methods-grid" id="withdrawMethodsGrid">
                 <!-- Akan diisi dari API -->
             </div>
             <div class="withdraw-info" id="withdrawInfo">Silakan pilih metode penarikan di atas</div>
 
-            <!-- Form Withdraw -->
             <div class="withdraw-input-group">
                 <input type="number" id="withdrawAmount" placeholder="Jumlah (min 10.000)" min="10000">
                 <input type="text" id="withdrawAccount" placeholder="Nomor Rekening / E-Wallet">
                 <button class="withdraw-btn" id="withdrawBtn"><i class="fas fa-arrow-up"></i> Tarik</button>
             </div>
 
-            <!-- Riwayat Withdraw -->
             <div style="font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-top:16px;margin-bottom:8px;">
                 <i class="fas fa-history"></i> Riwayat Penarikan
             </div>
