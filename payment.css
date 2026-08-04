@@ -41,10 +41,8 @@
 }
 
 /* ============================================================
-   QRIS DISPLAY - FIXED
+   QRIS CONTAINER - DIPERBAIKI
    ============================================================ */
-
-/* QRIS Container - Lebih baik */
 .payment-qris-container {
     text-align: center;
     margin: 16px 0;
@@ -60,7 +58,26 @@
     transition: all 0.3s ease;
 }
 
-/* QRIS Image */
+.payment-qris-container .qris-placeholder {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.payment-qris-container .qris-placeholder i {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 12px;
+    color: var(--accent-light);
+}
+
+.payment-qris-container .qris-placeholder small {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* QRIS Image Wrapper */
 #qrisImageWrapper {
     width: 100%;
     display: flex;
@@ -88,42 +105,9 @@
     font-weight: 600;
 }
 
-/* Invoice History - Clickable */
-.invoice-history-item {
-    cursor: pointer;
-    transition: all 0.3s ease;
+#qrisImageWrapper .qris-success-text i {
+    margin-right: 4px;
 }
-
-.invoice-history-item:hover {
-    background: rgba(99,102,241,0.05);
-    border-color: var(--accent);
-    transform: translateX(4px);
-}
-
-/* Invoice Detail Button */
-.invoice-detail-btn {
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 2px 10px;
-    font-size: 0.6rem;
-    cursor: pointer;
-    margin-left: 4px;
-    transition: all 0.3s ease;
-}
-
-.invoice-detail-btn:hover {
-    background: var(--accent-light);
-    transform: scale(1.05);
-}
-
-/* Responsive */
-@media (max-width: 500px) {
-    #qrisImageWrapper img {
-        max-width: 200px;
-    }
-   }
 
 /* ============================================================
    PAYMENT DETAILS
@@ -494,3 +478,156 @@
         max-width: 200px;
     }
 }
+
+/* Invoice History Clickable */
+.invoice-history-item {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.invoice-history-item:hover {
+    background: rgba(99,102,241,0.05);
+    border-color: var(--accent);
+    transform: translateX(4px);
+}
+
+/* Withdraw Section in Profile */
+.withdraw-section-in-profile {
+    margin-top: 24px;
+    padding: 20px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border-subtle);
+}
+
+.withdraw-section-in-profile .withdraw-methods-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.withdraw-section-in-profile .withdraw-method-item {
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid var(--border-subtle);
+    background: var(--bg-primary);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.withdraw-section-in-profile .withdraw-method-item:hover {
+    border-color: var(--accent);
+}
+
+.withdraw-section-in-profile .withdraw-method-item.active {
+    border-color: var(--accent);
+    background: rgba(99,102,241,0.1);
+}
+
+.withdraw-section-in-profile .withdraw-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.withdraw-section-in-profile .withdraw-input-group input {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    outline: none;
+    min-width: 120px;
+}
+
+.withdraw-section-in-profile .withdraw-input-group input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.withdraw-section-in-profile .withdraw-input-group .withdraw-btn {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--orange), #ea580c);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.withdraw-section-in-profile .withdraw-input-group .withdraw-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.withdraw-section-in-profile .withdraw-info {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    padding: 8px 12px;
+    background: rgba(99,102,241,0.05);
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.withdraw-section-in-profile .withdraw-history {
+    margin-top: 14px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.withdraw-section-in-profile .withdraw-history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--bg-primary);
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    margin-bottom: 6px;
+    font-size: 0.8rem;
+}
+
+.withdraw-section-in-profile .withdraw-history-item .wh-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.withdraw-section-in-profile .withdraw-history-item .wh-left .wh-amount {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.withdraw-section-in-profile .withdraw-history-item .wh-left .wh-method {
+    color: var(--text-muted);
+    font-size: 0.7rem;
+}
+
+.withdraw-section-in-profile .withdraw-history-item .wh-status {
+    font-weight: 700;
+    font-size: 0.7rem;
+    padding: 2px 12px;
+    border-radius: 30px;
+}
+
+.withdraw-section-in-profile .withdraw-history-item .wh-status.pending {
+    background: rgba(251,191,36,0.15);
+    color: #fbbf24;
+}
+
+.withdraw-section-in-profile .withdraw-history-item .wh-status.success {
+    background: rgba(16,185,129,0.15);
+    color: #10b981;
+}
+
+.withdraw-section-in-profile .withdraw-history-item .wh-status.failed {
+    background: rgba(239,68,68,0.15);
+    color: #ef4444;
+   }
