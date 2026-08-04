@@ -780,7 +780,7 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
     document.getElementById('checkoutOverlay').classList.add('open');
 });
 
-// Checkout form submission - akan di-override oleh payment system
+// Checkout form submission
 if (document.getElementById('checkoutForm')) {
     document.getElementById('checkoutForm').addEventListener('submit', function(e) {
         e.preventDefault();
