@@ -781,7 +781,6 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
 });
 
 // Checkout form submission - akan di-override oleh payment system
-// Tapi kita tetap simpan handler default untuk fallback
 if (document.getElementById('checkoutForm')) {
     document.getElementById('checkoutForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -829,7 +828,7 @@ if (document.getElementById('checkoutForm')) {
         
         document.getElementById('checkoutOverlay').classList.remove('open');
         
-        // Coba buka payment modal jika tersedia
+        // Buka payment modal
         if (typeof openPaymentModal === 'function') {
             openPaymentModal(order);
         } else {
@@ -1943,7 +1942,8 @@ document.querySelectorAll('.detail-close, .modal-close').forEach(btn => {
     btn.addEventListener('click', () => btn.closest('.detail-overlay, .modal-overlay').classList.remove('open'));
 });
 document.querySelectorAll('.detail-overlay, .modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); }
+    );
 });
 
 document.querySelectorAll('.anime-tab').forEach(tab => {
@@ -2041,3 +2041,20 @@ renderTopupGames();
 renderMenus();
 updateCartUI();
 showToast('Selamat Datang', 'JOELL SHOP siap melayani!', 'success', 4000);
+
+// ============================================================
+// FUNGSI UNTUK MEMISAHKAN WITHDRAW DARI PAYMENT
+// ============================================================
+window.closePaymentAndOpenWithdraw = function() {
+    const paymentOverlay = document.getElementById('paymentOverlay');
+    if (paymentOverlay) {
+        paymentOverlay.classList.remove('open');
+    }
+    navigateTo('profile');
+    setTimeout(() => {
+        const withdrawSection = document.querySelector('.withdraw-section-in-profile');
+        if (withdrawSection) {
+            withdrawSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 500);
+};
