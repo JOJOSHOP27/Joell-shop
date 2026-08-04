@@ -408,7 +408,7 @@
 </div>
 
 <!-- ============================================================ -->
-<!-- SEMUA MODAL -->
+<!-- SEMUA MODAL (CART, CHECKOUT, DETAIL, TOPUP, ANIME, BOT, OSINT, SSWEB, UPLOAD, LOGIN, CHAT, PROFILE) -->
 <!-- ============================================================ -->
 
 <!-- CART OVERLAY -->
@@ -923,5 +923,113 @@
 <script src="script.js"></script>
 <script src="payment-api.js"></script>
 
+<!-- INISIALISASI PAYMENT SYSTEM -->
+<script>
+// ============================================================
+// PAYMENT SYSTEM INITIALIZATION
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Load histories
+    const storedWithdraw = localStorage.getItem('joellWithdrawHistory');
+    if (storedWithdraw) {
+        try {
+            window.withdrawHistory = JSON.parse(storedWithdraw);
+            if (typeof renderWithdrawHistory === 'function') renderWithdrawHistory();
+        } catch(e) {}
+    }
+    const storedInvoice = localStorage.getItem('joellInvoiceHistory');
+    if (storedInvoice) {
+        try {
+            window.invoiceHistory = JSON.parse(storedInvoice);
+            if (typeof renderInvoiceHistory === 'function') renderInvoiceHistory();
+        } catch(e) {}
+    }
+    
+    // Setup payment event listeners
+    setupPaymentListeners();
+});
+
+function setupPaymentListeners() {
+    // Payment method switching
+    document.querySelectorAll('.payment-method-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.payment-method-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const method = this.dataset.method;
+            const qrisSection = document.getElementById('paymentQrisSection');
+            const bankSection = document.getElementById('paymentBankSection');
+            if (qrisSection) qrisSection.style.display = method === 'qris' ? 'block' : 'none';
+            if (bankSection) bankSection.style.display = method === 'bank' ? 'block' : 'none';
+        });
+    });
+
+    // Create Invoice
+    const createBtn = document.getElementById('createInvoiceBtn');
+    if (createBtn) {
+        createBtn.addEventListener('click', function() {
+            const totalEl = document.getElementById('paymentOrderTotal');
+            if (totalEl) {
+                const total = parseInt(totalEl.textContent.replace(/[^0-9]/g, ''));
+                if (total > 0 && typeof createInvoice === 'function') {
+                    createInvoice(total);
+                } else {
+                    showToast('Error', 'Total pembayaran tidak valid', 'error');
+                }
+            }
+        });
+    }
+
+    // Check Status
+    const checkBtn = document.getElementById('checkStatusBtn');
+    if (checkBtn) {
+        checkBtn.addEventListener('click', function() {
+            if (window.currentInvoiceId && typeof checkInvoiceStatus === 'function') {
+                checkInvoiceStatus(window.currentInvoiceId);
+            }
+        });
+    }
+
+    // Copy Payment Link
+    const copyBtn = document.getElementById('copyPaymentLinkBtn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', function() {
+            if (window.currentInvoiceId) {
+                const link = `https://app.lzpedia.my.id/pay/${window.currentInvoiceId}`;
+                navigator.clipboard.writeText(link).then(() => {
+                    showToast('Berhasil', 'Link pembayaran disalin!', 'success');
+                }).catch(() => {
+                    showToast('Gagal', 'Gagal menyalin link', 'error');
+                });
+            }
+        });
+    }
+
+    // Withdraw
+    const withdrawBtn = document.getElementById('withdrawBtn');
+    if (withdrawBtn) {
+        withdrawBtn.addEventListener('click', function() {
+            if (typeof processWithdraw === 'function') processWithdraw();
+        });
+    }
+
+    // Balance Refresh
+    const refreshBtn = document.getElementById('balanceRefreshBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            if (typeof fetchBalance === 'function') fetchBalance();
+        });
+    }
+
+    // Close Payment Modal
+    const closeBtn = document.getElementById('paymentCloseBtn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            document.getElementById('paymentOverlay').classList.remove('open');
+            if (window.timerInterval) clearInterval(window.timerInterval);
+        });
+    }
+}
+</script>
+
 </body>
-                                                                          </html>
+    </html>
