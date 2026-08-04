@@ -850,4 +850,4 @@ if (typeof showToast !== 'function') {
             alert(`${title}: ${message}`);
         }
     };
-            }
+}
