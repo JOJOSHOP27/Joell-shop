@@ -408,10 +408,8 @@
 </div>
 
 <!-- ============================================================ -->
-<!-- SEMUA MODAL (CART, CHECKOUT, DETAIL, TOPUP, ANIME, BOT, OSINT, SSWEB, UPLOAD, LOGIN, CHAT, PROFILE) -->
-<!-- ============================================================ -->
-
 <!-- CART OVERLAY -->
+<!-- ============================================================ -->
 <div class="cart-overlay" id="cartOverlay">
     <div class="cart-panel">
         <div class="cart-header">
@@ -761,7 +759,7 @@
 </div>
 
 <!-- ============================================================ -->
-<!-- PAYMENT MODAL -->
+<!-- PAYMENT MODAL - VERSI DIPERBAIKI -->
 <!-- ============================================================ -->
 <div class="modal-overlay" id="paymentOverlay">
     <div class="modal-box payment-modal">
@@ -772,129 +770,153 @@
         </h2>
         <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;">Selesaikan pembayaran pesanan Anda</p>
         
-        <!-- Balance Display -->
-        <div class="payment-balance-display">
-            <div>
-                <div class="balance-label"><i class="fas fa-wallet"></i> Saldo Akun</div>
-                <div class="balance-amount" id="balanceAmount">Rp 0</div>
+        <!-- ========================================================== -->
+        <!-- BAGIAN 1: SALDO -->
+        <!-- ========================================================== -->
+        <div class="payment-section">
+            <div class="section-label"><i class="fas fa-wallet"></i> Saldo Akun</div>
+            <div class="payment-balance-display" id="balanceDisplay">
+                <div>
+                    <div class="balance-label">Saldo Anda</div>
+                    <div class="balance-amount" id="balanceAmount">Rp 0</div>
+                </div>
+                <button class="balance-refresh" id="balanceRefreshBtn" title="Refresh Saldo">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
             </div>
-            <button class="balance-refresh" id="balanceRefreshBtn" title="Refresh Saldo">
-                <i class="fas fa-sync-alt"></i>
-            </button>
         </div>
 
-        <!-- Order Summary -->
-        <div class="order-summary-box">
-            <h4><i class="fas fa-shopping-bag"></i> Ringkasan Pesanan</h4>
-            <div id="paymentOrderItems"></div>
-            <div class="order-item-line total" id="paymentOrderTotal">Total: Rp 0</div>
+        <!-- ========================================================== -->
+        <!-- BAGIAN 2: RINGKASAN PESANAN -->
+        <!-- ========================================================== -->
+        <div class="payment-section">
+            <div class="section-label"><i class="fas fa-shopping-bag"></i> Ringkasan Pesanan</div>
+            <div class="order-summary-box">
+                <div id="paymentOrderItems"></div>
+                <div class="order-item-line total" id="paymentOrderTotal">Total: Rp 0</div>
+            </div>
         </div>
 
-        <!-- Payment Methods -->
-        <div style="font-weight:700;font-size:0.9rem;margin-bottom:8px;">Pilih Metode Pembayaran</div>
-        <div class="payment-methods">
-            <button class="payment-method-btn active" data-method="qris">
-                <i class="fas fa-qrcode"></i> QRIS
-            </button>
-            <button class="payment-method-btn" data-method="bank">
-                <i class="fas fa-university"></i> Bank Transfer
-            </button>
-        </div>
+        <!-- ========================================================== -->
+        <!-- BAGIAN 3: METODE PEMBAYARAN & INVOICE -->
+        <!-- ========================================================== -->
+        <div class="payment-section">
+            <div class="section-label"><i class="fas fa-credit-card"></i> Metode Pembayaran</div>
+            <div class="payment-methods">
+                <button class="payment-method-btn active" data-method="qris">
+                    <i class="fas fa-qrcode"></i> QRIS
+                </button>
+                <button class="payment-method-btn" data-method="bank">
+                    <i class="fas fa-university"></i> Bank Transfer
+                </button>
+            </div>
 
-        <!-- QRIS Section -->
-        <div id="paymentQrisSection">
-            <div class="payment-qris-container" id="qrisContainer">
-                <p style="color:var(--text-muted);font-size:0.85rem;">
-                    <i class="fas fa-info-circle"></i> Klik tombol "Buat Invoice" untuk mendapatkan QRIS
+            <!-- QRIS Section -->
+            <div id="paymentQrisSection">
+                <div class="payment-qris-container" id="qrisContainer">
+                    <p style="color:var(--text-muted);font-size:0.85rem;">
+                        <i class="fas fa-info-circle"></i> Klik tombol "Buat Invoice" untuk mendapatkan QRIS
+                    </p>
+                    <div id="qrisImageWrapper" style="display:none;">
+                        <img id="qrisImage" src="" alt="QRIS Code" loading="lazy">
+                    </div>
+                </div>
+                
+                <div class="payment-details" id="paymentDetails" style="display:none;">
+                    <div class="detail-row">
+                        <span class="label">Invoice ID</span>
+                        <span class="value" id="invoiceId" style="font-family:var(--font-mono);font-size:0.8rem;">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Total</span>
+                        <span class="value total" id="invoiceTotal">Rp 0</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Biaya Admin</span>
+                        <span class="value" id="invoiceFee">Rp 0</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Status</span>
+                        <span class="value"><span class="payment-status-badge pending" id="invoiceStatusBadge">⏳ Menunggu</span></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Kadaluarsa</span>
+                        <span class="value" id="invoiceExpiry">-</span>
+                    </div>
+                </div>
+
+                <div class="payment-timer" id="paymentTimer" style="display:none;">
+                    <i class="fas fa-hourglass-half"></i> <span id="timerDisplay">15:00</span>
+                </div>
+
+                <div class="payment-actions">
+                    <button class="btn-pay" id="createInvoiceBtn"><i class="fas fa-qrcode"></i> Buat Invoice</button>
+                    <button class="btn-check-status" id="checkStatusBtn" style="display:none;"><i class="fas fa-sync-alt"></i> Cek Status</button>
+                    <button class="btn-copy-link" id="copyPaymentLinkBtn" style="display:none;"><i class="fas fa-copy"></i> Salin Link</button>
+                </div>
+            </div>
+
+            <!-- Bank Transfer Section -->
+            <div id="paymentBankSection" style="display:none;">
+                <div class="payment-details">
+                    <div class="detail-row">
+                        <span class="label">Bank</span>
+                        <span class="value">BCA</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Nomor Rekening</span>
+                        <span class="value" style="font-family:var(--font-mono);">1234567890</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Atas Nama</span>
+                        <span class="value">JOELL SHOP</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Total</span>
+                        <span class="value total" id="bankTotal">Rp 0</span>
+                    </div>
+                </div>
+                <p style="color:var(--text-muted);font-size:0.8rem;text-align:center;margin:8px 0;">
+                    <i class="fas fa-info-circle"></i> Transfer sesuai total dan kirim bukti ke admin
                 </p>
-                <div id="qrisImageWrapper" style="display:none;">
-                    <img id="qrisImage" src="" alt="QRIS Code" loading="lazy">
-                </div>
-            </div>
-            
-            <div class="payment-details" id="paymentDetails" style="display:none;">
-                <div class="detail-row">
-                    <span class="label">Invoice ID</span>
-                    <span class="value" id="invoiceId" style="font-family:var(--font-mono);font-size:0.8rem;">-</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Total</span>
-                    <span class="value total" id="invoiceTotal">Rp 0</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Biaya Admin</span>
-                    <span class="value" id="invoiceFee">Rp 0</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Status</span>
-                    <span class="value"><span class="payment-status-badge pending" id="invoiceStatusBadge">⏳ Menunggu</span></span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Kadaluarsa</span>
-                    <span class="value" id="invoiceExpiry">-</span>
-                </div>
-            </div>
-
-            <div class="payment-timer" id="paymentTimer" style="display:none;">
-                <i class="fas fa-hourglass-half"></i> <span id="timerDisplay">15:00</span>
-            </div>
-
-            <div class="payment-actions">
-                <button class="btn-pay" id="createInvoiceBtn"><i class="fas fa-qrcode"></i> Buat Invoice</button>
-                <button class="btn-check-status" id="checkStatusBtn" style="display:none;"><i class="fas fa-sync-alt"></i> Cek Status</button>
-                <button class="btn-copy-link" id="copyPaymentLinkBtn" style="display:none;"><i class="fas fa-copy"></i> Salin Link</button>
+                <button class="btn-pay" onclick="copyBankInfo()"><i class="fas fa-copy"></i> Salin Info Bank</button>
             </div>
         </div>
 
-        <!-- Bank Transfer Section -->
-        <div id="paymentBankSection" style="display:none;">
-            <div class="payment-details">
-                <div class="detail-row">
-                    <span class="label">Bank</span>
-                    <span class="value">BCA</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Nomor Rekening</span>
-                    <span class="value" style="font-family:var(--font-mono);">1234567890</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Atas Nama</span>
-                    <span class="value">JOELL SHOP</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Total</span>
-                    <span class="value total" id="bankTotal">Rp 0</span>
-                </div>
-            </div>
-            <p style="color:var(--text-muted);font-size:0.8rem;text-align:center;margin:8px 0;">
-                <i class="fas fa-info-circle"></i> Transfer sesuai total dan kirim bukti ke admin
-            </p>
-            <button class="btn-pay" onclick="copyBankInfo()"><i class="fas fa-copy"></i> Salin Info Bank</button>
-        </div>
-
-        <!-- Withdraw Section -->
-        <div class="withdraw-section">
-            <h4><i class="fas fa-money-bill-wave"></i> Tarik Saldo</h4>
+        <!-- ========================================================== -->
+        <!-- BAGIAN 4: TARIK SALDO (WITHDRAW) - DIPISAHKAN -->
+        <!-- ========================================================== -->
+        <div class="payment-section withdraw-section" id="withdrawSection">
+            <div class="section-label"><i class="fas fa-money-bill-wave"></i> Tarik Saldo</div>
             
+            <!-- Metode Withdraw -->
+            <div style="font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">Pilih Metode Penarikan</div>
             <div class="withdraw-methods-grid" id="withdrawMethodsGrid">
                 <!-- Akan diisi dari API -->
             </div>
+            <div class="withdraw-info" id="withdrawInfo">Silakan pilih metode penarikan di atas</div>
 
+            <!-- Form Withdraw -->
             <div class="withdraw-input-group">
                 <input type="number" id="withdrawAmount" placeholder="Jumlah (min 10.000)" min="10000">
                 <input type="text" id="withdrawAccount" placeholder="Nomor Rekening / E-Wallet">
                 <button class="withdraw-btn" id="withdrawBtn"><i class="fas fa-arrow-up"></i> Tarik</button>
             </div>
-            <div class="withdraw-info" id="withdrawInfo">Pilih metode penarikan di atas</div>
 
+            <!-- Riwayat Withdraw -->
+            <div style="font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-top:16px;margin-bottom:8px;">
+                <i class="fas fa-history"></i> Riwayat Penarikan
+            </div>
             <div class="withdraw-history" id="withdrawHistory">
                 <p style="color:var(--text-muted);font-size:0.8rem;text-align:center;">Belum ada riwayat penarikan</p>
             </div>
         </div>
 
-        <!-- Invoice History -->
-        <div class="withdraw-section">
-            <h4><i class="fas fa-history"></i> Riwayat Invoice</h4>
+        <!-- ========================================================== -->
+        <!-- BAGIAN 5: RIWAYAT INVOICE -->
+        <!-- ========================================================== -->
+        <div class="payment-section" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border-subtle);">
+            <div class="section-label"><i class="fas fa-file-invoice"></i> Riwayat Invoice</div>
             <div class="invoice-history-list" id="invoiceHistoryList">
                 <p style="color:var(--text-muted);font-size:0.8rem;text-align:center;">Belum ada invoice</p>
             </div>
@@ -923,113 +945,33 @@
 <script src="script.js"></script>
 <script src="payment-api.js"></script>
 
-<!-- INISIALISASI PAYMENT SYSTEM -->
 <script>
-// ============================================================
-// PAYMENT SYSTEM INITIALIZATION
-// ============================================================
-document.addEventListener('DOMContentLoaded', function() {
-    // Load histories
-    const storedWithdraw = localStorage.getItem('joellWithdrawHistory');
-    if (storedWithdraw) {
-        try {
-            window.withdrawHistory = JSON.parse(storedWithdraw);
-            if (typeof renderWithdrawHistory === 'function') renderWithdrawHistory();
-        } catch(e) {}
-    }
-    const storedInvoice = localStorage.getItem('joellInvoiceHistory');
-    if (storedInvoice) {
-        try {
-            window.invoiceHistory = JSON.parse(storedInvoice);
-            if (typeof renderInvoiceHistory === 'function') renderInvoiceHistory();
-        } catch(e) {}
-    }
-    
-    // Setup payment event listeners
-    setupPaymentListeners();
-});
-
-function setupPaymentListeners() {
-    // Payment method switching
-    document.querySelectorAll('.payment-method-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.payment-method-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            const method = this.dataset.method;
-            const qrisSection = document.getElementById('paymentQrisSection');
-            const bankSection = document.getElementById('paymentBankSection');
-            if (qrisSection) qrisSection.style.display = method === 'qris' ? 'block' : 'none';
-            if (bankSection) bankSection.style.display = method === 'bank' ? 'block' : 'none';
-        });
+    // Ensure home page is active on load
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedPage = localStorage.getItem('joellCurrentPage');
+        if (savedPage && savedPage !== 'home' && document.getElementById('page-' + savedPage)) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + savedPage).classList.add('active');
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === savedPage) item.classList.add('active');
+            });
+            document.getElementById('bottomNav').style.display = 'flex';
+            document.getElementById('page-admin').classList.remove('active');
+            if (savedPage === 'orders') renderOrdersList();
+            if (savedPage === 'profile') renderProfilePage();
+        } else {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-home').classList.add('active');
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === 'home') item.classList.add('active');
+            });
+            document.getElementById('bottomNav').style.display = 'flex';
+            document.getElementById('page-admin').classList.remove('active');
+        }
     });
-
-    // Create Invoice
-    const createBtn = document.getElementById('createInvoiceBtn');
-    if (createBtn) {
-        createBtn.addEventListener('click', function() {
-            const totalEl = document.getElementById('paymentOrderTotal');
-            if (totalEl) {
-                const total = parseInt(totalEl.textContent.replace(/[^0-9]/g, ''));
-                if (total > 0 && typeof createInvoice === 'function') {
-                    createInvoice(total);
-                } else {
-                    showToast('Error', 'Total pembayaran tidak valid', 'error');
-                }
-            }
-        });
-    }
-
-    // Check Status
-    const checkBtn = document.getElementById('checkStatusBtn');
-    if (checkBtn) {
-        checkBtn.addEventListener('click', function() {
-            if (window.currentInvoiceId && typeof checkInvoiceStatus === 'function') {
-                checkInvoiceStatus(window.currentInvoiceId);
-            }
-        });
-    }
-
-    // Copy Payment Link
-    const copyBtn = document.getElementById('copyPaymentLinkBtn');
-    if (copyBtn) {
-        copyBtn.addEventListener('click', function() {
-            if (window.currentInvoiceId) {
-                const link = `https://app.lzpedia.my.id/pay/${window.currentInvoiceId}`;
-                navigator.clipboard.writeText(link).then(() => {
-                    showToast('Berhasil', 'Link pembayaran disalin!', 'success');
-                }).catch(() => {
-                    showToast('Gagal', 'Gagal menyalin link', 'error');
-                });
-            }
-        });
-    }
-
-    // Withdraw
-    const withdrawBtn = document.getElementById('withdrawBtn');
-    if (withdrawBtn) {
-        withdrawBtn.addEventListener('click', function() {
-            if (typeof processWithdraw === 'function') processWithdraw();
-        });
-    }
-
-    // Balance Refresh
-    const refreshBtn = document.getElementById('balanceRefreshBtn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', function() {
-            if (typeof fetchBalance === 'function') fetchBalance();
-        });
-    }
-
-    // Close Payment Modal
-    const closeBtn = document.getElementById('paymentCloseBtn');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', function() {
-            document.getElementById('paymentOverlay').classList.remove('open');
-            if (window.timerInterval) clearInterval(window.timerInterval);
-        });
-    }
-}
 </script>
 
 </body>
-                    </html>
+</html>
