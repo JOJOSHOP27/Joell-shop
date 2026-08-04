@@ -4,9 +4,9 @@
 
 const PAYMENT_API = {
     config: {
-        apiKey: 'LXZ_679979c28d5a4dd4',
-        userId: 'f92d9400d6aa05',
+        apiKey: 'LXZ_d7347e2859884015',  // ← API KEY BARU
         baseUrl: 'https://app.lzpedia.my.id/api'
+        // userId TIDAK DIPERLUKAN, sudah dihapus!
     },
 
     // ============================================================
@@ -24,7 +24,7 @@ const PAYMENT_API = {
                 email: data.email || ''
             };
         } catch (error) {
-            console.error('Balance Error:', error);
+            console.error('❌ Balance Error:', error);
             return {
                 success: false,
                 error: error.message,
@@ -34,28 +34,54 @@ const PAYMENT_API = {
     },
 
     // ============================================================
-    // 2. BUAT INVOICE (FINAL - QRIS MANUAL)
+    // 2. BUAT INVOICE (FIXED)
     // ============================================================
     async createInvoice(amount) {
         try {
             console.log('📤 MEMBUAT INVOICE...');
             console.log('💰 Amount:', amount);
+            console.log('🔑 API Key:', this.config.apiKey);
             
             const response = await fetch(
                 `${this.config.baseUrl}/invoice?apikey=${this.config.apiKey}&amount=${amount}`
             );
             const data = await response.json();
             
-            console.log('📥 Response Invoice:', data);
+            console.log('📥 Response Invoice:', JSON.stringify(data, null, 2));
             
             if (data.success && data.invoice_id) {
-                let qrisImage = null;
-                const paymentLink = data.payment_link || `https://app.lzpedia.my.id/pay/${data.invoice_id}`;
+                // === AMBIL QRIS DARI RESPONSE ===
+                let qrisImage = data.qris_image || null;
                 
-                // Generate QRIS manual dari payment link
-                qrisImage = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(paymentLink)}`;
+                // === FALLBACK 1: Coba generate dari endpoint /qris ===
+                if (!qrisImage) {
+                    console.log('🔄 QRIS tidak ada di response, mencoba generate dari /qris...');
+                    try {
+                        const qrisResponse = await fetch(
+                            `${this.config.baseUrl}/invoice/qris?apikey=${this.config.apiKey}&invoice_id=${data.invoice_id}`
+                        );
+                        const qrisData = await qrisResponse.json();
+                        console.log('📥 QRIS Response:', qrisData);
+                        qrisImage = qrisData.qris_image || null;
+                    } catch (e) {
+                        console.warn('⚠️ Gagal generate QRIS dari /qris:', e.message);
+                    }
+                }
                 
-                console.log('🖼️ QRIS Generated:', qrisImage);
+                // === FALLBACK 2: Generate QRIS manual dari payment_link ===
+                if (!qrisImage && data.payment_link) {
+                    console.log('🔄 Membuat QRIS manual dari payment_link...');
+                    qrisImage = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(data.payment_link)}`;
+                }
+                
+                // === FALLBACK 3: Generate QRIS dari invoice_id ===
+                if (!qrisImage) {
+                    console.log('🔄 Membuat QRIS manual dari invoice_id...');
+                    const paymentLink = `https://app.lzpedia.my.id/pay/${data.invoice_id}`;
+                    qrisImage = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(paymentLink)}`;
+                }
+
+                console.log('🖼️ QRIS Image Final:', qrisImage);
                 
                 return {
                     success: true,
@@ -64,10 +90,11 @@ const PAYMENT_API = {
                     fee: data.fee || 0,
                     total: data.total || amount,
                     qrisImage: qrisImage,
-                    paymentLink: paymentLink,
+                    paymentLink: data.payment_link || `https://app.lzpedia.my.id/pay/${data.invoice_id}`,
                     expiredAt: data.expired_at || null
                 };
             } else {
+                console.error('❌ Invoice Gagal:', data);
                 return {
                     success: false,
                     error: data.message || 'Gagal membuat invoice'
@@ -107,7 +134,7 @@ const PAYMENT_API = {
                 createdAt: data.created_at || null
             };
         } catch (error) {
-            console.error('Status Check Error:', error);
+            console.error('❌ Status Check Error:', error);
             return {
                 success: false,
                 error: error.message
@@ -125,7 +152,10 @@ const PAYMENT_API = {
             );
             const data = await response.json();
             
+            console.log('📥 Withdraw Methods:', data);
+            
             if (!data.manual_methods && !data.instant_methods) {
+                // Fallback data
                 return {
                     success: true,
                     manualMethods: [
@@ -143,7 +173,7 @@ const PAYMENT_API = {
                 instantMethods: data.instant_methods || []
             };
         } catch (error) {
-            console.error('Withdraw Methods Error:', error);
+            console.error('❌ Withdraw Methods Error:', error);
             return {
                 success: true,
                 manualMethods: [
@@ -165,6 +195,8 @@ const PAYMENT_API = {
             const response = await fetch(url);
             const data = await response.json();
             
+            console.log('📥 Withdraw Response:', data);
+            
             if (data.success) {
                 return {
                     success: true,
@@ -172,6 +204,7 @@ const PAYMENT_API = {
                     data: data.data || null
                 };
             } else {
+                // Fallback sukses
                 return {
                     success: true,
                     message: 'Permintaan penarikan berhasil diajukan',
@@ -186,7 +219,7 @@ const PAYMENT_API = {
                 };
             }
         } catch (error) {
-            console.error('Withdraw Error:', error);
+            console.error('❌ Withdraw Error:', error);
             return {
                 success: true,
                 message: 'Permintaan penarikan berhasil diajukan',
@@ -257,6 +290,7 @@ window.createInvoice = async function(amount) {
 
     try {
         const result = await PAYMENT_API.createInvoice(amount);
+        console.log('📥 Result:', result);
 
         if (result.success) {
             window.currentInvoiceId = result.invoiceId;
@@ -267,6 +301,7 @@ window.createInvoice = async function(amount) {
             const qrisPlaceholder = document.getElementById('qrisPlaceholder');
             
             if (result.qrisImage && qrisImage) {
+                console.log('✅ Menampilkan QRIS...');
                 qrisImage.src = result.qrisImage;
                 qrisImage.style.display = 'block';
                 qrisImage.style.maxWidth = '280px';
@@ -286,6 +321,7 @@ window.createInvoice = async function(amount) {
                 
                 showToast('✅ QRIS Siap', 'Scan QR code untuk membayar', 'success');
             } else {
+                console.warn('⚠️ QRIS tidak tersedia');
                 if (qrisPlaceholder) {
                     qrisPlaceholder.innerHTML = `
                         <i class="fas fa-exclamation-triangle" style="color:var(--orange);font-size:2rem;"></i>
@@ -762,7 +798,6 @@ window.initProfileWithdraw = function() {
     // Event listener untuk tombol withdraw di profile
     const withdrawBtn = document.getElementById('profileWithdrawBtn');
     if (withdrawBtn) {
-        // Remove old listeners
         const newBtn = withdrawBtn.cloneNode(true);
         withdrawBtn.parentNode.replaceChild(newBtn, withdrawBtn);
         newBtn.addEventListener('click', function() {
@@ -906,7 +941,6 @@ window.renderProfilePage = function() {
     if (typeof originalRenderProfilePage === 'function') {
         originalRenderProfilePage();
     }
-    // Init withdraw di profile
     setTimeout(() => {
         if (currentUser) {
             window.initProfileWithdraw();
@@ -919,6 +953,7 @@ window.renderProfilePage = function() {
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Payment System Initializing...');
+    console.log('🔑 API Key:', PAYMENT_API.config.apiKey);
     
     // === PAYMENT METHOD SWITCHING ===
     document.querySelectorAll('.payment-method-btn').forEach(btn => {
@@ -1028,4 +1063,4 @@ if (typeof showToast !== 'function') {
             alert(`${title}: ${message}`);
         }
     };
-    }
+}
