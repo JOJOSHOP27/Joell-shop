@@ -464,6 +464,12 @@
 }
 
 /* Invoice History */
+.invoice-history-list {
+    margin-top: 14px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
 .invoice-history-item {
     display: flex;
     justify-content: space-between;
@@ -591,3 +597,62 @@
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
 }
+
+/* Additional Payment Styles */
+.payment-method-btn .method-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.payment-qris-container .qris-placeholder {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.payment-qris-container .qris-placeholder i {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 8px;
+    color: var(--accent-light);
+}
+
+.payment-details .detail-row .value .payment-status-badge {
+    font-size: 0.7rem;
+}
+
+/* Timer warning when nearing expiration */
+.payment-timer.warning {
+    color: #fbbf24;
+    border-color: rgba(251,191,36,0.2);
+    background: rgba(251,191,36,0.05);
+}
+
+.payment-timer.danger {
+    color: #ef4444;
+    border-color: rgba(239,68,68,0.2);
+    background: rgba(239,68,68,0.05);
+    animation: timerPulse 1s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Payment success animation */
+.payment-success-animation {
+    text-align: center;
+    padding: 20px;
+}
+
+.payment-success-animation .checkmark {
+    font-size: 4rem;
+    color: #10b981;
+    animation: checkmarkPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes checkmarkPop {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
+   }
