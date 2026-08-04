@@ -41,8 +41,10 @@
 }
 
 /* ============================================================
-   QRIS CONTAINER - DIPERBAIKI
+   QRIS DISPLAY - FIXED
    ============================================================ */
+
+/* QRIS Container - Lebih baik */
 .payment-qris-container {
     text-align: center;
     margin: 16px 0;
@@ -58,26 +60,7 @@
     transition: all 0.3s ease;
 }
 
-.payment-qris-container .qris-placeholder {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-.payment-qris-container .qris-placeholder i {
-    font-size: 3rem;
-    display: block;
-    margin-bottom: 12px;
-    color: var(--accent-light);
-}
-
-.payment-qris-container .qris-placeholder small {
-    display: block;
-    margin-top: 4px;
-    font-size: 0.7rem;
-    color: var(--text-muted);
-}
-
-/* QRIS Image Wrapper */
+/* QRIS Image */
 #qrisImageWrapper {
     width: 100%;
     display: flex;
@@ -105,9 +88,42 @@
     font-weight: 600;
 }
 
-#qrisImageWrapper .qris-success-text i {
-    margin-right: 4px;
+/* Invoice History - Clickable */
+.invoice-history-item {
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
+
+.invoice-history-item:hover {
+    background: rgba(99,102,241,0.05);
+    border-color: var(--accent);
+    transform: translateX(4px);
+}
+
+/* Invoice Detail Button */
+.invoice-detail-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    padding: 2px 10px;
+    font-size: 0.6rem;
+    cursor: pointer;
+    margin-left: 4px;
+    transition: all 0.3s ease;
+}
+
+.invoice-detail-btn:hover {
+    background: var(--accent-light);
+    transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+    #qrisImageWrapper img {
+        max-width: 200px;
+    }
+   }
 
 /* ============================================================
    PAYMENT DETAILS
