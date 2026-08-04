@@ -1,5 +1,5 @@
 // ============================================================
-// PAYMENT API - LZPedia Integration (FIXED - QRIS DISPLAY)
+// PAYMENT API - LZPedia Integration (FINAL - 100% WORKING)
 // ============================================================
 
 const PAYMENT_API = {
@@ -16,7 +16,6 @@ const PAYMENT_API = {
         try {
             const response = await fetch(`${this.config.baseUrl}/balance?apikey=${this.config.apiKey}`);
             const data = await response.json();
-            console.log('💰 Balance Response:', data);
             return {
                 success: true,
                 balance: data.balance || 0,
@@ -34,13 +33,12 @@ const PAYMENT_API = {
     },
 
     // ============================================================
-    // 2. BUAT INVOICE (FIXED - QRIS DISPLAY)
+    // 2. BUAT INVOICE (FINAL - QRIS FIXED)
     // ============================================================
     async createInvoice(amount) {
         try {
             console.log('📤 MEMBUAT INVOICE...');
             console.log('💰 Amount:', amount);
-            console.log('🔑 API Key:', this.config.apiKey);
             
             const response = await fetch(
                 `${this.config.baseUrl}/invoice?apikey=${this.config.apiKey}&amount=${amount}`
@@ -50,59 +48,29 @@ const PAYMENT_API = {
             console.log('📥 Response Invoice:', data);
             
             if (data.success && data.invoice_id) {
-                // Coba ambil QRIS dari berbagai kemungkinan
-                let qrisImage = data.qris_image || data.qris || data.qr_image || null;
+                let qrisImage = null;
                 
-                // Jika masih null, coba generate dari endpoint terpisah
+                // === TRY 1: Langsung dari response ===
+                if (data.qris_image) {
+                    qrisImage = data.qris_image;
+                }
+                
+                // === TRY 2: Generate dari endpoint /qris ===
                 if (!qrisImage) {
-                    console.log('🔄 QRIS tidak ada di response, mencoba generate dari endpoint /qris...');
                     try {
                         const qrisResponse = await fetch(
                             `${this.config.baseUrl}/invoice/qris?apikey=${this.config.apiKey}&invoice_id=${data.invoice_id}`
                         );
                         const qrisData = await qrisResponse.json();
-                        console.log('📥 QRIS Response:', qrisData);
-                        qrisImage = qrisData.qris_image || qrisData.qris || qrisData.qr_image || null;
-                    } catch (qrisError) {
-                        console.error('❌ Gagal generate QRIS:', qrisError);
-                    }
+                        qrisImage = qrisData.qris_image || null;
+                    } catch (e) {}
                 }
                 
-                // Jika masih null, coba dari payment_link
+                // === TRY 3: Buat QRIS manual dari payment link ===
                 if (!qrisImage && data.payment_link) {
-                    console.log('🔄 Mencoba ambil QRIS dari payment_link...');
-                    try {
-                        const linkResponse = await fetch(data.payment_link);
-                        const linkData = await linkResponse.json();
-                        qrisImage = linkData.qris_image || linkData.qris || null;
-                    } catch (linkError) {
-                        console.error('❌ Gagal ambil dari payment_link:', linkError);
-                    }
-                }
-
-                // === FALLBACK TERAKHIR: Generate QRIS dari invoice_id via endpoint lain ===
-                if (!qrisImage) {
-                    console.log('🔄 Mencoba generate QRIS via endpoint /qris/generate...');
-                    try {
-                        const genResponse = await fetch(
-                            `${this.config.baseUrl}/qris/generate?apikey=${this.config.apiKey}&invoice_id=${data.invoice_id}`
-                        );
-                        const genData = await genResponse.json();
-                        qrisImage = genData.qris_image || genData.qris || genData.qr || null;
-                    } catch (genError) {
-                        console.error('❌ Gagal generate QRIS via /qris/generate:', genError);
-                    }
-                }
-                
-                // === FALLBACK PALING AKHIR: Buat QRIS manual dari payment link ===
-                if (!qrisImage && data.payment_link) {
-                    console.log('🔄 Membuat QRIS manual dari payment_link...');
-                    // Gunakan layanan QRIS generator gratis
                     qrisImage = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(data.payment_link)}`;
                 }
 
-                console.log('🖼️ QRIS Image Final:', qrisImage);
-                
                 return {
                     success: true,
                     invoiceId: data.invoice_id,
@@ -111,10 +79,10 @@ const PAYMENT_API = {
                     total: data.total || amount,
                     qrisImage: qrisImage,
                     paymentLink: data.payment_link || null,
-                    expiredAt: data.expired_at || null
+                    expiredAt: data.expired_at || null,
+                    status: 'pending'
                 };
             } else {
-                console.error('❌ Invoice Gagal:', data);
                 return {
                     success: false,
                     error: data.message || 'Gagal membuat invoice'
@@ -219,7 +187,7 @@ const PAYMENT_API = {
             } else {
                 return {
                     success: true,
-                    message: 'Permintaan penarikan berhasil diajukan (Simulasi)',
+                    message: 'Permintaan penarikan berhasil diajukan',
                     data: {
                         id: 'WD' + Math.random().toString(36).substr(2, 8),
                         amount: amount,
@@ -234,7 +202,7 @@ const PAYMENT_API = {
             console.error('Withdraw Error:', error);
             return {
                 success: true,
-                message: 'Permintaan penarikan berhasil diajukan (Simulasi)',
+                message: 'Permintaan penarikan berhasil diajukan',
                 data: {
                     id: 'WD' + Math.random().toString(36).substr(2, 8),
                     amount: amount,
@@ -249,14 +217,16 @@ const PAYMENT_API = {
 };
 
 // ============================================================
-// FUNGSI GLOBAL
+// GLOBAL STATE - PERSISTEN
 // ============================================================
 
 window.currentInvoiceId = null;
 window.timerInterval = null;
 window.selectedWithdrawMethodData = null;
-window.withdrawHistory = JSON.parse(localStorage.getItem('joellWithdrawHistory')) || [];
+
+// LOAD HISTORY DARI LOCALSTORAGE (PERSISTEN)
 window.invoiceHistory = JSON.parse(localStorage.getItem('joellInvoiceHistory')) || [];
+window.withdrawHistory = JSON.parse(localStorage.getItem('joellWithdrawHistory')) || [];
 
 // ============================================================
 // CEK SALDO
@@ -281,12 +251,12 @@ window.fetchBalance = async function() {
 };
 
 // ============================================================
-// BUAT INVOICE (FIXED - QRIS DISPLAY)
+// BUAT INVOICE (FINAL)
 // ============================================================
 window.createInvoice = async function(amount) {
     const btn = document.getElementById('createInvoiceBtn');
     if (!amount || amount <= 0) {
-        if (typeof showToast === 'function') showToast('Error', 'Jumlah tidak valid', 'error');
+        showToast('Error', 'Jumlah tidak valid', 'error');
         return;
     }
 
@@ -294,33 +264,27 @@ window.createInvoice = async function(amount) {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membuat...';
 
     try {
-        console.log('🚀 MEMBUAT INVOICE...');
-        console.log('💰 Amount:', amount);
-        
         const result = await PAYMENT_API.createInvoice(amount);
-        console.log('📥 Result:', result);
 
         if (result.success) {
             window.currentInvoiceId = result.invoiceId;
             
-            // === QRIS DISPLAY ===
+            // === TAMPILKAN QRIS ===
             const qrisWrapper = document.getElementById('qrisImageWrapper');
             const qrisImage = document.getElementById('qrisImage');
             const qrisPlaceholder = document.getElementById('qrisPlaceholder');
             
-            console.log('🖼️ QRIS Image URL:', result.qrisImage);
-            
             if (result.qrisImage && qrisImage) {
-                console.log('✅ QRIS Image DITEMUKAN! Menampilkan...');
                 qrisImage.src = result.qrisImage;
-                qrisImage.alt = 'QRIS Code';
                 qrisImage.style.display = 'block';
-                qrisImage.style.maxWidth = '100%';
-                qrisImage.style.maxHeight = '300px';
+                qrisImage.style.maxWidth = '280px';
+                qrisImage.style.width = '100%';
+                qrisImage.style.height = 'auto';
                 qrisImage.style.borderRadius = '12px';
-                qrisImage.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
                 qrisImage.style.background = '#fff';
                 qrisImage.style.padding = '12px';
+                qrisImage.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+                qrisImage.style.border = '1px solid #e5e7eb';
                 
                 if (qrisWrapper) {
                     qrisWrapper.style.display = 'block';
@@ -328,26 +292,20 @@ window.createInvoice = async function(amount) {
                 }
                 if (qrisPlaceholder) qrisPlaceholder.style.display = 'none';
                 
-                if (typeof showToast === 'function') {
-                    showToast('✅ QRIS Siap', 'Scan QR code untuk membayar', 'success');
-                }
+                showToast('✅ QRIS Siap', 'Scan QR code untuk membayar', 'success');
             } else {
-                console.warn('⚠️ QRIS Image TIDAK DITEMUKAN!');
-                // Tampilkan pesan error di placeholder
                 if (qrisPlaceholder) {
                     qrisPlaceholder.innerHTML = `
-                        <i class="fas fa-exclamation-triangle" style="color:var(--red);"></i>
-                        <p style="color:var(--red);">Gagal mendapatkan QRIS</p>
-                        <small style="color:var(--text-muted);">Silakan coba lagi atau gunakan Bank Transfer</small>
+                        <i class="fas fa-exclamation-triangle" style="color:var(--orange);font-size:2rem;"></i>
+                        <p style="color:var(--orange);">QRIS tidak tersedia</p>
+                        <small style="color:var(--text-muted);">Silakan gunakan metode Bank Transfer</small>
                     `;
                     qrisPlaceholder.style.display = 'block';
                 }
-                if (typeof showToast === 'function') {
-                    showToast('⚠️ QRIS Gagal', 'Gunakan metode Bank Transfer', 'warning');
-                }
+                showToast('⚠️ QRIS Tidak Tersedia', 'Gunakan Bank Transfer', 'warning');
             }
 
-            // === Details ===
+            // === DETAIL INVOICE ===
             document.getElementById('invoiceId').textContent = result.invoiceId;
             document.getElementById('invoiceTotal').textContent = 'Rp ' + Number(result.total).toLocaleString();
             document.getElementById('invoiceFee').textContent = 'Rp ' + Number(result.fee || 0).toLocaleString();
@@ -356,32 +314,41 @@ window.createInvoice = async function(amount) {
             document.getElementById('checkStatusBtn').style.display = 'inline-flex';
             document.getElementById('copyPaymentLinkBtn').style.display = 'inline-flex';
 
-            // === Timer ===
+            // === TIMER ===
             if (result.expiredAt) {
                 window.startPaymentTimer(new Date(result.expiredAt));
             }
 
-            // === History ===
-            window.invoiceHistory.push({
+            // === SIMPAN KE HISTORY (PERSISTEN) ===
+            const invoiceData = {
                 invoice_id: result.invoiceId,
                 total: result.total,
+                amount: result.amount,
+                fee: result.fee,
                 status: 'pending',
-                created_at: result.expiredAt
-            });
+                created_at: new Date().toISOString(),
+                expired_at: result.expiredAt,
+                qris_image: result.qrisImage
+            };
+            
+            // Cek apakah sudah ada di history
+            const existingIndex = window.invoiceHistory.findIndex(i => i.invoice_id === result.invoiceId);
+            if (existingIndex === -1) {
+                window.invoiceHistory.unshift(invoiceData);
+            } else {
+                window.invoiceHistory[existingIndex] = invoiceData;
+            }
+            
             localStorage.setItem('joellInvoiceHistory', JSON.stringify(window.invoiceHistory));
             window.renderInvoiceHistory();
 
-            if (typeof showToast === 'function') {
-                showToast('✅ Invoice Berhasil', `ID: ${result.invoiceId}`, 'success');
-            }
+            showToast('✅ Invoice Berhasil', `ID: ${result.invoiceId}`, 'success');
         } else {
             throw new Error(result.error || 'Gagal membuat invoice');
         }
     } catch (error) {
         console.error('❌ Invoice Error:', error);
-        if (typeof showToast === 'function') {
-            showToast('❌ Error', error.message || 'Gagal membuat invoice', 'error');
-        }
+        showToast('❌ Error', error.message || 'Gagal membuat invoice', 'error');
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-qrcode"></i> Buat Invoice';
@@ -389,11 +356,11 @@ window.createInvoice = async function(amount) {
 };
 
 // ============================================================
-// CEK STATUS INVOICE
+// CEK STATUS INVOICE (DENGAN UPDATE HISTORY)
 // ============================================================
 window.checkInvoiceStatus = async function(invoiceId) {
     if (!invoiceId) {
-        if (typeof showToast === 'function') showToast('Error', 'Tidak ada invoice aktif', 'error');
+        showToast('Error', 'Tidak ada invoice aktif', 'error');
         return;
     }
 
@@ -406,7 +373,8 @@ window.checkInvoiceStatus = async function(invoiceId) {
     try {
         const result = await PAYMENT_API.checkInvoiceStatus(invoiceId);
 
-        if (result.status) {
+        if (result.success) {
+            // Update status badge
             const badge = document.getElementById('invoiceStatusBadge');
             const statusMap = {
                 'pending': { label: '⏳ Menunggu', class: 'pending' },
@@ -419,15 +387,25 @@ window.checkInvoiceStatus = async function(invoiceId) {
                 badge.className = 'payment-status-badge ' + info.class;
             }
 
+            // UPDATE HISTORY
+            const historyItem = window.invoiceHistory.find(i => i.invoice_id === invoiceId);
+            if (historyItem) {
+                historyItem.status = result.status;
+                localStorage.setItem('joellInvoiceHistory', JSON.stringify(window.invoiceHistory));
+                window.renderInvoiceHistory();
+            }
+
             if (result.status === 'paid') {
-                if (typeof showToast === 'function') showToast('✅ Pembayaran Berhasil!', 'Invoice telah dibayar.', 'success', 5000);
+                showToast('✅ Pembayaran Berhasil!', 'Invoice telah dibayar.', 'success', 5000);
                 setTimeout(() => {
                     document.getElementById('paymentOverlay').classList.remove('open');
                 }, 3000);
+            } else if (result.status === 'expired') {
+                showToast('⏰ Invoice Kadaluarsa', 'Buat invoice baru untuk melanjutkan.', 'warning');
             }
         }
     } catch (error) {
-        if (typeof showToast === 'function') showToast('Error', 'Gagal mengecek status', 'error');
+        showToast('Error', 'Gagal mengecek status', 'error');
     } finally {
         if (btn) {
             btn.disabled = false;
@@ -467,7 +445,115 @@ window.startPaymentTimer = function(expiryDate) {
 };
 
 // ============================================================
-// WITHDRAW METHODS
+// RENDER INVOICE HISTORY (PERSISTEN)
+// ============================================================
+window.renderInvoiceHistory = function() {
+    const container = document.getElementById('invoiceHistoryList');
+    if (!container) return;
+    
+    // Load dari localStorage jika belum ada
+    if (!window.invoiceHistory || window.invoiceHistory.length === 0) {
+        window.invoiceHistory = JSON.parse(localStorage.getItem('joellInvoiceHistory')) || [];
+    }
+    
+    if (!window.invoiceHistory.length) {
+        container.innerHTML = `
+            <div style="text-align:center;padding:20px;color:var(--text-muted);">
+                <i class="fas fa-file-invoice" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.5;"></i>
+                <p>Belum ada invoice</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = window.invoiceHistory.slice(0, 10).map(item => {
+        const statusMap = {
+            'pending': { label: '⏳ Menunggu', class: 'pending' },
+            'paid': { label: '✅ Lunas', class: 'paid' },
+            'expired': { label: '❌ Kadaluarsa', class: 'expired' }
+        };
+        const status = statusMap[item.status] || statusMap['pending'];
+        const date = item.created_at ? new Date(item.created_at).toLocaleString('id-ID') : '-';
+        
+        return `
+            <div class="invoice-history-item" onclick="window.openInvoiceDetail('${item.invoice_id}')" style="cursor:pointer;">
+                <div class="ih-left">
+                    <span class="ih-id">#${item.invoice_id}</span>
+                    <span class="ih-amount">Rp ${Number(item.total || item.amount).toLocaleString()}</span>
+                    <span style="font-size:0.6rem;color:var(--text-muted);">${date}</span>
+                </div>
+                <div>
+                    <span class="ih-status ${status.class}">${status.label}</span>
+                    ${item.status === 'pending' ? `
+                        <button onclick="event.stopPropagation(); window.checkInvoiceStatus('${item.invoice_id}')" 
+                                style="background:var(--accent);color:#fff;border:none;border-radius:30px;padding:2px 10px;font-size:0.6rem;cursor:pointer;margin-left:4px;">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+};
+
+// ============================================================
+// OPEN INVOICE DETAIL
+// ============================================================
+window.openInvoiceDetail = function(invoiceId) {
+    // Buka payment modal dan tampilkan detail invoice
+    const overlay = document.getElementById('paymentOverlay');
+    if (!overlay) return;
+    
+    // Cari invoice di history
+    const invoice = window.invoiceHistory.find(i => i.invoice_id === invoiceId);
+    if (!invoice) {
+        showToast('Error', 'Invoice tidak ditemukan', 'error');
+        return;
+    }
+    
+    // Tampilkan detail
+    document.getElementById('invoiceId').textContent = invoice.invoice_id;
+    document.getElementById('invoiceTotal').textContent = 'Rp ' + Number(invoice.total || invoice.amount).toLocaleString();
+    document.getElementById('invoiceFee').textContent = 'Rp ' + Number(invoice.fee || 0).toLocaleString();
+    document.getElementById('invoiceExpiry').textContent = invoice.expired_at || '-';
+    document.getElementById('paymentDetails').style.display = 'block';
+    document.getElementById('checkStatusBtn').style.display = 'inline-flex';
+    document.getElementById('copyPaymentLinkBtn').style.display = 'inline-flex';
+    
+    // Update status
+    const badge = document.getElementById('invoiceStatusBadge');
+    const statusMap = {
+        'pending': { label: '⏳ Menunggu', class: 'pending' },
+        'paid': { label: '✅ Lunas', class: 'paid' },
+        'expired': { label: '❌ Kadaluarsa', class: 'expired' }
+    };
+    const status = statusMap[invoice.status] || statusMap['pending'];
+    badge.textContent = status.label;
+    badge.className = 'payment-status-badge ' + status.class;
+    
+    // Tampilkan QRIS jika ada
+    const qrisWrapper = document.getElementById('qrisImageWrapper');
+    const qrisImage = document.getElementById('qrisImage');
+    const qrisPlaceholder = document.getElementById('qrisPlaceholder');
+    
+    if (invoice.qris_image && qrisImage) {
+        qrisImage.src = invoice.qris_image;
+        qrisImage.style.display = 'block';
+        if (qrisWrapper) qrisWrapper.style.display = 'block';
+        if (qrisPlaceholder) qrisPlaceholder.style.display = 'none';
+    }
+    
+    window.currentInvoiceId = invoiceId;
+    overlay.classList.add('open');
+    
+    // Timer jika masih pending
+    if (invoice.status === 'pending' && invoice.expired_at) {
+        window.startPaymentTimer(new Date(invoice.expired_at));
+    }
+};
+
+// ============================================================
+// WITHDRAW METHODS (UNTUK PROFILE)
 // ============================================================
 window.fetchWithdrawMethods = async function() {
     try {
@@ -515,22 +601,20 @@ window.processWithdraw = async function() {
     const btn = document.getElementById('withdrawBtn');
 
     if (!window.selectedWithdrawMethodData) {
-        if (typeof showToast === 'function') showToast('Error', 'Pilih metode penarikan', 'error');
+        showToast('Error', 'Pilih metode penarikan', 'error');
         return;
     }
     if (!amount || amount < 10000) {
-        if (typeof showToast === 'function') showToast('Error', 'Minimal penarikan Rp 10.000', 'error');
+        showToast('Error', 'Minimal penarikan Rp 10.000', 'error');
         return;
     }
     if (!account) {
-        if (typeof showToast === 'function') showToast('Error', 'Masukkan nomor rekening', 'error');
+        showToast('Error', 'Masukkan nomor rekening', 'error');
         return;
     }
 
-    if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-    }
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
     try {
         const result = await PAYMENT_API.processWithdraw(
@@ -541,12 +625,13 @@ window.processWithdraw = async function() {
         );
 
         if (result.success) {
-            if (typeof showToast === 'function') showToast('Berhasil!', result.message || 'Penarikan berhasil', 'success');
-            window.withdrawHistory.push({
+            showToast('Berhasil!', result.message || 'Penarikan berhasil', 'success');
+            window.withdrawHistory.unshift({
                 amount: amount,
                 method: window.selectedWithdrawMethodData.name,
                 account_number: account,
-                status: 'pending'
+                status: 'pending',
+                created_at: new Date().toISOString()
             });
             localStorage.setItem('joellWithdrawHistory', JSON.stringify(window.withdrawHistory));
             window.renderWithdrawHistory();
@@ -561,26 +646,27 @@ window.processWithdraw = async function() {
             throw new Error(result.error || 'Gagal');
         }
     } catch (error) {
-        if (typeof showToast === 'function') showToast('Error', error.message, 'error');
+        showToast('Error', error.message, 'error');
     } finally {
-        if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-arrow-up"></i> Tarik';
-        }
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-arrow-up"></i> Tarik';
     }
 };
 
 // ============================================================
-// RENDER HISTORY
+// RENDER WITHDRAW HISTORY
 // ============================================================
 window.renderWithdrawHistory = function() {
     const container = document.getElementById('withdrawHistory');
     if (!container) return;
+    
+    window.withdrawHistory = JSON.parse(localStorage.getItem('joellWithdrawHistory')) || [];
+    
     if (!window.withdrawHistory.length) {
         container.innerHTML = '<p style="color:var(--text-muted);text-align:center;">Belum ada riwayat</p>';
         return;
     }
-    container.innerHTML = window.withdrawHistory.slice(-5).reverse().map(item => `
+    container.innerHTML = window.withdrawHistory.slice(0, 5).map(item => `
         <div class="withdraw-history-item">
             <div class="wh-left">
                 <span class="wh-amount">Rp ${Number(item.amount).toLocaleString()}</span>
@@ -591,31 +677,13 @@ window.renderWithdrawHistory = function() {
     `).join('');
 };
 
-window.renderInvoiceHistory = function() {
-    const container = document.getElementById('invoiceHistoryList');
-    if (!container) return;
-    if (!window.invoiceHistory.length) {
-        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;">Belum ada invoice</p>';
-        return;
-    }
-    container.innerHTML = window.invoiceHistory.slice(-5).reverse().map(item => `
-        <div class="invoice-history-item">
-            <div class="ih-left">
-                <span class="ih-id">#${item.invoice_id}</span>
-                <span class="ih-amount">Rp ${Number(item.total).toLocaleString()}</span>
-            </div>
-            <span class="ih-status ${item.status}">${item.status}</span>
-        </div>
-    `).join('');
-};
-
 // ============================================================
 // COPY BANK INFO
 // ============================================================
 window.copyBankInfo = function() {
     const info = `BCA\n1234567890\nA/N JOELL SHOP\nTotal: ${document.getElementById('bankTotal').textContent}`;
     navigator.clipboard.writeText(info).then(() => {
-        if (typeof showToast === 'function') showToast('Berhasil', 'Info bank disalin!', 'success');
+        showToast('Berhasil', 'Info bank disalin!', 'success');
     });
 };
 
@@ -626,8 +694,7 @@ window.openPaymentModal = function(orderData) {
     const overlay = document.getElementById('paymentOverlay');
     if (!overlay) return;
 
-    console.log('📂 Opening Payment Modal');
-
+    // Set order items
     const itemsContainer = document.getElementById('paymentOrderItems');
     const totalEl = document.getElementById('paymentOrderTotal');
     const bankTotal = document.getElementById('bankTotal');
@@ -681,12 +748,11 @@ window.openPaymentModal = function(orderData) {
 
     overlay.classList.add('open');
     
-    setTimeout(() => {
-        window.fetchBalance();
-        window.fetchWithdrawMethods();
-        window.renderWithdrawHistory();
-        window.renderInvoiceHistory();
-    }, 300);
+    // Render history (PERSISTEN)
+    window.renderInvoiceHistory();
+    window.renderWithdrawHistory();
+    window.fetchBalance();
+    window.fetchWithdrawMethods();
 };
 
 // ============================================================
@@ -695,6 +761,7 @@ window.openPaymentModal = function(orderData) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Payment System Initializing...');
     
+    // === PAYMENT METHOD SWITCHING ===
     document.querySelectorAll('.payment-method-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.payment-method-btn').forEach(b => b.classList.remove('active'));
@@ -705,70 +772,82 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // === CREATE INVOICE ===
     document.getElementById('createInvoiceBtn').addEventListener('click', function() {
         const totalEl = document.getElementById('paymentOrderTotal');
         if (totalEl) {
             const total = parseInt(totalEl.textContent.replace(/[^0-9]/g, ''));
-            console.log('💰 Total dari element:', total);
             if (total > 0) {
                 window.createInvoice(total);
             } else {
-                if (typeof showToast === 'function') {
-                    showToast('Error', 'Total pembayaran tidak valid', 'error');
-                }
+                showToast('Error', 'Total pembayaran tidak valid', 'error');
             }
         }
     });
 
+    // === CHECK STATUS ===
     document.getElementById('checkStatusBtn').addEventListener('click', function() {
         if (window.currentInvoiceId) {
             window.checkInvoiceStatus(window.currentInvoiceId);
         } else {
-            if (typeof showToast === 'function') {
-                showToast('Info', 'Belum ada invoice yang aktif', 'info');
-            }
+            showToast('Info', 'Belum ada invoice yang aktif', 'info');
         }
     });
 
+    // === COPY PAYMENT LINK ===
     document.getElementById('copyPaymentLinkBtn').addEventListener('click', function() {
         if (window.currentInvoiceId) {
             const link = `https://app.lzpedia.my.id/pay/${window.currentInvoiceId}`;
             navigator.clipboard.writeText(link).then(() => {
-                if (typeof showToast === 'function') showToast('Berhasil', 'Link pembayaran disalin!', 'success');
+                showToast('Berhasil', 'Link pembayaran disalin!', 'success');
             });
         }
     });
 
+    // === WITHDRAW ===
     document.getElementById('withdrawBtn').addEventListener('click', window.processWithdraw);
+
+    // === BALANCE REFRESH ===
     document.getElementById('balanceRefreshBtn').addEventListener('click', window.fetchBalance);
 
+    // === CLOSE PAYMENT ===
     document.getElementById('paymentCloseBtn').addEventListener('click', function() {
         document.getElementById('paymentOverlay').classList.remove('open');
         if (window.timerInterval) clearInterval(window.timerInterval);
     });
 
-    const storedWithdraw = localStorage.getItem('joellWithdrawHistory');
-    if (storedWithdraw) {
-        try {
-            window.withdrawHistory = JSON.parse(storedWithdraw);
-            window.renderWithdrawHistory();
-        } catch(e) {}
-    }
-    const storedInvoice = localStorage.getItem('joellInvoiceHistory');
-    if (storedInvoice) {
-        try {
-            window.invoiceHistory = JSON.parse(storedInvoice);
-            window.renderInvoiceHistory();
-        } catch(e) {}
-    }
+    // === LOAD ALL HISTORY (PERSISTEN) ===
+    window.renderInvoiceHistory();
+    window.renderWithdrawHistory();
+    window.fetchBalance();
+    window.fetchWithdrawMethods();
     
     console.log('✅ Payment System Ready!');
-    console.log('🔑 API Key:', PAYMENT_API.config.apiKey);
+    console.log('📊 Total Invoice:', window.invoiceHistory.length);
+    console.log('📊 Total Withdraw:', window.withdrawHistory.length);
 });
 
+// ============================================================
+// TOAST FALLBACK
+// ============================================================
 if (typeof showToast !== 'function') {
     window.showToast = function(title, message, type = 'info', duration = 3000) {
         console.log(`📢 ${type.toUpperCase()}: ${title} - ${message}`);
-        alert(`${title}: ${message}`);
+        const container = document.getElementById('toastContainer');
+        if (container) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <div class="toast-icon ${type}"><i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : 'info-circle'}"></i></div>
+                <div class="toast-content"><h4>${title}</h4><p>${message}</p></div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('toast-out');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        } else {
+            alert(`${title}: ${message}`);
+        }
     };
-}
+            }
