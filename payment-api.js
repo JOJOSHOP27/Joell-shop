@@ -1,10 +1,10 @@
 // ============================================================
-// PAYMENT API - LZPedia Integration (FIXED)
+// PAYMENT API - LZPedia Integration (FIXED - QRIS FIX)
 // ============================================================
 
 const PAYMENT_API = {
     config: {
-        apiKey: 'LXZ_679979c28d5a4dd4',  // ← API KEY BARU
+        apiKey: 'LXZ_679979c28d5a4dd4',  // API KEY BARU
         userId: 'f92d9400d6aa05',
         baseUrl: 'https://app.lzpedia.my.id/api'
     },
@@ -16,6 +16,7 @@ const PAYMENT_API = {
         try {
             const response = await fetch(`${this.config.baseUrl}/balance?apikey=${this.config.apiKey}`);
             const data = await response.json();
+            console.log('💰 Balance Response:', data);
             return {
                 success: true,
                 balance: data.balance || 0,
@@ -33,13 +34,14 @@ const PAYMENT_API = {
     },
 
     // ============================================================
-    // 2. BUAT INVOICE (DIPERBAIKI - QRIS FIX)
+    // 2. BUAT INVOICE (DIPERBAIKI)
     // ============================================================
     async createInvoice(amount) {
         try {
-            console.log('📤 Mengirim request ke:', `${this.config.baseUrl}/invoice`);
+            console.log('📤 MEMBUAT INVOICE...');
             console.log('💰 Amount:', amount);
             console.log('🔑 API Key:', this.config.apiKey);
+            console.log('🌐 URL:', `${this.config.baseUrl}/invoice?apikey=${this.config.apiKey}&amount=${amount}`);
             
             const response = await fetch(
                 `${this.config.baseUrl}/invoice?apikey=${this.config.apiKey}&amount=${amount}`
@@ -70,13 +72,14 @@ const PAYMENT_API = {
                     success: true,
                     invoiceId: data.invoice_id,
                     amount: data.amount,
-                    fee: data.fee,
-                    total: data.total,
+                    fee: data.fee || 0,
+                    total: data.total || amount,
                     qrisImage: qrisImage,
                     paymentLink: data.payment_link || null,
                     expiredAt: data.expired_at || null
                 };
             } else {
+                console.error('❌ Invoice Gagal:', data);
                 return {
                     success: false,
                     error: data.message || 'Gagal membuat invoice'
@@ -96,10 +99,12 @@ const PAYMENT_API = {
     // ============================================================
     async generateQRIS(invoiceId) {
         try {
+            console.log('🔄 Generate QRIS Manual untuk:', invoiceId);
             const response = await fetch(
                 `${this.config.baseUrl}/invoice/qris?apikey=${this.config.apiKey}&invoice_id=${invoiceId}`
             );
             const data = await response.json();
+            console.log('📥 QRIS Generate Response:', data);
             return {
                 success: true,
                 qrisImage: data.qris_image || null
@@ -156,6 +161,7 @@ const PAYMENT_API = {
             
             // Fallback data jika API error
             if (!data.manual_methods && !data.instant_methods) {
+                console.log('⚠️ API Withdraw Methods tidak tersedia, menggunakan fallback');
                 return {
                     success: true,
                     manualMethods: [
@@ -255,6 +261,7 @@ window.fetchBalance = async function() {
     try {
         if (refreshBtn) refreshBtn.classList.add('spinning');
         const result = await PAYMENT_API.getBalance();
+        console.log('💰 Saldo:', result.balance);
         balanceEl.textContent = 'Rp ' + Number(result.balance).toLocaleString();
         return result.balance;
     } catch (error) {
@@ -280,11 +287,11 @@ window.createInvoice = async function(amount) {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membuat...';
 
     try {
-        console.log('🚀 Membuat invoice dengan amount:', amount);
-        console.log('🔑 API Key:', PAYMENT_API.config.apiKey);
+        console.log('🚀 MEMBUAT INVOICE...');
+        console.log('💰 Amount:', amount);
         
         const result = await PAYMENT_API.createInvoice(amount);
-        console.log('📥 Response dari API:', result);
+        console.log('📥 Result:', result);
 
         if (result.success) {
             window.currentInvoiceId = result.invoiceId;
@@ -292,41 +299,54 @@ window.createInvoice = async function(amount) {
             // === QRIS ===
             const qrisWrapper = document.getElementById('qrisImageWrapper');
             const qrisImage = document.getElementById('qrisImage');
-            const qrisContainer = document.getElementById('qrisContainer');
             const qrisPlaceholder = document.getElementById('qrisPlaceholder');
             
+            console.log('🖼️ QRIS Image URL:', result.qrisImage);
+            
             if (result.qrisImage && qrisImage) {
-                console.log('✅ QRIS Image ditemukan:', result.qrisImage);
+                console.log('✅ QRIS Image DITEMUKAN!');
                 qrisImage.src = result.qrisImage;
                 qrisImage.alt = 'QRIS Code';
+                qrisImage.style.display = 'block';
                 if (qrisWrapper) qrisWrapper.style.display = 'block';
-                
-                // Sembunyikan placeholder
                 if (qrisPlaceholder) qrisPlaceholder.style.display = 'none';
                 
                 if (typeof showToast === 'function') {
-                    showToast('QRIS Siap', 'Scan QR code untuk membayar', 'success');
+                    showToast('✅ QRIS Siap', 'Scan QR code untuk membayar', 'success');
                 }
             } else {
-                console.warn('⚠️ QRIS Image tidak ditemukan dalam response');
+                console.warn('⚠️ QRIS Image TIDAK DITEMUKAN dalam response');
                 // Coba generate ulang
                 try {
+                    console.log('🔄 Mencoba generate QRIS ulang...');
                     const qrisResult = await PAYMENT_API.generateQRIS(result.invoiceId);
+                    console.log('📥 QRIS Generate Result:', qrisResult);
                     if (qrisResult.success && qrisResult.qrisImage) {
                         qrisImage.src = qrisResult.qrisImage;
                         if (qrisWrapper) qrisWrapper.style.display = 'block';
                         if (qrisPlaceholder) qrisPlaceholder.style.display = 'none';
                         console.log('✅ QRIS berhasil digenerate ulang');
+                        if (typeof showToast === 'function') {
+                            showToast('✅ QRIS Siap', 'Scan QR code untuk membayar', 'success');
+                        }
+                    } else {
+                        console.error('❌ Gagal generate QRIS ulang');
+                        if (typeof showToast === 'function') {
+                            showToast('Error', 'Gagal generate QRIS, coba refresh', 'error');
+                        }
                     }
                 } catch (fallbackError) {
-                    console.error('Fallback QRIS gagal:', fallbackError);
+                    console.error('❌ Fallback QRIS gagal:', fallbackError);
+                    if (typeof showToast === 'function') {
+                        showToast('Error', 'Gagal generate QRIS: ' + fallbackError.message, 'error');
+                    }
                 }
             }
 
             // === Details ===
             document.getElementById('invoiceId').textContent = result.invoiceId;
             document.getElementById('invoiceTotal').textContent = 'Rp ' + Number(result.total).toLocaleString();
-            document.getElementById('invoiceFee').textContent = 'Rp ' + Number(result.fee).toLocaleString();
+            document.getElementById('invoiceFee').textContent = 'Rp ' + Number(result.fee || 0).toLocaleString();
             document.getElementById('invoiceExpiry').textContent = result.expiredAt || '-';
             document.getElementById('paymentDetails').style.display = 'block';
             document.getElementById('checkStatusBtn').style.display = 'inline-flex';
@@ -356,7 +376,7 @@ window.createInvoice = async function(amount) {
     } catch (error) {
         console.error('❌ Invoice Error:', error);
         if (typeof showToast === 'function') {
-            showToast('Error', error.message || 'Gagal membuat invoice', 'error');
+            showToast('❌ Error', error.message || 'Gagal membuat invoice', 'error');
         }
     } finally {
         btn.disabled = false;
@@ -396,7 +416,7 @@ window.checkInvoiceStatus = async function(invoiceId) {
             }
 
             if (result.status === 'paid') {
-                if (typeof showToast === 'function') showToast('Pembayaran Berhasil!', 'Invoice telah dibayar.', 'success', 5000);
+                if (typeof showToast === 'function') showToast('✅ Pembayaran Berhasil!', 'Invoice telah dibayar.', 'success', 5000);
                 setTimeout(() => {
                     document.getElementById('paymentOverlay').classList.remove('open');
                 }, 3000);
@@ -603,6 +623,8 @@ window.openPaymentModal = function(orderData) {
     const overlay = document.getElementById('paymentOverlay');
     if (!overlay) return;
 
+    console.log('📂 Opening Payment Modal with:', orderData);
+
     // Set order items
     const itemsContainer = document.getElementById('paymentOrderItems');
     const totalEl = document.getElementById('paymentOrderTotal');
@@ -642,21 +664,31 @@ window.openPaymentModal = function(orderData) {
     const qrisPlaceholder = document.getElementById('qrisPlaceholder');
     if (qrisPlaceholder) qrisPlaceholder.style.display = 'block';
     
+    // Reset QRIS image
+    const qrisImage = document.getElementById('qrisImage');
+    if (qrisImage) qrisImage.src = '';
+    
     document.querySelectorAll('.payment-method-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.method === 'qris');
     });
 
     overlay.classList.add('open');
-    window.fetchBalance();
-    window.fetchWithdrawMethods();
-    window.renderWithdrawHistory();
-    window.renderInvoiceHistory();
+    
+    // Load data
+    setTimeout(() => {
+        window.fetchBalance();
+        window.fetchWithdrawMethods();
+        window.renderWithdrawHistory();
+        window.renderInvoiceHistory();
+    }, 300);
 };
 
 // ============================================================
 // INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔧 Payment System Initializing...');
+    
     // Payment method switching
     document.querySelectorAll('.payment-method-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -670,13 +702,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Create Invoice
     document.getElementById('createInvoiceBtn').addEventListener('click', function() {
-        const total = parseInt(document.getElementById('paymentOrderTotal').textContent.replace(/[^0-9]/g, ''));
-        if (total > 0) window.createInvoice(total);
+        const totalEl = document.getElementById('paymentOrderTotal');
+        if (totalEl) {
+            const total = parseInt(totalEl.textContent.replace(/[^0-9]/g, ''));
+            console.log('💰 Total dari element:', total);
+            if (total > 0) {
+                window.createInvoice(total);
+            } else {
+                if (typeof showToast === 'function') {
+                    showToast('Error', 'Total pembayaran tidak valid', 'error');
+                }
+            }
+        }
     });
 
     // Check Status
     document.getElementById('checkStatusBtn').addEventListener('click', function() {
-        if (window.currentInvoiceId) window.checkInvoiceStatus(window.currentInvoiceId);
+        if (window.currentInvoiceId) {
+            window.checkInvoiceStatus(window.currentInvoiceId);
+        } else {
+            if (typeof showToast === 'function') {
+                showToast('Info', 'Belum ada invoice yang aktif', 'info');
+            }
+        }
     });
 
     // Copy Payment Link
@@ -704,15 +752,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load histories
     const storedWithdraw = localStorage.getItem('joellWithdrawHistory');
     if (storedWithdraw) {
-        window.withdrawHistory = JSON.parse(storedWithdraw);
-        window.renderWithdrawHistory();
+        try {
+            window.withdrawHistory = JSON.parse(storedWithdraw);
+            window.renderWithdrawHistory();
+        } catch(e) {}
     }
     const storedInvoice = localStorage.getItem('joellInvoiceHistory');
     if (storedInvoice) {
-        window.invoiceHistory = JSON.parse(storedInvoice);
-        window.renderInvoiceHistory();
+        try {
+            window.invoiceHistory = JSON.parse(storedInvoice);
+            window.renderInvoiceHistory();
+        } catch(e) {}
     }
+    
+    console.log('✅ Payment System Ready!');
+    console.log('🔑 API Key:', PAYMENT_API.config.apiKey);
 });
 
-console.log('✅ Payment API Loaded Successfully!');
-console.log('🔑 API Key:', PAYMENT_API.config.apiKey);
+// Toast fallback jika fungsi showToast tidak tersedia
+if (typeof showToast !== 'function') {
+    window.showToast = function(title, message, type = 'info', duration = 3000) {
+        console.log(`📢 ${type.toUpperCase()}: ${title} - ${message}`);
+        alert(`${title}: ${message}`);
+    };
+}
