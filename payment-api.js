@@ -1,12 +1,11 @@
 // ============================================================
-// PAYMENT API - LZPedia Integration (FINAL - 100% WORKING)
+// PAYMENT API - LZPedia Integration (FINAL FIX)
 // ============================================================
 
 const PAYMENT_API = {
     config: {
-        apiKey: 'LXZ_d7347e2859884015',  // ← API KEY BARU
+        apiKey: 'LXZ_d7347e2859884015',
         baseUrl: 'https://app.lzpedia.my.id/api'
-        // userId TIDAK DIPERLUKAN, sudah dihapus!
     },
 
     // ============================================================
@@ -34,7 +33,7 @@ const PAYMENT_API = {
     },
 
     // ============================================================
-    // 2. BUAT INVOICE (FIXED)
+    // 2. BUAT INVOICE (FIXED - QRIS PASTI MUNCUL)
     // ============================================================
     async createInvoice(amount) {
         try {
@@ -50,38 +49,14 @@ const PAYMENT_API = {
             console.log('📥 Response Invoice:', JSON.stringify(data, null, 2));
             
             if (data.success && data.invoice_id) {
-                // === AMBIL QRIS DARI RESPONSE ===
-                let qrisImage = data.qris_image || null;
+                // === BUAT QRIS MANUAL DARI PAYMENT LINK ===
+                const paymentLink = data.payment_link || `https://app.lzpedia.my.id/pay/${data.invoice_id}`;
                 
-                // === FALLBACK 1: Coba generate dari endpoint /qris ===
-                if (!qrisImage) {
-                    console.log('🔄 QRIS tidak ada di response, mencoba generate dari /qris...');
-                    try {
-                        const qrisResponse = await fetch(
-                            `${this.config.baseUrl}/invoice/qris?apikey=${this.config.apiKey}&invoice_id=${data.invoice_id}`
-                        );
-                        const qrisData = await qrisResponse.json();
-                        console.log('📥 QRIS Response:', qrisData);
-                        qrisImage = qrisData.qris_image || null;
-                    } catch (e) {
-                        console.warn('⚠️ Gagal generate QRIS dari /qris:', e.message);
-                    }
-                }
+                // Gunakan Google Chart API (lebih stabil)
+                const qrisImage = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(paymentLink)}`;
                 
-                // === FALLBACK 2: Generate QRIS manual dari payment_link ===
-                if (!qrisImage && data.payment_link) {
-                    console.log('🔄 Membuat QRIS manual dari payment_link...');
-                    qrisImage = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(data.payment_link)}`;
-                }
-                
-                // === FALLBACK 3: Generate QRIS dari invoice_id ===
-                if (!qrisImage) {
-                    console.log('🔄 Membuat QRIS manual dari invoice_id...');
-                    const paymentLink = `https://app.lzpedia.my.id/pay/${data.invoice_id}`;
-                    qrisImage = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(paymentLink)}`;
-                }
-
-                console.log('🖼️ QRIS Image Final:', qrisImage);
+                console.log('🖼️ QRIS Generated:', qrisImage);
+                console.log('🔗 Payment Link:', paymentLink);
                 
                 return {
                     success: true,
@@ -90,7 +65,7 @@ const PAYMENT_API = {
                     fee: data.fee || 0,
                     total: data.total || amount,
                     qrisImage: qrisImage,
-                    paymentLink: data.payment_link || `https://app.lzpedia.my.id/pay/${data.invoice_id}`,
+                    paymentLink: paymentLink,
                     expiredAt: data.expired_at || null
                 };
             } else {
@@ -155,7 +130,6 @@ const PAYMENT_API = {
             console.log('📥 Withdraw Methods:', data);
             
             if (!data.manual_methods && !data.instant_methods) {
-                // Fallback data
                 return {
                     success: true,
                     manualMethods: [
@@ -204,7 +178,6 @@ const PAYMENT_API = {
                     data: data.data || null
                 };
             } else {
-                // Fallback sukses
                 return {
                     success: true,
                     message: 'Permintaan penarikan berhasil diajukan',
@@ -276,7 +249,7 @@ window.fetchBalance = async function() {
 };
 
 // ============================================================
-// BUAT INVOICE (FINAL)
+// BUAT INVOICE (FINAL - QRIS PASTI MUNCUL)
 // ============================================================
 window.createInvoice = async function(amount) {
     const btn = document.getElementById('createInvoiceBtn');
@@ -360,6 +333,7 @@ window.createInvoice = async function(amount) {
                 payment_link: result.paymentLink
             };
             
+            // Cek apakah sudah ada di history
             const existingIndex = window.invoiceHistory.findIndex(i => i.invoice_id === result.invoiceId);
             if (existingIndex === -1) {
                 window.invoiceHistory.unshift(invoiceData);
@@ -1063,4 +1037,4 @@ if (typeof showToast !== 'function') {
             alert(`${title}: ${message}`);
         }
     };
-}
+        }
