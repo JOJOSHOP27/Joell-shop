@@ -1,13 +1,4 @@
 <!DOCTYPE html>
-<noscript>
-    <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0f172a;display:flex;justify-content:center;align-items:center;z-index:9999;">
-        <div style="text-align:center;color:#e2e8f0;padding:20px;">
-            <h2>JavaScript Diperlukan</h2>
-            <p>Mohon aktifkan JavaScript untuk menggunakan aplikasi ini.</p>
-        </div>
-    </div>
-</noscript>
-
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -19,24 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- FIREBASE SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-    <!-- Firebase Configuration - Replace with your actual config -->
-    <script>
-        // const firebaseConfig = {
-        //     apiKey: "YOUR_API_KEY",
-        //     authDomain: "YOUR_PROJECT.firebaseapp.com",
-        //     databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-        //     projectId: "YOUR_PROJECT",
-        //     storageBucket: "YOUR_PROJECT.appspot.com",
-        //     messagingSenderId: "YOUR_SENDER_ID",
-        //     appId: "YOUR_APP_ID"
-        // };
-        // firebase.initializeApp(firebaseConfig);
-    </script>
-
-    
-    <!-- SECURITY SCRIPTS -->
+    <!-- Security Scripts -->
     <script>
         (function() {
             var allowedDomains = ["joell-payment.vercel.app", "nanz-officialstore.vercel.app", "localhost", "127.0.0.1"];
@@ -73,249 +50,148 @@
     </script>
     <meta name="robots" content="noindex, nofollow">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    
-    <!-- STYLES -->
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="payment.css">
-
-    <style>
-        /* Critical fallback styles - remove if style.css and payment.css are available */
-        :root {
-            --accent: #6366f1;
-            --accent-light: #818cf8;
-            --green: #10b981;
-            --text-primary: #e2e8f0;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --border-subtle: rgba(255,255,255,0.1);
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Roboto Condensed', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
-        .app-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .top-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border-subtle); margin-bottom: 20px; }
-        .logo-area { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .logo-area img { width: 40px; height: 40px; border-radius: 8px; }
-        .logo-area span { font-size: 1.5rem; font-weight: 700; color: var(--accent-light); }
-        .header-actions { display: flex; gap: 10px; align-items: center; }
-        .header-btn { background: var(--bg-secondary); border: 1px solid var(--border-subtle); color: var(--text-primary); padding: 10px 16px; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
-        .header-btn:hover { background: var(--accent); }
-        .admin-page { display: none; }
-        .admin-page.active { display: block; }
-        .admin-login-box { max-width: 400px; margin: 60px auto; text-align: center; padding: 40px; background: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--border-subtle); }
-        .admin-login-box h2 { margin-bottom: 8px; }
-        .admin-login-box p { color: var(--text-muted); margin-bottom: 24px; }
-        .admin-login-box input { width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); margin-bottom: 16px; font-size: 1rem; }
-        .admin-login-box button { width: 100%; padding: 12px; background: var(--accent); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-        .admin-login-box button:hover { background: var(--accent-light); }
-        .tracking-detail-box { background: var(--bg-secondary); padding: 20px; border-radius: 12px; border: 1px solid var(--border-subtle); }
-        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
-        .badge { background: var(--accent); color: white; border-radius: 12px; font-weight: 600; }
-        .admin-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin: 20px 0; }
-        .admin-stat-card { background: var(--bg-secondary); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid var(--border-subtle); }
-        .admin-stat-card .num { font-size: 2rem; font-weight: 700; color: var(--accent-light); }
-        .admin-stat-card .label { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
-        .admin-section { background: var(--bg-secondary); padding: 20px; border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--border-subtle); }
-        .admin-section h3 { margin-bottom: 12px; color: var(--text-primary); }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-overlay.open { display: flex; }
-        .modal-box { background: var(--bg-secondary); border-radius: 16px; max-width: 600px; width: 90%; max-height: 80vh; overflow: hidden; border: 1px solid var(--border-subtle); }
-        .order-chat-modal { max-width: 500px; height: 70vh; display: flex; flex-direction: column; }
-        .order-chat-header { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid var(--border-subtle); gap: 12px; }
-        .order-chat-header .info h3 { margin: 0; font-size: 1rem; }
-        .order-chat-header .info p { margin: 0; color: var(--text-muted); font-size: 0.8rem; }
-        .order-chat-messages { flex: 1; overflow-y: auto; padding: 16px; }
-        .order-chat-input-wrap { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--border-subtle); align-items: center; }
-        .chat-attach-btn { background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; padding: 8px; }
-        .chat-attach-btn:hover { color: var(--accent-light); }
-        .input-container { flex: 1; display: flex; gap: 8px; }
-        .input-container input { flex: 1; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 20px; color: var(--text-primary); }
-        .input-container button { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); border: none; color: white; cursor: pointer; }
-        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
-        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; }
-        .back-to-top { position: fixed; bottom: 20px; right: 20px; background: var(--accent); border: none; color: white; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: none; z-index: 100; }
-        #particlesCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
-        .testimonial-avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--green), var(--accent)); color: white; }
-        @media (max-width: 768px) {
-            .admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .admin-login-box { margin: 20px; padding: 24px; }
-        }
-    </style>
-
 </head>
 <body>
-<canvas id="particlesCanvas"></canvas>
+    <canvas id="particlesCanvas"></canvas>
 
-<div class="app-container">
-    <!-- HEADER -->
-    <header class="top-header">
-        <div class="logo-area" id="logoArea" title="Klik 5x untuk Mode Admin">
-            <img src="https://files.catbox.moe/ijemcy.png" alt="JOELL SHOP Logo" loading="lazy">
-            <span>JOELL SHOP</span>
-        </div>
-        <div class="header-actions">
-            <button class="header-btn" id="themeToggle" title="Toggle Dark/Light Mode" aria-label="Toggle theme">
-                <i class="fas fa-moon"></i>
-            </button>
-            <div id="userSection">
-                <button class="header-btn" id="loginBtn" title="Login" aria-label="Login">
-                    <i class="fas fa-sign-in-alt"></i>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="top-header">
+            <div class="logo-area" id="logoArea" title="Klik 5x untuk Mode Admin">
+                <img src="https://files.catbox.moe/ijemcy.png" alt="logo" loading="lazy">
+                <span>JOELL SHOP</span>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" id="themeToggle" title="Toggle Dark/Light Mode">
+                    <i class="fas fa-moon"></i>
                 </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- ADMIN PAGE -->
-    <div class="admin-page active" id="page-admin">
-        <div id="adminLoginView">
-            <div class="admin-login-box">
-                <div style="font-size:3rem;color:var(--accent-light);margin-bottom:8px;"><i class="fas fa-shield-alt"></i></div>
-                <h2>Admin Panel</h2>
-                <p>Masukkan password untuk mengakses dashboard admin</p>
-                <input type="password" id="adminPasswordInput" placeholder="••••••••">
-                <button id="adminLoginBtn"><i class="fas fa-lock"></i> Masuk Admin</button>
-                <button id="adminBackBtn" style="margin-top:12px;background:transparent;color:var(--text-muted);border:1px solid var(--border-subtle);">Kembali ke Toko</button>
-            </div>
-        </div>
-        <div id="adminDashboardView" style="display:none;">
-            <div class="tracking-detail-box" style="margin-bottom:16px;">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-                    <div>
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <h2><i class="fas fa-shield-alt" style="color:var(--accent-light);"></i> Admin Dashboard</h2>
-                            <span class="badge" id="adminChatBadge" style="display:none;position:static;padding:2px 10px;font-size:0.8rem;">0</span>
-                        </div>
-                        <p class="subtitle">Kelola pesanan dan chat pelanggan</p>
-                    </div>
-                    <button onclick="refreshAdminOrders()" class="header-btn" title="Refresh Data" id="btnRefreshAdmin" aria-label="Refresh data">
-                        <i class="fas fa-sync-alt"></i>
+                <div id="userSection">
+                    <button class="header-btn" id="loginBtn" title="Login">
+                        <i class="fas fa-sign-in-alt"></i>
                     </button>
                 </div>
             </div>
-            <div class="admin-stats-grid">
-                <div class="admin-stat-card">
-                    <div class="num" id="adminStatTotal">0</div>
-                    <div class="label">Total Pesanan</div>
-                </div>
-                <div class="admin-stat-card">
-                    <div class="num" id="adminStatPending">0</div>
-                    <div class="label">Menunggu</div>
-                </div>
-                <div class="admin-stat-card">
-                    <div class="num" id="adminStatProcessing">0</div>
-                    <div class="label">Diproses</div>
-                </div>
-                <div class="admin-stat-card">
-                    <div class="num" id="adminStatCompleted">0</div>
-                    <div class="label">Selesai</div>
+        </header>
+
+        <!-- ADMIN PAGE -->
+        <div class="admin-page active" id="page-admin">
+            <div id="adminLoginView">
+                <div class="admin-login-box">
+                    <div style="font-size:3rem;color:var(--accent-light);margin-bottom:8px;"><i class="fas fa-shield-alt"></i></div>
+                    <h2>Admin Panel</h2>
+                    <p>Masukkan password untuk mengakses dashboard admin</p>
+                    <input type="password" id="adminPasswordInput" placeholder="••••••••">
+                    <button id="adminLoginBtn"><i class="fas fa-lock"></i> Masuk Admin</button>
+                    <button id="adminBackBtn" style="margin-top:12px;background:transparent;color:var(--text-muted);border:1px solid var(--border-subtle);">Kembali ke Toko</button>
                 </div>
             </div>
-            <div class="admin-section" style="background:rgba(99,102,241,0.05);border:1px solid rgba(99,102,241,0.2);">
-                <h3><i class="fas fa-cloud"></i> Cloud Sync Status</h3>
-                <div id="cloudStatusIndicator" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:rgba(0,0,0,0.2);margin-top:10px;">
-                    <div id="cloudStatusDot" style="width:12px;height:12px;border-radius:50%;background:var(--text-muted);"></div>
-                    <span id="cloudStatusText" style="font-size:0.9rem;color:var(--text-secondary);">Mengecek koneksi database...</span>
+            <div id="adminDashboardView" style="display:none;">
+                <div class="tracking-detail-box" style="margin-bottom:16px;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                        <div>
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <h2><i class="fas fa-shield-alt" style="color:var(--accent-light);"></i> Admin Dashboard</h2>
+                                <span class="badge" id="adminChatBadge" style="display:none;position:static;padding:2px 10px;font-size:0.8rem;">0</span>
+                            </div>
+                            <p class="subtitle">Kelola pesanan dan chat pelanggan</p>
+                        </div>
+                        <button onclick="refreshAdminOrders()" class="header-btn" title="Refresh Data" id="btnRefreshAdmin">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
                 </div>
-                <p style="color:var(--text-muted);font-size:0.75rem;margin-top:8px;">Database cloud memungkinkan chat real-time antar perangkat berbeda secara otomatis.</p>
-            </div>
-            <div class="admin-section">
-                <h3><i class="fas fa-shopping-bag"></i> Semua Pesanan</h3>
-                <div id="adminOrdersList"></div>
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card">
+                        <div class="num" id="adminStatTotal">0</div>
+                        <div class="label">Total Pesanan</div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="num" id="adminStatPending">0</div>
+                        <div class="label">Menunggu</div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="num" id="adminStatProcessing">0</div>
+                        <div class="label">Diproses</div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="num" id="adminStatCompleted">0</div>
+                        <div class="label">Selesai</div>
+                    </div>
+                </div>
+                <div class="admin-section" style="background:rgba(99,102,241,0.05);border:1px solid rgba(99,102,241,0.2);">
+                    <h3><i class="fas fa-cloud"></i> Cloud Sync Status</h3>
+                    <div id="cloudStatusIndicator" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:rgba(0,0,0,0.2);margin-top:10px;">
+                        <div id="cloudStatusDot" style="width:12px;height:12px;border-radius:50%;background:var(--text-muted);"></div>
+                        <span id="cloudStatusText" style="font-size:0.9rem;color:var(--text-secondary);">Mengecek koneksi database...</span>
+                    </div>
+                    <p style="color:var(--text-muted);font-size:0.75rem;margin-top:8px;">Database cloud memungkinkan chat real-time antar perangkat berbeda secara otomatis.</p>
+                </div>
+                <div class="admin-section">
+                    <h3><i class="fas fa-shopping-bag"></i> Semua Pesanan</h3>
+                    <div id="adminOrdersList"></div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- ADMIN CHAT MODAL -->
-<div class="modal-overlay" id="adminChatOverlay">
-    <div class="modal-box order-chat-modal">
-        <div class="order-chat-header">
-            <button onclick="document.getElementById('adminChatOverlay').classList.remove('open')" style="background:none;border:none;color:#8696a0;font-size:1.2rem;margin-right:10px;cursor:pointer;"><i class="fas fa-arrow-left"></i></button>
-            <div class="testimonial-avatar" id="adminChatUserImg" style="width:44px;height:44px;font-size:1.2rem;background:linear-gradient(135deg,var(--green),var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i class="fas fa-user"></i></div>
-            <div class="info">
-                <h3 id="adminChatUserName">Chat Pelanggan</h3>
-                <p id="adminChatOrderId">Order: #JOELL-0000-0000</p>
+    <!-- ADMIN CHAT MODAL (WHATSAPP STYLE) -->
+    <div class="modal-overlay" id="adminChatOverlay">
+        <div class="modal-box order-chat-modal">
+            <div class="order-chat-header">
+                <button onclick="document.getElementById('adminChatOverlay').classList.remove('open')" style="background:none;border:none;color:#8696a0;font-size:1.2rem;margin-right:10px;cursor:pointer;"><i class="fas fa-arrow-left"></i></button>
+                <div class="testimonial-avatar" id="adminChatUserImg" style="width:44px;height:44px;font-size:1.2rem;background:linear-gradient(135deg,var(--green),var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i class="fas fa-user"></i></div>
+                <div class="info">
+                    <h3 id="adminChatUserName">Chat Pelanggan</h3>
+                    <p id="adminChatOrderId">Order: #JOELL-0000-0000</p>
+                </div>
+                <button class="modal-close" id="adminChatCloseBtn" style="position:static;color:#8696a0;font-size:1.2rem;margin-left:auto;"><i class="fas fa-times"></i></button>
             </div>
-            <button class="modal-close" id="adminChatCloseBtn" style="position:static;color:#8696a0;font-size:1.2rem;margin-left:auto;"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="order-chat-messages" id="adminChatMessages"></div>
-        <div class="order-chat-input-wrap">
-            <button class="chat-attach-btn" onclick="document.getElementById('adminChatFile').click()" title="Upload Gambar"><i class="fas fa-image"></i></button>
-            <button class="chat-attach-btn" onclick="document.getElementById('adminDocFile').click()" title="Upload File/Script"><i class="fas fa-file-code"></i></button>
-            <input type="file" id="adminChatFile" accept="image/*" style="display:none;" onchange="handleChatFileUpload(this, 'admin')">
-            <input type="file" id="adminDocFile" accept=".json,.zip,.txt,.js,.html" style="display:none;" onchange="handleAdminDocUpload(this)">
-            <div class="input-container">
-                <input type="text" id="adminChatInput" placeholder="Reply to customer...">
-                <button id="adminChatSend"><i class="fas fa-arrow-up"></i></button>
+            <div class="order-chat-messages" id="adminChatMessages"></div>
+            <div class="order-chat-input-wrap">
+                <button class="chat-attach-btn" onclick="document.getElementById('adminChatFile').click()" title="Upload Gambar"><i class="fas fa-image"></i></button>
+                <button class="chat-attach-btn" onclick="document.getElementById('adminDocFile').click()" title="Upload File/Script"><i class="fas fa-file-code"></i></button>
+                <input type="file" id="adminChatFile" accept="image/*" style="display:none;" onchange="handleChatFileUpload(this, 'admin')">
+                <input type="file" id="adminDocFile" accept=".json,.zip,.txt,.js,.html" style="display:none;" onchange="handleAdminDocUpload(this)">
+                <div class="input-container">
+                    <input type="text" id="adminChatInput" placeholder="Reply to customer...">
+                    <button id="adminChatSend"><i class="fas fa-arrow-up"></i></button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- TOAST CONTAINER -->
-<div class="toast-container" id="toastContainer"></div>
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
 
-<!-- BACK TO TOP -->
-<button class="back-to-top" id="backToTop" title="Kembali ke atas">
-    <i class="fas fa-arrow-up"></i>
-</button>
+    <!-- BACK TO TOP -->
+    <button class="back-to-top" id="backToTop" title="Kembali ke atas">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
-<!-- SCRIPTS -->
-
-<script>
-    // Stub functions - will be overridden by script.js if loaded
-    function enterAdminMode() { console.log('Admin mode entered'); }
-    function refreshAdminOrders() { console.log('Refreshing orders...'); }
-    function handleChatFileUpload(input, role) { console.log('File upload:', role); }
-    function handleAdminDocUpload(input) { console.log('Doc upload'); }
-
-    // Firebase stub if not loaded
-    if (typeof firebase === 'undefined') {
-        window.firebase = {
-            initializeApp: function() { console.warn('Firebase not loaded'); return {}; },
-            database: function() { 
-                return {
-                    ref: function() { 
-                        return {
-                            on: function() {},
-                            once: function() { return Promise.resolve({val: function() { return {}; }}); },
-                            set: function() { return Promise.resolve(); },
-                            push: function() { return { key: 'stub-' + Date.now() }; }
-                        }; 
-                    }
-                }; 
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedPage = localStorage.getItem('joellCurrentPage');
+            if (savedPage && savedPage !== 'admin' && document.getElementById('page-' + savedPage)) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-' + savedPage).classList.add('active');
+                document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.page === savedPage) item.classList.add('active');
+                });
+                document.getElementById('bottomNav').style.display = 'flex';
+                if (savedPage === 'orders') renderOrdersList();
+                if (savedPage === 'profile') renderProfilePage();
+            } else {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-admin').classList.add('active');
+                document.getElementById('bottomNav').style.display = 'none';
+                enterAdminMode();
             }
-        };
-    }
-</script>
-
-<script src="script.js"></script>
-<script src="payment-api.js"></script>
-
-<script>
-    // Admin page initialization
-    document.addEventListener('DOMContentLoaded', function() {
-        const savedPage = localStorage.getItem('joellCurrentPage');
-        if (savedPage && savedPage !== 'admin' && document.getElementById('page-' + savedPage)) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-' + savedPage).classList.add('active');
-            document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
-                item.classList.remove('active');
-                if (item.dataset.page === savedPage) item.classList.add('active');
-            });
-            document.getElementById('bottomNav').style.display = 'flex';
-            if (savedPage === 'orders') renderOrdersList();
-            if (savedPage === 'profile') renderProfilePage();
-        } else {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-admin').classList.add('active');
-            document.getElementById('bottomNav').style.display = 'none';
-            enterAdminMode();
-        }
-    });
-</script>
+        });
+    </script>
 </body>
 </html>
