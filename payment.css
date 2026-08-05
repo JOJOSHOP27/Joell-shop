@@ -2,7 +2,6 @@
    PAYMENT SYSTEM STYLES (FIXED)
    ============================================================ */
 
-/* Payment Modal */
 .payment-modal .modal-box {
     max-width: 520px;
 }
@@ -40,9 +39,7 @@
     box-shadow: 0 0 20px var(--accent-glow);
 }
 
-/* ============================================================
-   QRIS CONTAINER - DIPERBAIKI
-   ============================================================ */
+/* QRIS Container */
 .payment-qris-container {
     text-align: center;
     margin: 16px 0;
@@ -77,7 +74,7 @@
     color: var(--text-muted);
 }
 
-/* QRIS Image Wrapper */
+/* QRIS Image */
 #qrisImageWrapper {
     width: 100%;
     display: flex;
@@ -105,13 +102,7 @@
     font-weight: 600;
 }
 
-#qrisImageWrapper .qris-success-text i {
-    margin-right: 4px;
-}
-
-/* ============================================================
-   PAYMENT DETAILS
-   ============================================================ */
+/* Payment Details */
 .payment-details {
     background: var(--bg-primary);
     border-radius: 8px;
@@ -283,142 +274,6 @@
     to { transform: rotate(360deg); }
 }
 
-/* Withdraw Section */
-.withdraw-section {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border-subtle);
-}
-
-.withdraw-methods-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
-    margin-bottom: 14px;
-}
-
-.withdraw-method-item {
-    padding: 12px;
-    border-radius: 8px;
-    border: 2px solid var(--border-subtle);
-    background: var(--bg-primary);
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.8rem;
-    font-weight: 700;
-}
-
-.withdraw-method-item:hover {
-    border-color: var(--accent);
-}
-
-.withdraw-method-item.active {
-    border-color: var(--accent);
-    background: rgba(99,102,241,0.1);
-}
-
-.withdraw-method-item .method-name {
-    display: block;
-    font-size: 0.65rem;
-    color: var(--text-muted);
-    font-weight: 400;
-}
-
-.withdraw-input-group {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-}
-
-.withdraw-input-group input {
-    flex: 1;
-    padding: 12px 16px;
-    border-radius: 8px;
-    border: 1px solid var(--border-subtle);
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    outline: none;
-    min-width: 120px;
-}
-
-.withdraw-input-group input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-glow);
-}
-
-.withdraw-input-group .withdraw-btn {
-    padding: 12px 24px;
-    background: linear-gradient(135deg, var(--accent), var(--purple));
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.withdraw-input-group .withdraw-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.withdraw-info {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    padding: 8px 12px;
-    background: rgba(99,102,241,0.05);
-    border-radius: 8px;
-}
-
-/* History */
-.withdraw-history,
-.invoice-history-list {
-    margin-top: 14px;
-    max-height: 220px;
-    overflow-y: auto;
-}
-
-.withdraw-history-item,
-.invoice-history-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 14px;
-    background: var(--bg-primary);
-    border-radius: 8px;
-    border: 1px solid var(--border-subtle);
-    margin-bottom: 6px;
-    font-size: 0.8rem;
-}
-
-.withdraw-history-item .wh-status,
-.invoice-history-item .ih-status {
-    font-weight: 700;
-    font-size: 0.7rem;
-    padding: 2px 12px;
-    border-radius: 30px;
-}
-
-.withdraw-history-item .wh-status.pending,
-.invoice-history-item .ih-status.pending {
-    background: rgba(251,191,36,0.15);
-    color: #fbbf24;
-}
-
-.withdraw-history-item .wh-status.success,
-.invoice-history-item .ih-status.paid {
-    background: rgba(16,185,129,0.15);
-    color: #10b981;
-}
-
-.withdraw-history-item .wh-status.failed,
-.invoice-history-item .ih-status.expired {
-    background: rgba(239,68,68,0.15);
-    color: #ef4444;
-}
-
 /* Section Label */
 .payment-section {
     margin-bottom: 20px;
@@ -440,47 +295,23 @@
     color: var(--accent-light);
 }
 
-.withdraw-section {
-    background: rgba(99,102,241,0.03);
-    border-radius: var(--radius-sm);
-    padding: 16px;
-    border: 1px solid var(--border-subtle);
-    margin-top: 8px;
+/* Invoice History */
+.invoice-history-list {
+    margin-top: 14px;
+    max-height: 220px;
+    overflow-y: auto;
 }
 
-.withdraw-section .section-label {
-    border-left-color: var(--orange);
-}
-
-.withdraw-section .section-label i {
-    color: var(--orange);
-}
-
-/* Responsive */
-@media (max-width: 500px) {
-    .payment-methods {
-        grid-template-columns: 1fr 1fr;
-    }
-    .withdraw-methods-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .withdraw-input-group {
-        flex-direction: column;
-    }
-    .payment-actions {
-        flex-direction: column;
-    }
-    .payment-actions .btn-pay {
-        width: 100%;
-    }
-    
-    #qrisImageWrapper img {
-        max-width: 200px;
-    }
-}
-
-/* Invoice History Clickable */
 .invoice-history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--bg-primary);
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    margin-bottom: 6px;
+    font-size: 0.8rem;
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -491,143 +322,59 @@
     transform: translateX(4px);
 }
 
-/* Withdraw Section in Profile */
-.withdraw-section-in-profile {
-    margin-top: 24px;
-    padding: 20px;
-    background: var(--bg-card);
-    border-radius: 12px;
-    border: 1px solid var(--border-subtle);
-}
-
-.withdraw-section-in-profile .withdraw-methods-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
-    margin-bottom: 14px;
-}
-
-.withdraw-section-in-profile .withdraw-method-item {
-    padding: 12px;
-    border-radius: 8px;
-    border: 2px solid var(--border-subtle);
-    background: var(--bg-primary);
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.8rem;
-    font-weight: 700;
-}
-
-.withdraw-section-in-profile .withdraw-method-item:hover {
-    border-color: var(--accent);
-}
-
-.withdraw-section-in-profile .withdraw-method-item.active {
-    border-color: var(--accent);
-    background: rgba(99,102,241,0.1);
-}
-
-.withdraw-section-in-profile .withdraw-input-group {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-}
-
-.withdraw-section-in-profile .withdraw-input-group input {
-    flex: 1;
-    padding: 12px 16px;
-    border-radius: 8px;
-    border: 1px solid var(--border-subtle);
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    outline: none;
-    min-width: 120px;
-}
-
-.withdraw-section-in-profile .withdraw-input-group input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-glow);
-}
-
-.withdraw-section-in-profile .withdraw-input-group .withdraw-btn {
-    padding: 12px 24px;
-    background: linear-gradient(135deg, var(--orange), #ea580c);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.withdraw-section-in-profile .withdraw-input-group .withdraw-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.withdraw-section-in-profile .withdraw-info {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    padding: 8px 12px;
-    background: rgba(99,102,241,0.05);
-    border-radius: 8px;
-    margin-bottom: 12px;
-}
-
-.withdraw-section-in-profile .withdraw-history {
-    margin-top: 14px;
-    max-height: 220px;
-    overflow-y: auto;
-}
-
-.withdraw-section-in-profile .withdraw-history-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 14px;
-    background: var(--bg-primary);
-    border-radius: 8px;
-    border: 1px solid var(--border-subtle);
-    margin-bottom: 6px;
-    font-size: 0.8rem;
-}
-
-.withdraw-section-in-profile .withdraw-history-item .wh-left {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.withdraw-section-in-profile .withdraw-history-item .wh-left .wh-amount {
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.withdraw-section-in-profile .withdraw-history-item .wh-left .wh-method {
-    color: var(--text-muted);
-    font-size: 0.7rem;
-}
-
-.withdraw-section-in-profile .withdraw-history-item .wh-status {
+.invoice-history-item .ih-status {
     font-weight: 700;
     font-size: 0.7rem;
     padding: 2px 12px;
     border-radius: 30px;
 }
 
-.withdraw-section-in-profile .withdraw-history-item .wh-status.pending {
+.invoice-history-item .ih-status.pending {
     background: rgba(251,191,36,0.15);
     color: #fbbf24;
 }
 
-.withdraw-section-in-profile .withdraw-history-item .wh-status.success {
+.invoice-history-item .ih-status.paid {
     background: rgba(16,185,129,0.15);
     color: #10b981;
 }
 
-.withdraw-section-in-profile .withdraw-history-item .wh-status.failed {
+.invoice-history-item .ih-status.expired {
     background: rgba(239,68,68,0.15);
     color: #ef4444;
+}
+
+.invoice-history-item .ih-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.invoice-history-item .ih-id {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--accent-light);
+    font-size: 0.75rem;
+}
+
+.invoice-history-item .ih-amount {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+    .payment-methods {
+        grid-template-columns: 1fr 1fr;
+    }
+    .payment-actions {
+        flex-direction: column;
+    }
+    .payment-actions .btn-pay {
+        width: 100%;
+    }
+    #qrisImageWrapper img {
+        max-width: 200px;
+    }
    }
