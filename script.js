@@ -520,7 +520,9 @@ function showToast(title, message, type = 'info', duration = 3000) {
 // ============================================================
 //  PROMO CODE
 // ============================================================
-document.getElementById('promoBtn').addEventListener('click', () => {
+const promoBtn = document.getElementById('promoBtn');
+if (promoBtn) {
+promoBtn.addEventListener('click', () => {
     const code = document.getElementById('promoInput').value.trim().toUpperCase();
     const msgEl = document.getElementById('promoMessage');
     if (!code) { msgEl.textContent = 'Masukkan kode promo'; msgEl.className = 'promo-message error'; return; }
@@ -536,11 +538,14 @@ document.getElementById('promoBtn').addEventListener('click', () => {
         msgEl.className = 'promo-message error';
     }
 });
+}
 
 // ============================================================
 //  SERVER STATUS REFRESH
 // ============================================================
-document.getElementById('refreshStatus').addEventListener('click', function() {
+const refreshStatusBtn = document.getElementById('refreshStatus');
+if (refreshStatusBtn) {
+refreshStatusBtn.addEventListener('click', function() {
     this.classList.add('spinning');
     setTimeout(() => {
         this.classList.remove('spinning');
@@ -553,6 +558,7 @@ document.getElementById('refreshStatus').addEventListener('click', function() {
         showToast('Server Status', 'Status server diperbarui', 'success');
     }, 1000);
 });
+}
 
 // ============================================================
 //  RENDER FUNCTIONS
@@ -696,7 +702,9 @@ function addToCart(productId, variantName, variantPrice) {
     showToast('Keranjang', `${p.name} ditambahkan!`, 'success');
 }
 
-document.getElementById('clearCartBtn').addEventListener('click', () => {
+const clearCartBtn = document.getElementById('clearCartBtn');
+if (clearCartBtn) {
+clearCartBtn.addEventListener('click', () => {
     if (!cart.length) return;
     if (confirm('Kosongkan keranjang?')) {
         cart = [];
@@ -707,6 +715,7 @@ document.getElementById('clearCartBtn').addEventListener('click', () => {
         showToast('Keranjang', 'Keranjang dikosongkan', 'info');
     }
 });
+}
 
 // ============================================================
 //  DETAIL MODAL
@@ -743,13 +752,17 @@ function selectVariant(el, index) {
     document.getElementById('detailPrice').textContent = priceText;
 }
 
-document.getElementById('addToCartBtn').addEventListener('click', () => {
+const addToCartBtn = document.getElementById('addToCartBtn');
+if (addToCartBtn) {
+addToCartBtn.addEventListener('click', () => {
     if (!selectedVariant) { showToast('Error', 'Pilih varian dulu', 'error'); return; }
     addToCart(currentProductId, selectedVariant.name, selectedVariant.price);
     document.getElementById('detailOverlay').classList.remove('open');
 });
 
-document.getElementById('buyNowBtn').addEventListener('click', () => {
+const buyNowBtn = document.getElementById('buyNowBtn');
+if (buyNowBtn) {
+buyNowBtn.addEventListener('click', () => {
     if (!selectedVariant) { showToast('Error', 'Pilih varian dulu', 'error'); return; }
     addToCart(currentProductId, selectedVariant.name, selectedVariant.price);
     document.getElementById('detailOverlay').classList.remove('open');
@@ -759,7 +772,9 @@ document.getElementById('buyNowBtn').addEventListener('click', () => {
 // ============================================================
 //  CHECKOUT SYSTEM
 // ============================================================
-document.getElementById('checkoutBtn').addEventListener('click', () => {
+const checkoutBtn = document.getElementById('checkoutBtn');
+if (checkoutBtn) {
+checkoutBtn.addEventListener('click', () => {
     if (!cart.length) { showToast('Error', 'Keranjang kosong', 'error'); return; }
     if (!currentUser) {
         showToast('Login Diperlukan', 'Silakan login untuk checkout', 'warning');
@@ -773,11 +788,16 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
         total += sub;
         return `<div class="order-item-line">${item.name} (${item.variant}) x${item.qty} = Rp ${sub.toLocaleString()}</div>`;
     }).join('');
-    document.getElementById('checkoutTotal').textContent = 'Total: Rp ' + total.toLocaleString();
-    document.getElementById('coName').value = currentUser.name || '';
-    document.getElementById('coEmail').value = currentUser.email || '';
-    document.getElementById('cartOverlay').classList.remove('open');
-    document.getElementById('checkoutOverlay').classList.add('open');
+    const checkoutTotalEl = document.getElementById('checkoutTotal');
+    if (checkoutTotalEl) checkoutTotalEl.textContent = 'Total: Rp ' + total.toLocaleString();
+    const coNameEl = document.getElementById('coName');
+    if (coNameEl) coNameEl.value = currentUser.name || '';
+    const coEmailEl = document.getElementById('coEmail');
+    if (coEmailEl) coEmailEl.value = currentUser.email || '';
+    const cartOverlay = document.getElementById('cartOverlay');
+    if (cartOverlay) cartOverlay.classList.remove('open');
+    const checkoutOverlay = document.getElementById('checkoutOverlay');
+    if (checkoutOverlay) checkoutOverlay.classList.add('open');
 });
 
 // Checkout form submission
@@ -792,10 +812,10 @@ if (document.getElementById('checkoutForm')) {
         const order = {
             id: orderId,
             userId: currentUser ? currentUser.id : 'guest',
-            userName: document.getElementById('coName').value,
-            userEmail: document.getElementById('coEmail').value,
-            userPhone: document.getElementById('coPhone').value,
-            address: document.getElementById('coAddress').value,
+            userName: (document.getElementById('coName') || {}).value || '',
+            userEmail: (document.getElementById('coEmail') || {}).value || '',
+            userPhone: (document.getElementById('coPhone') || {}).value || '',
+            address: (document.getElementById('coAddress') || {}).value || '',
             payment: 'online',
             items: [...cart],
             total: total,
@@ -811,7 +831,7 @@ if (document.getElementById('checkoutForm')) {
             chat: [
                 { 
                     from: 'admin', 
-                    text: `Halo ${document.getElementById('coName').value}! Terima kasih telah memesan. Silakan selesaikan pembayaran Anda.`,
+                    text: `Halo ${(document.getElementById('coName') || {}).value || 'Pelanggan'}! Terima kasih telah memesan. Silakan selesaikan pembayaran Anda.`,
                     time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) 
                 }
             ]
@@ -826,11 +846,15 @@ if (document.getElementById('checkoutForm')) {
         localStorage.setItem('joellCart', JSON.stringify(cart));
         updateCartUI();
         
-        document.getElementById('checkoutOverlay').classList.remove('open');
+        const checkoutOverlay = document.getElementById('checkoutOverlay');
+        if (checkoutOverlay) checkoutOverlay.classList.remove('open');
         
         // Buka payment modal
-        if (typeof openPaymentModal === 'function') {
-            openPaymentModal(order);
+        if (typeof window.openPaymentModal === 'function') {
+            // Beri sedikit delay agar DOM sudah siap
+            setTimeout(() => {
+                window.openPaymentModal(order);
+            }, 300);
         } else {
             showToast('Pesanan Dibuat', `ID: ${orderId}. Selesaikan pembayaran.`, 'success', 5000);
             navigateTo('orders');
@@ -1029,7 +1053,9 @@ function renderOrderChatMessages() {
     container.scrollTop = container.scrollHeight;
 }
 
-document.getElementById('orderChatSend').addEventListener('click', () => {
+const orderChatSendBtn = document.getElementById('orderChatSend');
+if (orderChatSendBtn) {
+orderChatSendBtn.addEventListener('click', () => {
     const input = document.getElementById('orderChatInput');
     const text = input.value.trim();
     if (!text || !currentOrderChatId) return;
@@ -1060,14 +1086,22 @@ document.getElementById('orderChatSend').addEventListener('click', () => {
     }, 2000);
 });
 
-document.getElementById('orderChatInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') document.getElementById('orderChatSend').click();
+const orderChatInput = document.getElementById('orderChatInput');
+if (orderChatInput) {
+orderChatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        const sendBtn = document.getElementById('orderChatSend');
+        if (sendBtn) sendBtn.click();
+    }
 });
+}
 
 // ============================================================
 //  TRACKING
 // ============================================================
-document.getElementById('trackBtn').addEventListener('click', () => {
+const trackBtn = document.getElementById('trackBtn');
+if (trackBtn) {
+trackBtn.addEventListener('click', () => {
     const input = document.getElementById('trackInput').value.trim();
     if (!input) { showToast('Error', 'Masukkan ID pesanan', 'error'); return; }
     
@@ -1111,19 +1145,27 @@ document.getElementById('trackBtn').addEventListener('click', () => {
         `;
     }).join('');
     
-    document.getElementById('trackChatBtn').onclick = () => {
-        document.getElementById('trackResult').style.display = 'none';
-        openOrderChat(order.id);
-    };
+    const trackChatBtn = document.getElementById('trackChatBtn');
+    if (trackChatBtn) {
+        trackChatBtn.onclick = () => {
+            const trackResult = document.getElementById('trackResult');
+            if (trackResult) trackResult.style.display = 'none';
+            openOrderChat(order.id);
+        };
+    }
     
-    document.getElementById('trackResult').style.display = 'block';
+    const trackResultEl = document.getElementById('trackResult');
+    if (trackResultEl) trackResultEl.style.display = 'block';
     showToast('Tracking', 'Data pesanan ditemukan', 'success');
 });
+}
 
 // ============================================================
 //  ADMIN PANEL SYSTEM
 // ============================================================
-document.getElementById('logoArea').addEventListener('click', () => {
+const logoArea = document.getElementById('logoArea');
+if (logoArea) {
+logoArea.addEventListener('click', () => {
     logoClickCount++;
     if (logoClickCount >= 5) {
         logoClickCount = 0;
@@ -1131,6 +1173,7 @@ document.getElementById('logoArea').addEventListener('click', () => {
     }
     setTimeout(() => { if (logoClickCount > 0) logoClickCount--; }, 2000);
 });
+}
 
 function enterAdminMode() {
     localStorage.setItem('joellCurrentPage', 'admin');
@@ -1142,15 +1185,21 @@ function enterAdminMode() {
     window.scrollTo(0,0);
 }
 
-document.getElementById('adminBackBtn').addEventListener('click', () => {
+const adminBackBtn = document.getElementById('adminBackBtn');
+if (adminBackBtn) {
+adminBackBtn.addEventListener('click', () => {
     localStorage.removeItem('joellCurrentPage');
     document.getElementById('page-admin').classList.remove('active');
     document.getElementById('page-home').classList.add('active');
-    document.getElementById('bottomNav').style.display = 'flex';
+    const bottomNav = document.getElementById('bottomNav');
+    if (bottomNav) bottomNav.style.display = 'flex';
     isAdminLoggedIn = false;
 });
+}
 
-document.getElementById('adminLoginBtn').addEventListener('click', () => {
+const adminLoginBtn = document.getElementById('adminLoginBtn');
+if (adminLoginBtn) {
+adminLoginBtn.addEventListener('click', () => {
     const input = document.getElementById('adminPasswordInput').value;
     if (input === CONFIG.adminPassword) {
         isAdminLoggedIn = true;
@@ -1163,10 +1212,17 @@ document.getElementById('adminLoginBtn').addEventListener('click', () => {
         showToast('Error', 'Password salah!', 'error');
     }
 });
+}
 
-document.getElementById('adminPasswordInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') document.getElementById('adminLoginBtn').click();
+const adminPasswordInput = document.getElementById('adminPasswordInput');
+if (adminPasswordInput) {
+adminPasswordInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        const loginBtn = document.getElementById('adminLoginBtn');
+        if (loginBtn) loginBtn.click();
+    }
 });
+}
 
 function updateAdminStats() {
     document.getElementById('adminStatTotal').textContent = orders.length;
@@ -1472,7 +1528,9 @@ async function handleAdminDocUpload(input) {
     }
 }
 
-document.getElementById('adminChatSend').addEventListener('click', () => {
+const adminChatSendBtn = document.getElementById('adminChatSend');
+if (adminChatSendBtn) {
+adminChatSendBtn.addEventListener('click', () => {
     const input = document.getElementById('adminChatInput');
     const text = input.value.trim();
     if (!text || !currentAdminChatId) return;
@@ -1490,9 +1548,15 @@ document.getElementById('adminChatSend').addEventListener('click', () => {
     showToast('Chat', 'Balasan terkirim ke pelanggan', 'success');
 });
 
-document.getElementById('adminChatInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') document.getElementById('adminChatSend').click();
+const adminChatInput = document.getElementById('adminChatInput');
+if (adminChatInput) {
+adminChatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        const sendBtn = document.getElementById('adminChatSend');
+        if (sendBtn) sendBtn.click();
+    }
 });
+}
 
 // ============================================================
 //  ANIME
@@ -1658,7 +1722,8 @@ async function loadAnime() {
 }
 
 function openAnime() {
-    document.getElementById('animeOverlay').classList.add('open');
+    const animeOverlay = document.getElementById('animeOverlay');
+    if (animeOverlay) animeOverlay.classList.add('open');
     loadAnime();
 }
 
@@ -1672,6 +1737,7 @@ function openAnime() {
     const panel = document.getElementById('botPanelKontrol');
     const logArea = document.getElementById('botLogArea');
     let currentToken = '', currentChatId = null;
+    if (!checkBtn) return; // bukan halaman bot controller, skip
 
     function addLog(type, text) {
         const time = new Date().toLocaleTimeString('id-ID', {hour12:false});
@@ -1728,6 +1794,7 @@ function openAnime() {
 // ============================================================
 (function() {
     const queryBtn = document.getElementById('osintQueryBtn');
+    if (!queryBtn) return; // bukan halaman OSINT, skip
     queryBtn.addEventListener('click', async () => {
         const phone = document.getElementById('osintPhone').value.trim();
         const endpoint = document.getElementById('osintEndpoint').value;
@@ -1761,7 +1828,9 @@ function openAnime() {
 //  SSWEB
 // ============================================================
 (function() {
-    document.getElementById('sswebBtn').addEventListener('click', async () => {
+    const sswebBtn = document.getElementById('sswebBtn');
+    if (!sswebBtn) return; // bukan halaman SSWeb, skip
+    sswebBtn.addEventListener('click', async () => {
         const url = document.getElementById('sswebUrl').value.trim();
         const result = document.getElementById('sswebResult');
         if (!url) { result.innerHTML = '<div class="error">Masukkan URL</div>'; return; }
@@ -1791,6 +1860,7 @@ function openAnime() {
 (function() {
     const dropzone = document.getElementById('uploadDropzone');
     const fileInput = document.getElementById('uploadFileInput');
+    if (!dropzone) return; // bukan halaman upload, skip
     let selectedFile = null;
 
     dropzone.addEventListener('click', () => fileInput.click());
@@ -1854,8 +1924,10 @@ function navigateTo(page) {
     document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
         item.classList.toggle('active', item.dataset.page === page);
     });
-    document.getElementById('cartOverlay').classList.remove('open');
-    document.getElementById('bottomNav').style.display = 'flex';
+    const cartOverlay = document.getElementById('cartOverlay');
+    if (cartOverlay) cartOverlay.classList.remove('open');
+    const bottomNav = document.getElementById('bottomNav');
+    if (bottomNav) bottomNav.style.display = 'flex';
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (page === 'orders') renderOrdersList();
     if (page === 'profile') renderProfilePage();
@@ -1867,11 +1939,15 @@ function renderProfilePage() {
     if (currentUser) {
         if (userView) userView.style.display = 'block';
         if (guestView) guestView.style.display = 'none';
-        document.getElementById('userProfileImg').src = currentUser.picture;
-        document.getElementById('userProfileName').textContent = currentUser.name;
-        document.getElementById('userProfileEmail').textContent = currentUser.email;
+        const userProfileImg = document.getElementById('userProfileImg');
+        if (userProfileImg) userProfileImg.src = currentUser.picture;
+        const userProfileName = document.getElementById('userProfileName');
+        if (userProfileName) userProfileName.textContent = currentUser.name;
+        const userProfileEmail = document.getElementById('userProfileEmail');
+        if (userProfileEmail) userProfileEmail.textContent = currentUser.email;
         const userOrders = orders.filter(o => o.userId === currentUser.id);
-        document.getElementById('statOrderCount').textContent = userOrders.length;
+        const statOrderCount = document.getElementById('statOrderCount');
+        if (statOrderCount) statOrderCount.textContent = userOrders.length;
         document.getElementById('btnProfileLogoutPage').onclick = () => {
             if (confirm('Apakah Anda yakin ingin keluar?')) {
                 currentUser = null; localStorage.removeItem('joellUser');
@@ -1899,26 +1975,41 @@ function doSearch() {
         const grid = document.getElementById('grid' + cat.charAt(0).toUpperCase() + cat.slice(1));
         if (grid) grid.innerHTML = renderMenuCards(filtered);
     });
-    navigateTo('home');
 }
 
 // ============================================================
 //  EVENT LISTENERS - NAVIGATION
 // ============================================================
-document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
+const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+if (navItems.length > 0) {
+navItems.forEach(btn => {
     btn.addEventListener('click', (e) => {
         e.preventDefault();
         const page = btn.dataset.page;
-        if (page === 'cart') { document.getElementById('cartOverlay').classList.toggle('open'); return; }
+        if (page === 'cart') {
+            const cartOverlay = document.getElementById('cartOverlay');
+            if (cartOverlay) cartOverlay.classList.toggle('open');
+            return;
+        }
         if (page) {
             localStorage.setItem('joellCurrentPage', page);
             navigateTo(page);
         }
     });
 });
+}
 
-document.getElementById('cartCloseBtn').addEventListener('click', () => document.getElementById('cartOverlay').classList.remove('open'));
-document.getElementById('cartOverlay').addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('open'); });
+const cartCloseBtn = document.getElementById('cartCloseBtn');
+if (cartCloseBtn) {
+cartCloseBtn.addEventListener('click', () => {
+    const cartOverlay = document.getElementById('cartOverlay');
+    if (cartOverlay) cartOverlay.classList.remove('open');
+});
+}
+const cartOverlay = document.getElementById('cartOverlay');
+if (cartOverlay) {
+cartOverlay.addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('open'); });
+}
 
 document.querySelectorAll('.grid-menu').forEach(grid => {
     grid.addEventListener('click', (e) => {
@@ -1927,35 +2018,44 @@ document.querySelectorAll('.grid-menu').forEach(grid => {
         const id = parseInt(card.dataset.id);
         const product = products.find(p => p.id === id);
         if (!product) return;
-        if (product.isUpload) { document.getElementById('uploadOverlay').classList.add('open'); return; }
-        if (product.isSsweb) { document.getElementById('sswebOverlay').classList.add('open'); return; }
-        if (product.isOsint) { document.getElementById('osintOverlay').classList.add('open'); return; }
-        if (product.isTopup) { document.getElementById('topupOverlay').classList.add('open'); return; }
+        if (product.isUpload) { const el = document.getElementById('uploadOverlay'); if (el) el.classList.add('open'); return; }
+        if (product.isSsweb) { const el = document.getElementById('sswebOverlay'); if (el) el.classList.add('open'); return; }
+        if (product.isOsint) { const el = document.getElementById('osintOverlay'); if (el) el.classList.add('open'); return; }
+        if (product.isTopup) { const el = document.getElementById('topupOverlay'); if (el) el.classList.add('open'); return; }
         if (product.isAnime) { openAnime(); return; }
-        if (product.isBotController) { document.getElementById('botControllerOverlay').classList.add('open'); return; }
+        if (product.isBotController) { const el = document.getElementById('botControllerOverlay'); if (el) el.classList.add('open'); return; }
         if (product.isDownloader) return;
         openDetail(id);
     });
 });
 
 document.querySelectorAll('.detail-close, .modal-close').forEach(btn => {
-    btn.addEventListener('click', () => btn.closest('.detail-overlay, .modal-overlay').classList.remove('open'));
+    btn.addEventListener('click', () => {
+        const parent = btn.closest('.detail-overlay, .modal-overlay');
+        if (parent) parent.classList.remove('open');
+    });
 });
 document.querySelectorAll('.detail-overlay, .modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); }
-    );
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
 });
 
-document.querySelectorAll('.anime-tab').forEach(tab => {
+const animeTabs = document.querySelectorAll('.anime-tab');
+if (animeTabs.length > 0) {
+animeTabs.forEach(tab => {
     tab.addEventListener('click', () => {
         document.querySelectorAll('.anime-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
-        document.getElementById('animeLatest').style.display = tab.dataset.tab === 'latest' ? 'block' : 'none';
-        document.getElementById('animeUpcoming').style.display = tab.dataset.tab === 'upcoming' ? 'block' : 'none';
+        const animeLatest = document.getElementById('animeLatest');
+        const animeUpcoming = document.getElementById('animeUpcoming');
+        if (animeLatest) animeLatest.style.display = tab.dataset.tab === 'latest' ? 'block' : 'none';
+        if (animeUpcoming) animeUpcoming.style.display = tab.dataset.tab === 'upcoming' ? 'block' : 'none';
     });
 });
+}
 
-document.getElementById('animeSearchBtn').addEventListener('click', async () => {
+const animeSearchBtn = document.getElementById('animeSearchBtn');
+if (animeSearchBtn) {
+animeSearchBtn.addEventListener('click', async () => {
     const query = document.getElementById('animeInput').value.trim();
     if (!query) return;
     document.getElementById('animeResult').innerHTML = '<p style="color:var(--text-muted);text-align:center;"><i class="fas fa-spinner fa-spin"></i> Mencari...</p>';
@@ -1977,14 +2077,19 @@ document.getElementById('animeSearchBtn').addEventListener('click', async () => 
     }
 });
 
-document.querySelectorAll('.bot-tab').forEach(tab => {
+const botTabs = document.querySelectorAll('.bot-tab');
+if (botTabs.length > 0) {
+botTabs.forEach(tab => {
     tab.addEventListener('click', () => {
         document.querySelectorAll('.bot-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
-        document.getElementById('botViewController').classList.toggle('hidden', tab.dataset.tab !== 'controller');
-        document.getElementById('botViewLibrary').classList.toggle('hidden', tab.dataset.tab !== 'library');
+        const botViewController = document.getElementById('botViewController');
+        const botViewLibrary = document.getElementById('botViewLibrary');
+        if (botViewController) botViewController.classList.toggle('hidden', tab.dataset.tab !== 'controller');
+        if (botViewLibrary) botViewLibrary.classList.toggle('hidden', tab.dataset.tab !== 'library');
     });
 });
+}
 
 // ============================================================
 //  VIDEO & BACK TO TOP
@@ -2007,12 +2112,14 @@ document.querySelectorAll('.bot-tab').forEach(tab => {
 })();
 
 const backToTop = document.getElementById('backToTop');
+if (backToTop) {
 window.addEventListener('scroll', () => {
     backToTop.classList.toggle('visible', window.scrollY > 300);
 });
 backToTop.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 });
+}
 
 // ============================================================
 //  ESCAPE KEY
@@ -2034,12 +2141,20 @@ setInterval(() => {
 }, 60000);
 
 // ============================================================
-//  INIT
+//  INIT - dengan safety checks
 // ============================================================
-updateUserUI();
-renderTopupGames();
-renderMenus();
-updateCartUI();
+try {
+    updateUserUI();
+} catch(e) { console.warn('updateUserUI error:', e); }
+try {
+    renderTopupGames();
+} catch(e) { console.warn('renderTopupGames error:', e); }
+try {
+    renderMenus();
+} catch(e) { console.warn('renderMenus error:', e); }
+try {
+    updateCartUI();
+} catch(e) { console.warn('updateCartUI error:', e); }
 showToast('Selamat Datang', 'JOELL SHOP siap melayani!', 'success', 4000);
 
 // ============================================================
@@ -2050,7 +2165,17 @@ window.closePaymentAndOpenWithdraw = function() {
     if (paymentOverlay) {
         paymentOverlay.classList.remove('open');
     }
-    navigateTo('profile');
+    if (typeof navigateTo === 'function') {
+        navigateTo('profile');
+    } else {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const profilePage = document.getElementById('page-profile');
+        if (profilePage) profilePage.classList.add('active');
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(function(item) {
+            item.classList.remove('active');
+            if (item.dataset.page === 'profile') item.classList.add('active');
+        });
+    }
     setTimeout(() => {
         const withdrawSection = document.querySelector('.withdraw-section-in-profile');
         if (withdrawSection) {
