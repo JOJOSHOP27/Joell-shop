@@ -1,4 +1,13 @@
 <!DOCTYPE html>
+<noscript>
+    <div>
+        <div>
+            <h2 style="font-size:1.5rem;margin-bottom:12px;">JavaScript Diperlukan</h2>
+            <p style="color:#64748b;">Mohon aktifkan JavaScript untuk menggunakan JOELL SHOP.</p>
+        </div>
+    </div>
+</noscript>
+
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -12,6 +21,23 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <!-- Firebase Configuration - Replace with your actual config -->
+    <script>
+        // Uncomment and fill with your Firebase project config:
+        // const firebaseConfig = {
+        //     apiKey: "YOUR_API_KEY",
+        //     authDomain: "YOUR_PROJECT.firebaseapp.com",
+        //     databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+        //     projectId: "YOUR_PROJECT",
+        //     storageBucket: "YOUR_PROJECT.appspot.com",
+        //     messagingSenderId: "YOUR_SENDER_ID",
+        //     appId: "YOUR_APP_ID"
+        // };
+        // if (typeof firebase !== 'undefined' && firebase.initializeApp) {
+        //     firebase.initializeApp(firebaseConfig);
+        // }
+    </script>
+
     
     <!-- SECURITY SCRIPTS -->
     <script>
@@ -31,14 +57,15 @@
             if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }
             if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }
         }
-        setInterval(function() {
-            var start = performance.now();
-            debugger;
-            var end = performance.now();
-            if (end - start > 100) {
-                document.body.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100vh;background:#050508;color:#ff4444;font-family:sans-serif;text-align:center;'><div><h1>SECURITY BREACH</h1><p>Access Denied: Developer Tools Detected.</p></div></div>";
-            }
-        }, 1000);
+        // Anti-debugger disabled for better compatibility
+        // setInterval(function() {
+        //     var start = performance.now();
+        //     debugger;
+        //     var end = performance.now();
+        //     if (end - start > 100) {
+        //         document.body.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100vh;background:#050508;color:#ff4444;font-family:sans-serif;text-align:center;'><div><h1>SECURITY BREACH</h1><p>Access Denied: Developer Tools Detected.</p></div></div>";
+        //     }
+        // }, 1000);
         if (window.self !== window.top) { window.top.location = window.self.location; }
         document.addEventListener('keyup', (e) => {
             if (e.key === 'PrintScreen') { navigator.clipboard.writeText(''); alert('Screenshots are disabled for security reasons.'); }
@@ -54,6 +81,407 @@
     <!-- STYLES -->
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="payment.css">
+
+    <style>
+        /* ===== CRITICAL FALLBACK CSS ===== */
+        :root {
+            --accent: #6366f1; --accent-light: #818cf8; --accent-glow: rgba(99,102,241,0.4);
+            --accent-secondary: #8b5cf6; --purple: #a855f7;
+            --green: #10b981; --green-glow: rgba(16,185,129,0.4);
+            --orange: #f59e0b; --red: #ef4444;
+            --text-primary: #e2e8f0; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --bg-primary: #0f172a; --bg-secondary: #1e293b; --bg-card: #1e293b;
+            --bg-card-solid: #1e293b; --border-subtle: rgba(255,255,255,0.1);
+            --font-mono: 'Roboto Mono', monospace; --radius-xs: 8px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto Condensed', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+        .app-container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+
+        /* Header */
+        .top-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border-subtle); margin-bottom: 20px; position: sticky; top: 0; z-index: 100; background: var(--bg-primary); }
+        .logo-area { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .logo-area img { width: 40px; height: 40px; border-radius: 8px; }
+        .logo-area span { font-size: 1.5rem; font-weight: 700; color: var(--accent-light); }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .header-btn { background: var(--bg-secondary); border: 1px solid var(--border-subtle); color: var(--text-primary); padding: 10px 16px; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
+        .header-btn:hover { background: var(--accent); }
+
+        /* Pages */
+        .page { display: none; animation: fadeIn 0.4s ease; }
+        .page.active { display: block; }
+        .admin-page { display: none; }
+        .admin-page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Hero */
+        .hero-section { position: relative; border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .hero-video-wrap { position: relative; width: 100%; height: 220px; }
+        .hero-video { width: 100%; height: 100%; object-fit: cover; }
+        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,23,42,0.9), transparent); }
+        .sound-toggle { position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.5); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; }
+        .hero-text-card { background: var(--bg-secondary); padding: 24px; border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--border-subtle); }
+        .hero-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+        .hero-title .typing-text { color: var(--accent-light); }
+        .hero-subtitle { color: var(--text-muted); margin-bottom: 16px; }
+        .hero-stats-row { display: flex; gap: 24px; }
+        .hero-stat { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 0.9rem; }
+        .hero-stat i { color: var(--accent-light); }
+        .stat-value { font-weight: 700; color: var(--text-primary); }
+
+        /* Flash Sale */
+        .flash-sale-bar { background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(245,158,11,0.2)); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .flash-sale-info { display: flex; align-items: center; gap: 10px; }
+        .flash-sale-info i { color: var(--red); }
+        .flash-sale-text .highlight { color: var(--red); font-weight: 800; }
+        .countdown-timer { display: flex; gap: 12px; }
+        .countdown-item { text-align: center; }
+        .countdown-item .num { font-size: 1.4rem; font-weight: 800; color: var(--text-primary); font-family: var(--font-mono); }
+        .countdown-item .label { font-size: 0.7rem; color: var(--text-muted); }
+
+        /* Store Header */
+        .store-header { margin-bottom: 16px; }
+        .store-name { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .store-name .rating { font-size: 0.85rem; color: var(--orange); font-weight: 600; }
+        .badge-free { background: var(--green); color: white; padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+
+        /* Search */
+        .search-wrap { margin-bottom: 20px; }
+        .search-box { display: flex; align-items: center; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 60px; padding: 4px 4px 4px 16px; }
+        .search-box input { flex: 1; background: transparent; border: none; color: var(--text-primary); padding: 10px; font-size: 0.95rem; outline: none; }
+        .search-box button { background: var(--accent); color: white; border: none; padding: 10px 24px; border-radius: 60px; font-weight: 600; cursor: pointer; }
+
+        /* Server Status */
+        .server-status-bar { background: var(--bg-secondary); border-radius: 12px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--border-subtle); }
+        .server-status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .server-status-header h3 { font-size: 1rem; }
+        .status-refresh { background: transparent; border: none; color: var(--text-muted); cursor: pointer; }
+        .server-grid { display: grid; gap: 10px; }
+        .server-item { display: flex; align-items: center; gap: 12px; padding: 10px; background: var(--bg-primary); border-radius: 8px; }
+        .server-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); }
+        .server-dot.warning { background: var(--orange); }
+        .server-info { flex: 1; }
+        .server-name { font-weight: 600; font-size: 0.9rem; }
+        .server-meta { font-size: 0.75rem; color: var(--text-muted); }
+        .server-ping { font-family: var(--font-mono); font-size: 0.85rem; color: var(--green); }
+
+        /* Promo */
+        .promo-section { background: var(--bg-secondary); border-radius: 12px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--border-subtle); }
+        .promo-input-wrap { display: flex; gap: 8px; margin-top: 10px; }
+        .promo-input-wrap input { flex: 1; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); }
+        .promo-input-wrap button { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .promo-message { margin-top: 8px; font-size: 0.85rem; }
+
+        /* Section Title */
+        .section-title { font-size: 1.1rem; font-weight: 800; margin: 24px 0 12px; padding-left: 12px; border-left: 3px solid var(--accent); }
+
+        /* Grid Menu */
+        .grid-menu { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .menu-card { background: var(--bg-secondary); border-radius: 12px; padding: 20px 12px; text-align: center; cursor: pointer; transition: all 0.3s; border: 1px solid var(--border-subtle); position: relative; }
+        .menu-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 8px 24px rgba(99,102,241,0.2); }
+        .menu-card i { font-size: 1.8rem; color: var(--accent-light); margin-bottom: 8px; display: block; }
+        .menu-card span { font-size: 0.85rem; font-weight: 600; }
+        .card-badge { position: absolute; top: 8px; right: 8px; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; }
+        .card-badge.hot { background: var(--red); color: white; }
+        .card-badge.new { background: var(--green); color: white; }
+        .card-badge.pro { background: var(--purple); color: white; }
+
+        /* Testimonials */
+        .testimonials-carousel { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 12px; scroll-snap-type: x mandatory; }
+        .testimonials-carousel::-webkit-scrollbar { height: 4px; }
+        .testimonials-carousel::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+        .testimonial-card { min-width: 280px; background: var(--bg-secondary); border-radius: 12px; padding: 16px; border: 1px solid var(--border-subtle); scroll-snap-align: start; }
+        .testimonial-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .testimonial-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--accent), var(--purple)); color: white; font-weight: 700; font-size: 0.85rem; }
+        .testimonial-info h4 { font-size: 0.95rem; }
+        .stars { color: var(--orange); font-size: 0.8rem; }
+        .testimonial-text { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px; }
+        .testimonial-date { font-size: 0.75rem; color: var(--text-muted); }
+
+        /* Tracking */
+        .tracking-detail-box { background: var(--bg-secondary); border-radius: 12px; padding: 20px; border: 1px solid var(--border-subtle); }
+        .tracking-detail-box h2 { font-size: 1.3rem; margin-bottom: 4px; }
+        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px; }
+        .tracking-timeline { position: relative; padding-left: 30px; }
+        .tracking-timeline::before { content: ''; position: absolute; left: 11px; top: 0; bottom: 0; width: 2px; background: var(--border-subtle); }
+        .tracking-step { position: relative; margin-bottom: 20px; }
+        .tracking-step .tracking-dot { position: absolute; left: -30px; width: 24px; height: 24px; border-radius: 50%; background: var(--bg-primary); border: 2px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--text-muted); }
+        .tracking-step.completed .tracking-dot { background: var(--green); border-color: var(--green); color: white; }
+        .tracking-step.active .tracking-dot { background: var(--accent); border-color: var(--accent); color: white; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4); } 50% { box-shadow: 0 0 0 8px rgba(99,102,241,0); } }
+        .tracking-info h4 { font-size: 0.95rem; margin-bottom: 4px; }
+        .tracking-info p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .tracking-info .time { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); }
+
+        /* Empty States */
+        .empty-orders { text-align: center; padding: 40px 20px; }
+        .empty-orders i { font-size: 3rem; color: var(--text-muted); margin-bottom: 16px; display: block; }
+        .empty-orders h3 { margin-bottom: 8px; }
+        .empty-orders p { color: var(--text-muted); }
+        .cart-empty { text-align: center; }
+
+        /* Profile */
+        .profile-page { padding-bottom: 80px; }
+        .profile-header-new { position: relative; margin-bottom: 60px; }
+        .profile-cover-new { width: 100%; height: 140px; object-fit: cover; border-radius: 12px; }
+        .profile-avatar-wrap { position: absolute; bottom: -40px; left: 20px; }
+        .profile-avatar-wrap img { width: 80px; height: 80px; border-radius: 50%; border: 4px solid var(--bg-primary); }
+        .edit-profile-btn { position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); border: none; color: white; cursor: pointer; }
+        .profile-info-new { padding: 0 20px; margin-bottom: 20px; }
+        .profile-info-new h2 { font-size: 1.3rem; margin-bottom: 4px; }
+        .profile-info-new p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px; }
+        .profile-stats-new { display: flex; gap: 24px; }
+        .stat-box { text-align: center; }
+        .stat-num { font-size: 1.2rem; font-weight: 700; color: var(--accent-light); display: block; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); }
+        .profile-menu-list { margin-top: 20px; }
+        .menu-item { display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--border-subtle); cursor: pointer; transition: all 0.3s; }
+        .menu-item:hover { background: rgba(99,102,241,0.05); }
+        .menu-item i:first-child { color: var(--accent-light); width: 20px; }
+        .menu-item span { flex: 1; font-weight: 600; }
+        .menu-item i:last-child { color: var(--text-muted); font-size: 0.8rem; }
+        .menu-item.logout { color: var(--red); }
+        .menu-item.logout i:first-child { color: var(--red); }
+
+        /* Withdraw */
+        .withdraw-section-in-profile { margin-top: 24px; }
+        .payment-balance-display { display: flex; justify-content: space-between; align-items: center; background: var(--bg-primary); padding: 16px; border-radius: 12px; }
+        .balance-label { font-size: 0.8rem; color: var(--text-muted); }
+        .balance-amount { font-size: 1.5rem; font-weight: 800; color: var(--green); }
+        .balance-refresh { background: transparent; border: none; color: var(--text-muted); cursor: pointer; }
+        .withdraw-methods-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 12px 0; }
+        .withdraw-info { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; }
+        .withdraw-input-group { display: flex; flex-direction: column; gap: 8px; }
+        .withdraw-input-group input { padding: 12px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); }
+        .withdraw-btn { padding: 12px; background: linear-gradient(135deg, var(--orange), #ea580c); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .withdraw-history { background: var(--bg-primary); border-radius: 8px; padding: 12px; }
+
+        /* Admin */
+        .admin-login-box { max-width: 400px; margin: 60px auto; text-align: center; padding: 40px; background: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--border-subtle); }
+        .admin-login-box h2 { margin-bottom: 8px; }
+        .admin-login-box p { color: var(--text-muted); margin-bottom: 24px; }
+        .admin-login-box input { width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); margin-bottom: 16px; font-size: 1rem; }
+        .admin-login-box button { width: 100%; padding: 12px; background: var(--accent); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; }
+        .admin-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin: 16px 0; }
+        .admin-stat-card { background: var(--bg-secondary); padding: 16px; border-radius: 12px; text-align: center; border: 1px solid var(--border-subtle); }
+        .admin-stat-card .num { font-size: 1.8rem; font-weight: 700; color: var(--accent-light); }
+        .admin-stat-card .label { color: var(--text-muted); font-size: 0.8rem; }
+        .admin-section { background: var(--bg-secondary); padding: 16px; border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--border-subtle); }
+        .admin-section h3 { margin-bottom: 12px; font-size: 1rem; }
+        .badge { background: var(--accent); color: white; border-radius: 12px; font-weight: 600; padding: 2px 10px; font-size: 0.8rem; }
+
+        /* Cart */
+        .cart-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; }
+        .cart-overlay.open { display: block; }
+        .cart-panel { position: fixed; right: 0; top: 0; bottom: 0; width: 100%; max-width: 420px; background: var(--bg-secondary); display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s ease; }
+        .cart-overlay.open .cart-panel { transform: translateX(0); }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid var(--border-subtle); }
+        .cart-title { font-size: 1.1rem; font-weight: 700; }
+        .cart-badge-total { background: var(--accent); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-left: 8px; }
+        .cart-close { background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
+        .cart-items-container { flex: 1; overflow-y: auto; padding: 16px; }
+        .cart-footer { padding: 16px; border-top: 1px solid var(--border-subtle); }
+        .cart-summary { margin-bottom: 16px; }
+        .summary-row { display: flex; justify-content: space-between; padding: 6px 0; color: var(--text-secondary); font-size: 0.9rem; }
+        .summary-row.total { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); border-top: 1px solid var(--border-subtle); padding-top: 12px; margin-top: 8px; }
+        .total-price { color: var(--accent-light); }
+        .cart-actions { display: flex; gap: 10px; }
+        .btn-checkout { flex: 1; padding: 12px; background: linear-gradient(135deg, var(--accent), var(--purple)); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .btn-clear { padding: 12px 20px; background: transparent; border: 1px solid var(--border-subtle); color: var(--text-muted); border-radius: 8px; cursor: pointer; }
+
+        /* Modals */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-overlay.open { display: flex; }
+        .modal-box { background: var(--bg-secondary); border-radius: 16px; max-width: 600px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 24px; border: 1px solid var(--border-subtle); position: relative; }
+        .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
+        .order-chat-modal { max-width: 500px; height: 70vh; display: flex; flex-direction: column; padding: 0; }
+        .order-chat-header { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid var(--border-subtle); gap: 12px; }
+        .order-chat-header img { width: 44px; height: 44px; border-radius: 50%; }
+        .order-chat-header .info h3 { margin: 0; font-size: 1rem; }
+        .order-chat-header .info p { margin: 0; color: var(--text-muted); font-size: 0.8rem; }
+        .order-chat-messages { flex: 1; overflow-y: auto; padding: 16px; }
+        .order-chat-input-wrap { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--border-subtle); align-items: center; }
+        .chat-attach-btn { background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; padding: 8px; }
+        .input-container { flex: 1; display: flex; gap: 8px; }
+        .input-container input { flex: 1; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 20px; color: var(--text-primary); outline: none; }
+        .input-container button { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); border: none; color: white; cursor: pointer; }
+
+        /* Detail Modal */
+        .detail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .detail-overlay.open { display: flex; }
+        .detail-modal { background: var(--bg-secondary); border-radius: 16px; max-width: 480px; width: 100%; padding: 24px; border: 1px solid var(--border-subtle); position: relative; }
+        .detail-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
+        .price-tag { font-size: 1.5rem; font-weight: 800; color: var(--accent-light); margin: 12px 0; }
+        .desc { color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+        .variant-title { font-weight: 700; margin-bottom: 10px; }
+        .variant-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .action-btns { display: flex; gap: 10px; }
+        .add-cart-btn { flex: 1; padding: 12px; background: var(--bg-primary); border: 1px solid var(--accent); color: var(--accent-light); border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .buy-now-btn { flex: 1; padding: 12px; background: linear-gradient(135deg, var(--accent), var(--purple)); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+
+        /* Payment */
+        .payment-modal { max-width: 480px; }
+        .payment-section { margin-bottom: 20px; }
+        .section-label { font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .order-summary-box { background: var(--bg-primary); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+        .order-item-line { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.9rem; }
+        .order-item-line.total { font-weight: 700; font-size: 1.1rem; border-top: 1px solid var(--border-subtle); padding-top: 10px; margin-top: 8px; }
+        .payment-methods { display: flex; gap: 10px; margin-bottom: 16px; }
+        .payment-method-btn { flex: 1; padding: 12px; background: var(--bg-primary); border: 1px solid var(--border-subtle); color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .payment-method-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .payment-qris-container { background: var(--bg-primary); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 12px; }
+        .qris-placeholder { color: var(--text-muted); }
+        .qris-placeholder i { font-size: 3rem; display: block; margin-bottom: 8px; }
+        .qris-success-text { color: var(--green); margin-top: 8px; }
+        .payment-details { background: var(--bg-primary); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+        .detail-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.85rem; }
+        .detail-row .label { color: var(--text-muted); }
+        .detail-row .value { font-weight: 600; }
+        .detail-row .value.total { color: var(--accent-light); font-size: 1rem; }
+        .payment-status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+        .payment-status-badge.pending { background: rgba(245,158,11,0.2); color: var(--orange); }
+        .payment-timer { text-align: center; color: var(--orange); font-weight: 700; margin: 12px 0; }
+        .payment-actions { display: flex; flex-direction: column; gap: 8px; }
+        .btn-pay { padding: 12px; background: linear-gradient(135deg, var(--accent), var(--purple)); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .btn-check-status { padding: 12px; background: var(--bg-primary); border: 1px solid var(--border-subtle); color: var(--text-secondary); border-radius: 8px; cursor: pointer; }
+        .btn-copy-link { padding: 12px; background: transparent; border: 1px solid var(--accent); color: var(--accent-light); border-radius: 8px; cursor: pointer; }
+        .invoice-history-list { max-height: 200px; overflow-y: auto; }
+
+        /* Topup */
+        .topup-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+
+        /* Anime */
+        .anime-input-wrap { display: flex; gap: 8px; margin-bottom: 12px; }
+        .anime-input-wrap input { flex: 1; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); }
+        .anime-input-wrap button { padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; }
+        .anime-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+        .anime-tab { padding: 8px 16px; background: var(--bg-primary); border: 1px solid var(--border-subtle); color: var(--text-muted); border-radius: 20px; cursor: pointer; }
+        .anime-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .anime-list { display: grid; gap: 10px; }
+
+        /* Bot Controller */
+        .bot-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .bot-tab { padding: 8px 16px; background: var(--bg-primary); border: 1px solid var(--border-subtle); color: var(--text-muted); border-radius: 20px; cursor: pointer; }
+        .bot-tab.active { background: var(--accent); color: white; }
+        .bot-view.hidden { display: none; }
+        .bot-header-section { margin-bottom: 16px; }
+        .bot-header-section h3 { font-size: 1rem; margin-bottom: 4px; }
+        .bot-header-section p { color: var(--text-muted); font-size: 0.85rem; }
+        .bot-input-group { display: flex; gap: 8px; margin-bottom: 12px; }
+        .bot-input-group input { flex: 1; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); }
+        .bot-btn-primary { padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .bot-status-banner { padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+        .bot-status-banner.hidden { display: none; }
+        .bot-panel.hidden { display: none; }
+        .bot-identity { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 10px; background: var(--bg-primary); border-radius: 8px; }
+        .bot-status-indicator { width: 10px; height: 10px; border-radius: 50%; background: var(--green); display: inline-block; margin-right: 6px; }
+        .bot-terminal { background: #000; border-radius: 8px; padding: 12px; font-family: var(--font-mono); font-size: 0.8rem; max-height: 200px; overflow-y: auto; }
+        .bot-terminal-line { margin-bottom: 4px; }
+        .bot-term-time { color: var(--accent-light); margin-right: 8px; }
+        .bot-term-info { color: var(--text-secondary); }
+        .bot-list { display: grid; gap: 8px; }
+
+        /* OSINT */
+        .osint-form { margin-bottom: 16px; }
+        .form-row { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+        .form-group input, .form-group select, .form-group textarea { padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); font-family: inherit; }
+        .form-group small { color: var(--text-muted); font-size: 0.75rem; }
+        .btn-query { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--accent), var(--purple)); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .osint-result { background: var(--bg-primary); border-radius: 8px; overflow: hidden; }
+        .osint-result.hidden { display: none; }
+        .result-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--border-subtle); }
+        .result-body { padding: 12px; max-height: 300px; overflow-y: auto; }
+        .result-body pre { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary); white-space: pre-wrap; }
+        .osint-badge { text-align: center; padding: 8px; color: var(--text-muted); font-size: 0.8rem; margin-top: 12px; }
+
+        /* Screenshot */
+        .ssweb-form { margin-bottom: 16px; }
+        .btn-ssweb { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--accent), var(--purple)); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .ssweb-result { background: var(--bg-primary); border-radius: 8px; min-height: 200px; display: flex; align-items: center; justify-content: center; }
+        .ssweb-result .placeholder { text-align: center; color: var(--text-muted); }
+
+        /* Upload */
+        .upload-dropzone { border: 2px dashed var(--border-subtle); border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; margin-bottom: 12px; transition: all 0.3s; }
+        .upload-dropzone:hover { border-color: var(--accent); background: rgba(99,102,241,0.05); }
+        .upload-dropzone i { font-size: 2.5rem; color: var(--accent-light); margin-bottom: 8px; display: block; }
+        .upload-dropzone p { color: var(--text-secondary); margin-bottom: 4px; }
+        .file-types { font-size: 0.75rem; color: var(--text-muted); }
+        .upload-btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; margin-bottom: 12px; }
+        .upload-progress { display: none; margin-bottom: 12px; }
+        .upload-progress.active { display: block; }
+        .progress-bar { height: 6px; background: var(--bg-primary); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; }
+        .progress-text { text-align: center; font-size: 0.85rem; color: var(--text-secondary); }
+        .upload-result { display: none; }
+        .upload-result.active { display: block; }
+        .result-link { display: flex; gap: 8px; margin-bottom: 12px; }
+        .result-link input { flex: 1; padding: 10px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); }
+        .upload-preview img { max-width: 100%; border-radius: 8px; }
+
+        /* Login */
+        .login-box { text-align: center; padding: 20px 0; }
+        .login-benefits { list-style: none; text-align: left; margin: 20px 0; }
+        .login-benefits li { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; color: var(--text-secondary); font-size: 0.9rem; }
+        .login-benefits li i { color: var(--accent-light); margin-top: 2px; }
+
+        /* Profile Settings */
+        .profile-settings-box { padding: 10px 0; }
+        .profile-avatar-edit { position: relative; width: 80px; height: 80px; margin: 0 auto 20px; }
+        .profile-avatar-edit img { width: 100%; height: 100%; border-radius: 50%; }
+        .edit-badge { position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; }
+        .profile-input-group { margin-bottom: 16px; }
+        .profile-input-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+        .profile-input-group input { width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); }
+        .profile-actions { display: flex; gap: 10px; }
+        .btn-profile-logout { flex: 1; padding: 12px; background: transparent; border: 1px solid var(--red); color: var(--red); border-radius: 8px; cursor: pointer; font-weight: 700; }
+        .btn-profile-save { flex: 1; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; }
+
+        /* Checkout */
+        .checkout-form { margin-top: 16px; }
+        .checkout-form .form-group { margin-bottom: 14px; }
+        .checkout-form label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+        .checkout-form input, .checkout-form textarea { width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); font-family: inherit; }
+        .btn-place-order { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--green), #059669); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 1rem; }
+
+        /* Toast */
+        .toast-container { position: fixed; bottom: 80px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
+
+        /* Back to Top */
+        .back-to-top { position: fixed; bottom: 80px; right: 20px; background: var(--accent); border: none; color: white; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: none; z-index: 100; align-items: center; justify-content: center; }
+        .back-to-top.visible { display: flex; }
+
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-around; padding: 8px 0; z-index: 300; backdrop-filter: blur(10px); }
+        .nav-item { background: transparent; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.7rem; cursor: pointer; padding: 4px 12px; transition: all 0.3s; }
+        .nav-item i { font-size: 1.2rem; }
+        .nav-item.active { color: var(--accent-light); }
+        .nav-item .badge { position: absolute; top: 0; background: var(--red); color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.65rem; font-weight: 700; }
+
+        /* Canvas */
+        #particlesCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+
+        /* NoScript */
+        noscript div { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-primary); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        noscript div div { text-align: center; color: var(--text-primary); padding: 20px; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 1.4rem; }
+            .grid-menu { grid-template-columns: repeat(2, 1fr); }
+            .admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .form-row { grid-template-columns: 1fr; }
+            .flash-sale-bar { flex-direction: column; align-items: flex-start; }
+            .cart-panel { max-width: 100%; }
+        }
+        @media (max-width: 480px) {
+            .grid-menu { grid-template-columns: repeat(2, 1fr); }
+            .hero-stats-row { flex-wrap: wrap; gap: 12px; }
+            .store-name { font-size: 1.1rem; }
+        }
+    </style>
+
 </head>
 <body>
 <canvas id="particlesCanvas"></canvas>
@@ -66,11 +494,11 @@
             <span>JOELL SHOP</span>
         </div>
         <div class="header-actions">
-            <button class="header-btn" id="themeToggle" title="Toggle Dark/Light Mode">
+            <button class="header-btn" id="themeToggle" title="Toggle Dark/Light Mode" aria-label="Toggle dark/light mode">
                 <i class="fas fa-moon"></i>
             </button>
             <div id="userSection">
-                <button class="header-btn" id="loginBtn" title="Login">
+                <button class="header-btn" id="loginBtn" title="Login" aria-label="Login">
                     <i class="fas fa-sign-in-alt"></i>
                 </button>
             </div>
@@ -83,7 +511,7 @@
             <div class="hero-video-wrap">
                 <video src="https://files.catbox.moe/trw5j2.mp4" autoplay loop playsinline muted class="hero-video" id="heroVideo"></video>
                 <div class="hero-overlay"></div>
-                <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound">
+                <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound" title="Toggle sound">
                     <i class="fas fa-volume-mute"></i>
                 </button>
             </div>
@@ -133,7 +561,7 @@
         <div class="server-status-bar">
             <div class="server-status-header">
                 <h3><i class="fas fa-server"></i> Server Status</h3>
-                <button class="status-refresh" id="refreshStatus" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+                <button class="status-refresh" id="refreshStatus" title="Refresh server status" aria-label="Refresh server status"><i class="fas fa-sync-alt"></i></button>
             </div>
             <div class="server-grid" id="serverGrid">
                 <div class="server-item"><div class="server-dot"></div><div class="server-info"><div class="server-name">Node-1 Jakarta</div><div class="server-meta">Panel Pterodactyl</div></div><div class="server-ping">12ms</div></div>
@@ -456,7 +884,7 @@
     <div class="cart-panel">
         <div class="cart-header">
             <div class="cart-title"><i class="fas fa-shopping-cart"></i> Keranjang <span class="cart-badge-total" id="cartBadgeTotal">0</span></div>
-            <button class="cart-close" id="cartCloseBtn"><i class="fas fa-times"></i></button>
+            <button class="cart-close" id="cartCloseBtn" aria-label="Close cart" title="Close cart"><i class="fas fa-times"></i></button>
         </div>
         <div class="cart-items-container" id="cartItems"></div>
         <div class="cart-footer" id="cartFooter">
@@ -477,7 +905,7 @@
 <!-- CHECKOUT MODAL -->
 <div class="modal-overlay" id="checkoutOverlay">
     <div class="modal-box">
-        <button class="modal-close" id="checkoutCloseBtn"><i class="fas fa-times"></i></button>
+        <button class="modal-close" id="checkoutCloseBtn" aria-label="Close checkout" title="Close checkout"><i class="fas fa-times"></i></button>
         <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:4px;"><i class="fas fa-credit-card" style="color:var(--accent-light);"></i> Checkout</h2>
         <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;">Lengkapi data pengiriman pesanan</p>
         <div class="order-summary-box">
@@ -510,7 +938,7 @@
 <!-- DETAIL MODAL -->
 <div class="detail-overlay" id="detailOverlay">
     <div class="detail-modal">
-        <button class="detail-close" id="detailCloseBtn"><i class="fas fa-times"></i></button>
+        <button class="detail-close" id="detailCloseBtn" aria-label="Close details" title="Close details"><i class="fas fa-times"></i></button>
         <h2 id="detailName">Nama Produk</h2>
         <div class="price-tag" id="detailPrice">Rp 0</div>
         <p class="desc" id="detailDesc">Deskripsi produk.</p>
@@ -526,7 +954,7 @@
 <!-- TOPUP MODAL -->
 <div class="modal-overlay" id="topupOverlay">
     <div class="modal-box">
-        <button class="modal-close" id="topupCloseBtn"><i class="fas fa-times"></i></button>
+        <button class="modal-close" id="topupCloseBtn" aria-label="Close topup" title="Close topup"><i class="fas fa-times"></i></button>
         <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:4px;"><i class="fas fa-gamepad" style="color:var(--accent-light);"></i> Topup All Game</h2>
         <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;">Pilih game favoritmu:</p>
         <div class="topup-grid" id="topupGrid"></div>
@@ -536,7 +964,7 @@
 <!-- ANIME MODAL -->
 <div class="modal-overlay" id="animeOverlay">
     <div class="modal-box">
-        <button class="modal-close" id="animeCloseBtn"><i class="fas fa-times"></i></button>
+        <button class="modal-close" id="animeCloseBtn" aria-label="Close anime" title="Close anime"><i class="fas fa-times"></i></button>
         <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:4px;"><i class="fas fa-film" style="color:var(--accent-light);"></i> Info Anime</h2>
         <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:14px;">Cari anime atau lihat jadwal tayang</p>
         <div class="anime-input-wrap">
@@ -557,7 +985,7 @@
 <!-- BOT CONTROLLER MODAL -->
 <div class="modal-overlay" id="botControllerOverlay">
     <div class="modal-box">
-        <button class="modal-close" id="botControllerCloseBtn"><i class="fas fa-times"></i></button>
+        <button class="modal-close" id="botControllerCloseBtn" aria-label="Close bot controller" title="Close bot controller"><i class="fas fa-times"></i></button>
         <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:4px;"><i class="fas fa-robot" style="color:var(--accent-light);"></i> Bot Controller</h2>
         <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;">Kelola bot Telegram Anda</p>
         <div class="bot-tabs">
@@ -598,7 +1026,7 @@
 <!-- OSINT MODAL -->
 <div class="modal-overlay" id="osintOverlay">
     <div class="modal-box" style="max-width:640px;">
-        <button class="modal-close" id="osintCloseBtn"><i class="fas fa-times"></i></button>
+        <button class="modal-close" id="osintCloseBtn" aria-label="Close OSINT" title="Close OSINT"><i class="fas fa-times"></i></button>
         <div style="font-size:2.2rem;color:var(--accent-light);margin-bottom:4px;"><i class="fas fa-search"></i></div>
         <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:2px;">WhatsApp OSINT</h2>
         <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;border-bottom:1px solid var(--border-subtle);padding-bottom:12px;"><i class="fas fa-shield-alt" style="color:var(--accent-light);margin-right:6px;"></i>Open-Source Intelligence untuk WhatsApp</p>
@@ -636,7 +1064,7 @@
     <div class="modal-box" style="max-width:640px;">
         <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border-subtle);margin-bottom:12px;">
             <div style="display:flex;align-items:center;gap:10px;font-size:1.3rem;font-weight:800;"><i class="fas fa-camera" style="color:var(--accent-light);"></i> Screenshot Website</div>
-            <button class="modal-close" id="sswebCloseBtn"><i class="fas fa-times"></i></button>
+            <button class="modal-close" id="sswebCloseBtn" aria-label="Close screenshot" title="Close screenshot"><i class="fas fa-times"></i></button>
         </div>
         <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:12px;">Ambil screenshot dari website mana saja</p>
         <div class="ssweb-form">
@@ -657,7 +1085,7 @@
     <div class="modal-box" style="max-width:560px;">
         <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border-subtle);margin-bottom:12px;">
             <div style="display:flex;align-items:center;gap:10px;font-size:1.3rem;font-weight:800;"><i class="fas fa-cloud-upload-alt" style="color:var(--accent-light);"></i> Upload Gambar</div>
-            <button class="modal-close" id="uploadCloseBtn"><i class="fas fa-times"></i></button>
+            <button class="modal-close" id="uploadCloseBtn" aria-label="Close upload" title="Close upload"><i class="fas fa-times"></i></button>
         </div>
         <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:12px;">Upload gambar — dapatkan link permanen</p>
         <div class="upload-dropzone" id="uploadDropzone">
@@ -684,7 +1112,7 @@
 <!-- LOGIN MODAL -->
 <div class="modal-overlay" id="loginOverlay">
     <div class="modal-box" style="max-width:440px; border: 1px solid rgba(99, 102, 241, 0.3); box-shadow: 0 0 40px rgba(0,0,0,0.6);">
-        <button class="modal-close" id="loginCloseBtn"><i class="fas fa-times"></i></button>
+        <button class="modal-close" id="loginCloseBtn" aria-label="Close login" title="Close login"><i class="fas fa-times"></i></button>
         <div class="login-box">
             <div style="position: relative; display: inline-block; margin-bottom: 20px;">
                 <div style="font-size:4rem; color:var(--accent); filter: drop-shadow(0 0 15px var(--accent-glow));">
@@ -728,12 +1156,12 @@
     <div class="modal-box order-chat-modal">
         <div class="order-chat-header">
             <button onclick="document.getElementById('orderChatOverlay').classList.remove('open')" style="background:none;border:none;color:#8696a0;font-size:1.2rem;margin-right:10px;cursor:pointer;"><i class="fas fa-arrow-left"></i></button>
-            <img src="https://files.catbox.moe/ijemcy.png" alt="admin">
+            <img src="https://files.catbox.moe/ijemcy.png" alt="Admin JOELL SHOP">
             <div class="info">
                 <h3>Admin JOELL SHOP</h3>
                 <p id="orderChatOrderId">Order: #JOELL-0000-0000</p>
             </div>
-            <button class="modal-close" id="orderChatCloseBtn" style="position:static;color:#8696a0;font-size:1.2rem;margin-left:auto;"><i class="fas fa-times"></i></button>
+            <button class="modal-close" id="orderChatCloseBtn" aria-label="Close chat" title="Close chat" style="position:static;color:#8696a0;font-size:1.2rem;margin-left:auto;"><i class="fas fa-times"></i></button>
         </div>
         <div class="order-chat-messages" id="orderChatMessages"></div>
         <div class="order-chat-input-wrap">
@@ -757,7 +1185,7 @@
                 <h3 id="adminChatUserName">Chat Pelanggan</h3>
                 <p id="adminChatOrderId">Order: #JOELL-0000-0000</p>
             </div>
-            <button class="modal-close" id="adminChatCloseBtn" style="position:static;color:#8696a0;font-size:1.2rem;margin-left:auto;"><i class="fas fa-times"></i></button>
+            <button class="modal-close" id="adminChatCloseBtn" aria-label="Close admin chat" title="Close admin chat" style="position:static;color:#8696a0;font-size:1.2rem;margin-left:auto;"><i class="fas fa-times"></i></button>
         </div>
         <div class="order-chat-messages" id="adminChatMessages"></div>
         <div class="order-chat-input-wrap">
@@ -776,7 +1204,7 @@
 <!-- PROFILE SETTINGS MODAL -->
 <div class="modal-overlay" id="profileOverlay">
     <div class="modal-box" style="max-width:400px; border: 1px solid rgba(99, 102, 241, 0.3);">
-        <button class="modal-close" id="profileCloseBtn"><i class="fas fa-times"></i></button>
+        <button class="modal-close" id="profileCloseBtn" aria-label="Close profile settings" title="Close profile settings"><i class="fas fa-times"></i></button>
         <div class="profile-settings-box">
             <h2 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 24px; color: #fff;">PENGATURAN PROFIL</h2>
             <div class="profile-avatar-edit">
@@ -805,7 +1233,7 @@
 <!-- ============================================================ -->
 <div class="modal-overlay" id="paymentOverlay">
     <div class="modal-box payment-modal">
-        <button class="modal-close" id="paymentCloseBtn"><i class="fas fa-times"></i></button>
+        <button class="modal-close" id="paymentCloseBtn" aria-label="Close payment" title="Close payment"><i class="fas fa-times"></i></button>
         
         <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:4px;">
             <i class="fas fa-credit-card" style="color:var(--accent-light);"></i> Pembayaran
@@ -949,7 +1377,7 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <!-- BACK TO TOP -->
-<button class="back-to-top" id="backToTop" title="Kembali ke atas">
+<button class="back-to-top" id="backToTop" title="Kembali ke atas" aria-label="Back to top">
     <i class="fas fa-arrow-up"></i>
 </button>
 
@@ -963,6 +1391,110 @@
 </nav>
 
 <!-- SCRIPTS -->
+
+<script>
+    // ===== STUB FUNCTIONS - prevent errors when external JS is missing =====
+    function doSearch() { 
+        var q = document.getElementById('searchInput'); 
+        if (q && q.value) { 
+            showToast('Mencari: ' + q.value, 'info'); 
+        } else { 
+            showToast('Masukkan kata kunci pencarian', 'warning'); 
+        } 
+    }
+    function openProfileSettings() { 
+        var overlay = document.getElementById('profileOverlay'); 
+        if (overlay) overlay.classList.add('open'); 
+    }
+    function fetchBalance() { 
+        showToast('Memuat saldo...', 'info'); 
+        setTimeout(function() { showToast('Saldo: Rp 0 (Demo)', 'info'); }, 500);
+    }
+    function navigateTo(page) {
+        document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+        document.querySelectorAll('.admin-page').forEach(function(p) { p.classList.remove('active'); });
+        var target = document.getElementById('page-' + page);
+        if (target) target.classList.add('active');
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(function(item) {
+            item.classList.remove('active');
+            if (item.dataset.page === page) item.classList.add('active');
+        });
+        localStorage.setItem('joellCurrentPage', page);
+    }
+    function renderOrdersList() { console.log('renderOrdersList: stub'); }
+    function renderProfilePage() { console.log('renderProfilePage: stub'); }
+    function updateUserUI() { console.log('updateUserUI: stub'); }
+    function updateCartUI() { console.log('updateCartUI: stub'); }
+    function renderMenus() { console.log('renderMenus: stub - using manual fallback'); }
+    function renderTopupGames() { console.log('renderTopupGames: stub'); }
+    function openDetail(id) { 
+        var overlay = document.getElementById('detailOverlay');
+        if (overlay) overlay.classList.add('open');
+        showToast('Detail produk #' + id, 'info');
+    }
+    function handleGoogleLogin(response) { 
+        console.log('Google login:', response); 
+        showToast('Login Google berhasil!', 'success');
+    }
+    function handleProfilePhotoUpload(input) { 
+        if (input.files && input.files[0]) {
+            showToast('Foto dipilih: ' + input.files[0].name, 'info');
+        }
+    }
+    function handleChatFileUpload(input, role) {
+        if (input.files && input.files[0]) {
+            showToast('File dikirim (' + role + '): ' + input.files[0].name, 'info');
+        }
+    }
+    function handleAdminDocUpload(input) {
+        if (input.files && input.files[0]) {
+            showToast('Dokumen dikirim: ' + input.files[0].name, 'info');
+        }
+    }
+    function refreshAdminOrders() { 
+        showToast('Memuat data pesanan...', 'info'); 
+    }
+    function enterAdminMode() { 
+        console.log('Admin mode activated'); 
+    }
+    function copyBankInfo() {
+        var info = 'Bank: BCA\nNo: 1234567890\nAtas Nama: JOELL SHOP';
+        navigator.clipboard.writeText(info).then(function() {
+            showToast('Info bank disalin!', 'success');
+        }).catch(function() {
+            showToast('Gagal menyalin', 'error');
+        });
+    }
+
+    // Toast system
+    function showToast(message, type) {
+        var container = document.getElementById('toastContainer');
+        if (!container) return;
+        var toast = document.createElement('div');
+        var colors = { success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#6366f1' };
+        var icons = { success: 'fa-check-circle', error: 'fa-times-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+        toast.style.cssText = 'background:' + (colors[type] || colors.info) + ';color:white;padding:12px 20px;border-radius:8px;font-size:0.9rem;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.3);animation:slideIn 0.3s ease;display:flex;align-items:center;gap:8px;';
+        toast.innerHTML = '<i class="fas ' + (icons[type] || icons.info) + '"></i> ' + message;
+        container.appendChild(toast);
+        setTimeout(function() { toast.style.animation = 'slideOut 0.3s ease'; setTimeout(function() { toast.remove(); }, 300); }, 3000);
+    }
+
+    // Firebase stub
+    if (typeof firebase === 'undefined') {
+        window.firebase = {
+            initializeApp: function() { console.warn('Firebase not loaded'); return {}; },
+            database: function() { 
+                return { ref: function() { return { on: function() {}, once: function() { return Promise.resolve({val: function() { return {}; }}); }, set: function() { return Promise.resolve(); }, push: function() { return { key: 'stub-' + Date.now() }; } }; } }; 
+            }
+        };
+    }
+
+    // Add toast animations
+    var toastStyle = document.createElement('style');
+    toastStyle.textContent = '@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } } @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }';
+    document.head.appendChild(toastStyle);
+</script>
+
 <script src="script.js"></script>
 <script src="payment-api.js"></script>
 
