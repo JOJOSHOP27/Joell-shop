@@ -1,45 +1,19 @@
 <!DOCTYPE html>
-<noscript>
-    <div>
-        <div>
-            <h2 style="font-size:1.5rem;margin-bottom:12px;">JavaScript Diperlukan</h2>
-            <p style="color:#64748b;">Mohon aktifkan JavaScript untuk menggunakan JOELL SHOP.</p>
-        </div>
-    </div>
-</noscript>
-
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JOELL SHOP · Next-Gen Digital Store</title>
+    <title>JOELL SHOP · Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- FIREBASE SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-    <!-- Firebase Configuration - Replace with your actual config -->
-    <script>
-        // Uncomment and fill with your Firebase project config:
-        // const firebaseConfig = {
-        //     apiKey: "YOUR_API_KEY",
-        //     authDomain: "YOUR_PROJECT.firebaseapp.com",
-        //     databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-        //     projectId: "YOUR_PROJECT",
-        //     storageBucket: "YOUR_PROJECT.appspot.com",
-        //     messagingSenderId: "YOUR_SENDER_ID",
-        //     appId: "YOUR_APP_ID"
-        // };
-        // if (typeof firebase !== 'undefined' && firebase.initializeApp) {
-        //     firebase.initializeApp(firebaseConfig);
-        // }
-    </script>
-
-    
-    <!-- SECURITY SCRIPTS -->
+    <!-- Security Scripts -->
     <script>
         (function() {
             var allowedDomains = ["joell-payment.vercel.app", "nanz-officialstore.vercel.app", "localhost", "127.0.0.1"];
@@ -57,15 +31,14 @@
             if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }
             if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }
         }
-        // Anti-debugger disabled for better compatibility
-        // setInterval(function() {
-        //     var start = performance.now();
-        //     debugger;
-        //     var end = performance.now();
-        //     if (end - start > 100) {
-        //         document.body.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100vh;background:#050508;color:#ff4444;font-family:sans-serif;text-align:center;'><div><h1>SECURITY BREACH</h1><p>Access Denied: Developer Tools Detected.</p></div></div>";
-        //     }
-        // }, 1000);
+        setInterval(function() {
+            var start = performance.now();
+            debugger;
+            var end = performance.now();
+            if (end - start > 100) {
+                document.body.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100vh;background:#050508;color:#ff4444;font-family:sans-serif;text-align:center;'><div><h1>SECURITY BREACH</h1><p>Access Denied: Developer Tools Detected.</p></div></div>";
+            }
+        }, 1000);
         if (window.self !== window.top) { window.top.location = window.self.location; }
         document.addEventListener('keyup', (e) => {
             if (e.key === 'PrintScreen') { navigator.clipboard.writeText(''); alert('Screenshots are disabled for security reasons.'); }
@@ -77,1600 +50,148 @@
     </script>
     <meta name="robots" content="noindex, nofollow">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    
-    <!-- STYLES -->
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="payment.css">
-
-    <style>
-        /* ===== CRITICAL FALLBACK CSS ===== */
-        :root {
-            --accent: #6366f1; --accent-light: #818cf8; --accent-glow: rgba(99,102,241,0.4);
-            --accent-secondary: #8b5cf6; --purple: #a855f7;
-            --green: #10b981; --green-glow: rgba(16,185,129,0.4);
-            --orange: #f59e0b; --red: #ef4444;
-            --text-primary: #e2e8f0; --text-secondary: #94a3b8; --text-muted: #64748b;
-            --bg-primary: #0f172a; --bg-secondary: #1e293b; --bg-card: #1e293b;
-            --bg-card-solid: #1e293b; --border-subtle: rgba(255,255,255,0.1);
-            --font-mono: 'Roboto Mono', monospace; --radius-xs: 8px;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Roboto Condensed', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
-        .app-container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
-
-        /* Header */
-        .top-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border-subtle); margin-bottom: 20px; position: sticky; top: 0; z-index: 100; background: var(--bg-primary); }
-        .logo-area { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .logo-area img { width: 40px; height: 40px; border-radius: 8px; }
-        .logo-area span { font-size: 1.5rem; font-weight: 700; color: var(--accent-light); }
-        .header-actions { display: flex; gap: 10px; align-items: center; }
-        .header-btn { background: var(--bg-secondary); border: 1px solid var(--border-subtle); color: var(--text-primary); padding: 10px 16px; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
-        .header-btn:hover { background: var(--accent); }
-
-        /* Pages */
-        .page { display: none; animation: fadeIn 0.4s ease; }
-        .page.active { display: block; }
-        .admin-page { display: none; }
-        .admin-page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Hero */
-        .hero-section { position: relative; border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
-        .hero-video-wrap { position: relative; width: 100%; height: 220px; }
-        .hero-video { width: 100%; height: 100%; object-fit: cover; }
-        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,23,42,0.9), transparent); }
-        .sound-toggle { position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.5); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; }
-        .hero-text-card { background: var(--bg-secondary); padding: 24px; border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--border-subtle); }
-        .hero-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
-        .hero-title .typing-text { color: var(--accent-light); }
-        .hero-subtitle { color: var(--text-muted); margin-bottom: 16px; }
-        .hero-stats-row { display: flex; gap: 24px; }
-        .hero-stat { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 0.9rem; }
-        .hero-stat i { color: var(--accent-light); }
-        .stat-value { font-weight: 700; color: var(--text-primary); }
-
-        /* Flash Sale */
-        .flash-sale-bar { background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(245,158,11,0.2)); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-        .flash-sale-info { display: flex; align-items: center; gap: 10px; }
-        .flash-sale-info i { color: var(--red); }
-        .flash-sale-text .highlight { color: var(--red); font-weight: 800; }
-        .countdown-timer { display: flex; gap: 12px; }
-        .countdown-item { text-align: center; }
-        .countdown-item .num { font-size: 1.4rem; font-weight: 800; color: var(--text-primary); font-family: var(--font-mono); }
-        .countdown-item .label { font-size: 0.7rem; color: var(--text-muted); }
-
-        /* Store Header */
-        .store-header { margin-bottom: 16px; }
-        .store-name { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .store-name .rating { font-size: 0.85rem; color: var(--orange); font-weight: 600; }
-        .badge-free { background: var(--green); color: white; padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
-
-        /* Search */
-        .search-wrap { margin-bottom: 20px; }
-        .search-box { display: flex; align-items: center; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 60px; padding: 4px 4px 4px 16px; }
-        .search-box input { flex: 1; background: transparent; border: none; color: var(--text-primary); padding: 10px; font-size: 0.95rem; outline: none; }
-        .search-box button { background: var(--accent); color: white; border: none; padding: 10px 24px; border-radius: 60px; font-weight: 600; cursor: pointer; }
-
-        /* Server Status */
-        .server-status-bar { background: var(--bg-secondary); border-radius: 12px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--border-subtle); }
-        .server-status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .server-status-header h3 { font-size: 1rem; }
-        .status-refresh { background: transparent; border: none; color: var(--text-muted); cursor: pointer; }
-        .server-grid { display: grid; gap: 10px; }
-        .server-item { display: flex; align-items: center; gap: 12px; padding: 10px; background: var(--bg-primary); border-radius: 8px; }
-        .server-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); }
-        .server-dot.warning { background: var(--orange); }
-        .server-info { flex: 1; }
-        .server-name { font-weight: 600; font-size: 0.9rem; }
-        .server-meta { font-size: 0.75rem; color: var(--text-muted); }
-        .server-ping { font-family: var(--font-mono); font-size: 0.85rem; color: var(--green); }
-
-        /* Promo */
-        .promo-section { background: var(--bg-secondary); border-radius: 12px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--border-subtle); }
-        .promo-input-wrap { display: flex; gap: 8px; margin-top: 10px; }
-        .promo-input-wrap input { flex: 1; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); }
-        .promo-input-wrap button { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-        .promo-message { margin-top: 8px; font-size: 0.85rem; }
-
-        /* Section Title */
-        .section-title { font-size: 1.1rem; font-weight: 800; margin: 24px 0 12px; padding-left: 12px; border-left: 3px solid var(--accent); }
-
-        /* Grid Menu */
-        .grid-menu { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .menu-card { background: var(--bg-secondary); border-radius: 12px; padding: 20px 12px; text-align: center; cursor: pointer; transition: all 0.3s; border: 1px solid var(--border-subtle); position: relative; }
-        .menu-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 8px 24px rgba(99,102,241,0.2); }
-        .menu-card i { font-size: 1.8rem; color: var(--accent-light); margin-bottom: 8px; display: block; }
-        .menu-card span { font-size: 0.85rem; font-weight: 600; }
-        .card-badge { position: absolute; top: 8px; right: 8px; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; }
-        .card-badge.hot { background: var(--red); color: white; }
-        .card-badge.new { background: var(--green); color: white; }
-        .card-badge.pro { background: var(--purple); color: white; }
-
-        /* Testimonials */
-        .testimonials-carousel { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 12px; scroll-snap-type: x mandatory; }
-        .testimonials-carousel::-webkit-scrollbar { height: 4px; }
-        .testimonials-carousel::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
-        .testimonial-card { min-width: 280px; background: var(--bg-secondary); border-radius: 12px; padding: 16px; border: 1px solid var(--border-subtle); scroll-snap-align: start; }
-        .testimonial-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .testimonial-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--accent), var(--purple)); color: white; font-weight: 700; font-size: 0.85rem; }
-        .testimonial-info h4 { font-size: 0.95rem; }
-        .stars { color: var(--orange); font-size: 0.8rem; }
-        .testimonial-text { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px; }
-        .testimonial-date { font-size: 0.75rem; color: var(--text-muted); }
-
-        /* Tracking */
-        .tracking-detail-box { background: var(--bg-secondary); border-radius: 12px; padding: 20px; border: 1px solid var(--border-subtle); }
-        .tracking-detail-box h2 { font-size: 1.3rem; margin-bottom: 4px; }
-        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px; }
-        .tracking-timeline { position: relative; padding-left: 30px; }
-        .tracking-timeline::before { content: ''; position: absolute; left: 11px; top: 0; bottom: 0; width: 2px; background: var(--border-subtle); }
-        .tracking-step { position: relative; margin-bottom: 20px; }
-        .tracking-step .tracking-dot { position: absolute; left: -30px; width: 24px; height: 24px; border-radius: 50%; background: var(--bg-primary); border: 2px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--text-muted); }
-        .tracking-step.completed .tracking-dot { background: var(--green); border-color: var(--green); color: white; }
-        .tracking-step.active .tracking-dot { background: var(--accent); border-color: var(--accent); color: white; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4); } 50% { box-shadow: 0 0 0 8px rgba(99,102,241,0); } }
-        .tracking-info h4 { font-size: 0.95rem; margin-bottom: 4px; }
-        .tracking-info p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
-        .tracking-info .time { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); }
-
-        /* Empty States */
-        .empty-orders { text-align: center; padding: 40px 20px; }
-        .empty-orders i { font-size: 3rem; color: var(--text-muted); margin-bottom: 16px; display: block; }
-        .empty-orders h3 { margin-bottom: 8px; }
-        .empty-orders p { color: var(--text-muted); }
-        .cart-empty { text-align: center; }
-
-        /* Profile */
-        .profile-page { padding-bottom: 80px; }
-        .profile-header-new { position: relative; margin-bottom: 60px; }
-        .profile-cover-new { width: 100%; height: 140px; object-fit: cover; border-radius: 12px; }
-        .profile-avatar-wrap { position: absolute; bottom: -40px; left: 20px; }
-        .profile-avatar-wrap img { width: 80px; height: 80px; border-radius: 50%; border: 4px solid var(--bg-primary); }
-        .edit-profile-btn { position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); border: none; color: white; cursor: pointer; }
-        .profile-info-new { padding: 0 20px; margin-bottom: 20px; }
-        .profile-info-new h2 { font-size: 1.3rem; margin-bottom: 4px; }
-        .profile-info-new p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px; }
-        .profile-stats-new { display: flex; gap: 24px; }
-        .stat-box { text-align: center; }
-        .stat-num { font-size: 1.2rem; font-weight: 700; color: var(--accent-light); display: block; }
-        .stat-label { font-size: 0.75rem; color: var(--text-muted); }
-        .profile-menu-list { margin-top: 20px; }
-        .menu-item { display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--border-subtle); cursor: pointer; transition: all 0.3s; }
-        .menu-item:hover { background: rgba(99,102,241,0.05); }
-        .menu-item i:first-child { color: var(--accent-light); width: 20px; }
-        .menu-item span { flex: 1; font-weight: 600; }
-        .menu-item i:last-child { color: var(--text-muted); font-size: 0.8rem; }
-        .menu-item.logout { color: var(--red); }
-        .menu-item.logout i:first-child { color: var(--red); }
-
-        /* Withdraw */
-        .withdraw-section-in-profile { margin-top: 24px; }
-        .payment-balance-display { display: flex; justify-content: space-between; align-items: center; background: var(--bg-primary); padding: 16px; border-radius: 12px; }
-        .balance-label { font-size: 0.8rem; color: var(--text-muted); }
-        .balance-amount { font-size: 1.5rem; font-weight: 800; color: var(--green); }
-        .balance-refresh { background: transparent; border: none; color: var(--text-muted); cursor: pointer; }
-        .withdraw-methods-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 12px 0; }
-        .withdraw-info { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; }
-        .withdraw-input-group { display: flex; flex-direction: column; gap: 8px; }
-        .withdraw-input-group input { padding: 12px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); }
-        .withdraw-btn { padding: 12px; background: linear-gradient(135deg, var(--orange), #ea580c); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
-        .withdraw-history { background: var(--bg-primary); border-radius: 8px; padding: 12px; }
-
-        /* Admin */
-        .admin-login-box { max-width: 400px; margin: 60px auto; text-align: center; padding: 40px; background: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--border-subtle); }
-        .admin-login-box h2 { margin-bottom: 8px; }
-        .admin-login-box p { color: var(--text-muted); margin-bottom: 24px; }
-        .admin-login-box input { width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); margin-bottom: 16px; font-size: 1rem; }
-        .admin-login-box button { width: 100%; padding: 12px; background: var(--accent); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; }
-        .admin-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin: 16px 0; }
-        .admin-stat-card { background: var(--bg-secondary); padding: 16px; border-radius: 12px; text-align: center; border: 1px solid var(--border-subtle); }
-        .admin-stat-card .num { font-size: 1.8rem; font-weight: 700; color: var(--accent-light); }
-        .admin-stat-card .label { color: var(--text-muted); font-size: 0.8rem; }
-        .admin-section { background: var(--bg-secondary); padding: 16px; border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--border-subtle); }
-        .admin-section h3 { margin-bottom: 12px; font-size: 1rem; }
-        .badge { background: var(--accent); color: white; border-radius: 12px; font-weight: 600; padding: 2px 10px; font-size: 0.8rem; }
-
-        /* Cart */
-        .cart-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; }
-        .cart-overlay.open { display: block; }
-        .cart-panel { position: fixed; right: 0; top: 0; bottom: 0; width: 100%; max-width: 420px; background: var(--bg-secondary); display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s ease; }
-        .cart-overlay.open .cart-panel { transform: translateX(0); }
-        .cart-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid var(--border-subtle); }
-        .cart-title { font-size: 1.1rem; font-weight: 700; }
-        .cart-badge-total { background: var(--accent); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-left: 8px; }
-        .cart-close { background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
-        .cart-items-container { flex: 1; overflow-y: auto; padding: 16px; }
-        .cart-footer { padding: 16px; border-top: 1px solid var(--border-subtle); }
-        .cart-summary { margin-bottom: 16px; }
-        .summary-row { display: flex; justify-content: space-between; padding: 6px 0; color: var(--text-secondary); font-size: 0.9rem; }
-        .summary-row.total { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); border-top: 1px solid var(--border-subtle); padding-top: 12px; margin-top: 8px; }
-        .total-price { color: var(--accent-light); }
-        .cart-actions { display: flex; gap: 10px; }
-        .btn-checkout { flex: 1; padding: 12px; background: linear-gradient(135deg, var(--accent), var(--purple)); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
-        .btn-clear { padding: 12px 20px; background: transparent; border: 1px solid var(--border-subtle); color: var(--text-muted); border-radius: 8px; cursor: pointer; }
-
-        /* Modals */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-overlay.open { display: flex; }
-        .modal-box { background: var(--bg-secondary); border-radius: 16px; max-width: 600px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 24px; border: 1px solid var(--border-subtle); position: relative; }
-        .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
-        .order-chat-modal { max-width: 500px; height: 70vh; display: flex; flex-direction: column; padding: 0; }
-        .order-chat-header { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid var(--border-subtle); gap: 12px; }
-        .order-chat-header img { width: 44px; height: 44px; border-radius: 50%; }
-        .order-chat-header .info h3 { margin: 0; font-size: 1rem; }
-        .order-chat-header .info p { margin: 0; color: var(--text-muted); font-size: 0.8rem; }
-        .order-chat-messages { flex: 1; overflow-y: auto; padding: 16px; }
-        .order-chat-input-wrap { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--border-subtle); align-items: center; }
-        .chat-attach-btn { background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; padding: 8px; }
-        .input-container { flex: 1; display: flex; gap: 8px; }
-        .input-container input { flex: 1; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 20px; color: var(--text-primary); outline: none; }
-        .input-container button { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); border: none; color: white; cursor: pointer; }
-
-        /* Detail Modal */
-        .detail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
-        .detail-overlay.open { display: flex; }
-        .detail-modal { background: var(--bg-secondary); border-radius: 16px; max-width: 480px; width: 100%; padding: 24px; border: 1px solid var(--border-subtle); position: relative; }
-        .detail-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
-        .price-tag { font-size: 1.5rem; font-weight: 800; color: var(--accent-light); margin: 12px 0; }
-        .desc { color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
-        .variant-title { font-weight: 700; margin-bottom: 10px; }
-        .variant-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-        .action-btns { display: flex; gap: 10px; }
-        .add-cart-btn { flex: 1; padding: 12px; background: var(--bg-primary); border: 1px solid var(--accent); color: var(--accent-light); border-radius: 8px; font-weight: 700; cursor: pointer; }
-        .buy-now-btn { flex: 1; padding: 12px; background: linear-gradient(135deg, var(--accent), var(--purple)); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
-
-        /* Payment */
-        .payment-modal { max-width: 480px; }
-        .payment-section { margin-bottom: 20px; }
-        .section-label { font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        .order-summary-box { background: var(--bg-primary); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
-        .order-item-line { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.9rem; }
-        .order-item-line.total { font-weight: 700; font-size: 1.1rem; border-top: 1px solid var(--border-subtle); padding-top: 10px; margin-top: 8px; }
-        .payment-methods { display: flex; gap: 10px; margin-bottom: 16px; }
-        .payment-method-btn { flex: 1; padding: 12px; background: var(--bg-primary); border: 1px solid var(--border-subtle); color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .payment-method-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
-        .payment-qris-container { background: var(--bg-primary); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 12px; }
-        .qris-placeholder { color: var(--text-muted); }
-        .qris-placeholder i { font-size: 3rem; display: block; margin-bottom: 8px; }
-        .qris-success-text { color: var(--green); margin-top: 8px; }
-        .payment-details { background: var(--bg-primary); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
-        .detail-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.85rem; }
-        .detail-row .label { color: var(--text-muted); }
-        .detail-row .value { font-weight: 600; }
-        .detail-row .value.total { color: var(--accent-light); font-size: 1rem; }
-        .payment-status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
-        .payment-status-badge.pending { background: rgba(245,158,11,0.2); color: var(--orange); }
-        .payment-timer { text-align: center; color: var(--orange); font-weight: 700; margin: 12px 0; }
-        .payment-actions { display: flex; flex-direction: column; gap: 8px; }
-        .btn-pay { padding: 12px; background: linear-gradient(135deg, var(--accent), var(--purple)); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
-        .btn-check-status { padding: 12px; background: var(--bg-primary); border: 1px solid var(--border-subtle); color: var(--text-secondary); border-radius: 8px; cursor: pointer; }
-        .btn-copy-link { padding: 12px; background: transparent; border: 1px solid var(--accent); color: var(--accent-light); border-radius: 8px; cursor: pointer; }
-        .invoice-history-list { max-height: 200px; overflow-y: auto; }
-
-        /* Topup */
-        .topup-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
-
-        /* Anime */
-        .anime-input-wrap { display: flex; gap: 8px; margin-bottom: 12px; }
-        .anime-input-wrap input { flex: 1; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); }
-        .anime-input-wrap button { padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; }
-        .anime-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-        .anime-tab { padding: 8px 16px; background: var(--bg-primary); border: 1px solid var(--border-subtle); color: var(--text-muted); border-radius: 20px; cursor: pointer; }
-        .anime-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
-        .anime-list { display: grid; gap: 10px; }
-
-        /* Bot Controller */
-        .bot-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-        .bot-tab { padding: 8px 16px; background: var(--bg-primary); border: 1px solid var(--border-subtle); color: var(--text-muted); border-radius: 20px; cursor: pointer; }
-        .bot-tab.active { background: var(--accent); color: white; }
-        .bot-view.hidden { display: none; }
-        .bot-header-section { margin-bottom: 16px; }
-        .bot-header-section h3 { font-size: 1rem; margin-bottom: 4px; }
-        .bot-header-section p { color: var(--text-muted); font-size: 0.85rem; }
-        .bot-input-group { display: flex; gap: 8px; margin-bottom: 12px; }
-        .bot-input-group input { flex: 1; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); }
-        .bot-btn-primary { padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .bot-status-banner { padding: 12px; border-radius: 8px; margin-bottom: 12px; }
-        .bot-status-banner.hidden { display: none; }
-        .bot-panel.hidden { display: none; }
-        .bot-identity { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 10px; background: var(--bg-primary); border-radius: 8px; }
-        .bot-status-indicator { width: 10px; height: 10px; border-radius: 50%; background: var(--green); display: inline-block; margin-right: 6px; }
-        .bot-terminal { background: #000; border-radius: 8px; padding: 12px; font-family: var(--font-mono); font-size: 0.8rem; max-height: 200px; overflow-y: auto; }
-        .bot-terminal-line { margin-bottom: 4px; }
-        .bot-term-time { color: var(--accent-light); margin-right: 8px; }
-        .bot-term-info { color: var(--text-secondary); }
-        .bot-list { display: grid; gap: 8px; }
-
-        /* OSINT */
-        .osint-form { margin-bottom: 16px; }
-        .form-row { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
-        .form-group input, .form-group select, .form-group textarea { padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); font-family: inherit; }
-        .form-group small { color: var(--text-muted); font-size: 0.75rem; }
-        .btn-query { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--accent), var(--purple)); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
-        .osint-result { background: var(--bg-primary); border-radius: 8px; overflow: hidden; }
-        .osint-result.hidden { display: none; }
-        .result-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--border-subtle); }
-        .result-body { padding: 12px; max-height: 300px; overflow-y: auto; }
-        .result-body pre { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary); white-space: pre-wrap; }
-        .osint-badge { text-align: center; padding: 8px; color: var(--text-muted); font-size: 0.8rem; margin-top: 12px; }
-
-        /* Screenshot */
-        .ssweb-form { margin-bottom: 16px; }
-        .btn-ssweb { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--accent), var(--purple)); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
-        .ssweb-result { background: var(--bg-primary); border-radius: 8px; min-height: 200px; display: flex; align-items: center; justify-content: center; }
-        .ssweb-result .placeholder { text-align: center; color: var(--text-muted); }
-
-        /* Upload */
-        .upload-dropzone { border: 2px dashed var(--border-subtle); border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; margin-bottom: 12px; transition: all 0.3s; }
-        .upload-dropzone:hover { border-color: var(--accent); background: rgba(99,102,241,0.05); }
-        .upload-dropzone i { font-size: 2.5rem; color: var(--accent-light); margin-bottom: 8px; display: block; }
-        .upload-dropzone p { color: var(--text-secondary); margin-bottom: 4px; }
-        .file-types { font-size: 0.75rem; color: var(--text-muted); }
-        .upload-btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; margin-bottom: 12px; }
-        .upload-progress { display: none; margin-bottom: 12px; }
-        .upload-progress.active { display: block; }
-        .progress-bar { height: 6px; background: var(--bg-primary); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
-        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; }
-        .progress-text { text-align: center; font-size: 0.85rem; color: var(--text-secondary); }
-        .upload-result { display: none; }
-        .upload-result.active { display: block; }
-        .result-link { display: flex; gap: 8px; margin-bottom: 12px; }
-        .result-link input { flex: 1; padding: 10px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); }
-        .upload-preview img { max-width: 100%; border-radius: 8px; }
-
-        /* Login */
-        .login-box { text-align: center; padding: 20px 0; }
-        .login-benefits { list-style: none; text-align: left; margin: 20px 0; }
-        .login-benefits li { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; color: var(--text-secondary); font-size: 0.9rem; }
-        .login-benefits li i { color: var(--accent-light); margin-top: 2px; }
-
-        /* Profile Settings */
-        .profile-settings-box { padding: 10px 0; }
-        .profile-avatar-edit { position: relative; width: 80px; height: 80px; margin: 0 auto 20px; }
-        .profile-avatar-edit img { width: 100%; height: 100%; border-radius: 50%; }
-        .edit-badge { position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; }
-        .profile-input-group { margin-bottom: 16px; }
-        .profile-input-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
-        .profile-input-group input { width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); }
-        .profile-actions { display: flex; gap: 10px; }
-        .btn-profile-logout { flex: 1; padding: 12px; background: transparent; border: 1px solid var(--red); color: var(--red); border-radius: 8px; cursor: pointer; font-weight: 700; }
-        .btn-profile-save { flex: 1; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; }
-
-        /* Checkout */
-        .checkout-form { margin-top: 16px; }
-        .checkout-form .form-group { margin-bottom: 14px; }
-        .checkout-form label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
-        .checkout-form input, .checkout-form textarea { width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); font-family: inherit; }
-        .btn-place-order { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--green), #059669); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 1rem; }
-
-        /* Toast */
-        .toast-container { position: fixed; bottom: 80px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
-
-        /* Back to Top */
-        .back-to-top { position: fixed; bottom: 80px; right: 20px; background: var(--accent); border: none; color: white; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: none; z-index: 100; align-items: center; justify-content: center; }
-        .back-to-top.visible { display: flex; }
-
-        /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-around; padding: 8px 0; z-index: 300; backdrop-filter: blur(10px); }
-        .nav-item { background: transparent; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.7rem; cursor: pointer; padding: 4px 12px; transition: all 0.3s; }
-        .nav-item i { font-size: 1.2rem; }
-        .nav-item.active { color: var(--accent-light); }
-        .nav-item .badge { position: absolute; top: 0; background: var(--red); color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.65rem; font-weight: 700; }
-
-        /* Canvas */
-        #particlesCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
-
-        /* NoScript */
-        noscript div { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-primary); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        noscript div div { text-align: center; color: var(--text-primary); padding: 20px; }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero-title { font-size: 1.4rem; }
-            .grid-menu { grid-template-columns: repeat(2, 1fr); }
-            .admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .form-row { grid-template-columns: 1fr; }
-            .flash-sale-bar { flex-direction: column; align-items: flex-start; }
-            .cart-panel { max-width: 100%; }
-        }
-        @media (max-width: 480px) {
-            .grid-menu { grid-template-columns: repeat(2, 1fr); }
-            .hero-stats-row { flex-wrap: wrap; gap: 12px; }
-            .store-name { font-size: 1.1rem; }
-        }
-    </style>
-
 </head>
 <body>
-<canvas id="particlesCanvas"></canvas>
+    <canvas id="particlesCanvas"></canvas>
 
-<div class="app-container">
-    <!-- HEADER -->
-    <header class="top-header">
-        <div class="logo-area" id="logoArea" title="Klik 5x untuk Mode Admin">
-            <img src="https://files.catbox.moe/ijemcy.png" alt="logo" loading="lazy">
-            <span>JOELL SHOP</span>
-        </div>
-        <div class="header-actions">
-            <button class="header-btn" id="themeToggle" title="Toggle Dark/Light Mode" aria-label="Toggle dark/light mode">
-                <i class="fas fa-moon"></i>
-            </button>
-            <div id="userSection">
-                <button class="header-btn" id="loginBtn" title="Login" aria-label="Login">
-                    <i class="fas fa-sign-in-alt"></i>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="top-header">
+            <div class="logo-area" id="logoArea" title="Klik 5x untuk Mode Admin">
+                <img src="https://files.catbox.moe/ijemcy.png" alt="logo" loading="lazy">
+                <span>JOELL SHOP</span>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" id="themeToggle" title="Toggle Dark/Light Mode">
+                    <i class="fas fa-moon"></i>
                 </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- HOME PAGE -->
-    <div class="page active" id="page-home">
-        <div class="hero-section">
-            <div class="hero-video-wrap">
-                <video src="https://files.catbox.moe/trw5j2.mp4" autoplay loop playsinline muted class="hero-video" id="heroVideo"></video>
-                <div class="hero-overlay"></div>
-                <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound" title="Toggle sound">
-                    <i class="fas fa-volume-mute"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class="hero-text-card">
-            <h1 class="hero-title">Solusi Digital <span class="typing-text" id="typingText"></span><span class="cursor">|</span></h1>
-            <p class="hero-subtitle">Bot WhatsApp, Hosting, Script & Topup Game Terpercaya</p>
-            <div class="hero-stats-row">
-                <div class="hero-stat"><i class="fas fa-star"></i><span class="stat-value">4.9</span><span class="stat-label">Rating</span></div>
-                <div class="hero-stat"><i class="fas fa-users"></i><span class="stat-value">8.2K</span><span class="stat-label">Pelanggan</span></div>
-                <div class="hero-stat"><i class="fas fa-bolt"></i><span class="stat-value">24/7</span><span class="stat-label">Support</span></div>
-            </div>
-        </div>
-
-        <div class="flash-sale-bar" id="flashSaleBar">
-            <div class="flash-sale-info">
-                <i class="fas fa-fire"></i>
-                <div class="flash-sale-text">
-                    <span class="highlight">FLASH SALE</span> — Diskon 50% Panel Pterodactyl!
-                </div>
-            </div>
-            <div class="countdown-timer" id="countdownTimer">
-                <div class="countdown-item"><span class="num" id="cdHours">04</span><span class="label">Jam</span></div>
-                <div class="countdown-item"><span class="num" id="cdMinutes">32</span><span class="label">Menit</span></div>
-                <div class="countdown-item"><span class="num" id="cdSeconds">15</span><span class="label">Detik</span></div>
-            </div>
-        </div>
-
-        <div class="store-header">
-            <div class="store-name">
-                JOELL SHOP
-                <span class="rating"><i class="fas fa-star"></i> 4.9 <span style="font-weight:400;opacity:0.7">(1,234 Reviews)</span></span>
-                <span class="badge-free"><i class="fas fa-check-circle"></i> Free Fee Admin</span>
-            </div>
-        </div>
-
-        <!-- SEARCH BAR -->
-        <div class="search-wrap">
-            <div class="search-box">
-                <i class="fas fa-search" style="color:var(--text-muted);margin-right:10px;"></i>
-                <input type="text" id="searchInput" placeholder="Cari produk digital..." onkeyup="if(event.key==='Enter') doSearch()">
-                <button onclick="doSearch()">Cari</button>
-            </div>
-        </div>
-
-        <div class="server-status-bar">
-            <div class="server-status-header">
-                <h3><i class="fas fa-server"></i> Server Status</h3>
-                <button class="status-refresh" id="refreshStatus" title="Refresh server status" aria-label="Refresh server status"><i class="fas fa-sync-alt"></i></button>
-            </div>
-            <div class="server-grid" id="serverGrid">
-                <div class="server-item"><div class="server-dot"></div><div class="server-info"><div class="server-name">Node-1 Jakarta</div><div class="server-meta">Panel Pterodactyl</div></div><div class="server-ping">12ms</div></div>
-                <div class="server-item"><div class="server-dot"></div><div class="server-info"><div class="server-name">Node-2 Singapore</div><div class="server-meta">Bot Hosting</div></div><div class="server-ping">24ms</div></div>
-                <div class="server-item"><div class="server-dot warning"></div><div class="server-info"><div class="server-name">Node-3 Tokyo</div><div class="server-meta">Game Server</div></div><div class="server-ping" style="color:var(--orange)">89ms</div></div>
-                <div class="server-item"><div class="server-dot"></div><div class="server-info"><div class="server-name">API Gateway</div><div class="server-meta">Main API</div></div><div class="server-ping">5ms</div></div>
-            </div>
-        </div>
-
-        <!-- PROMO SECTION -->
-        <div class="promo-section">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-                <i class="fas fa-ticket-alt" style="color:var(--accent-light);"></i>
-                <span style="font-weight:700;font-size:0.9rem;">Punya Kode Promo?</span>
-            </div>
-            <div class="promo-input-wrap">
-                <input type="text" id="promoInput" placeholder="Masukkan kode promo..." style="text-transform:uppercase;">
-                <button id="promoBtn">Gunakan</button>
-            </div>
-            <div class="promo-message" id="promoMessage"></div>
-        </div>
-
-        <div class="section-title">Hosting & Kebutuhan Bot</div>
-        <div class="grid-menu" id="gridHosting"></div>
-
-        <div class="section-title">Jasa Script Bot WhatsApp</div>
-        <div class="grid-menu" id="gridScript"></div>
-
-        <div class="section-title">Topup Game</div>
-        <div class="grid-menu" id="gridTopup"></div>
-
-        <!-- TESTIMONIALS -->
-        <div class="section-title">Testimoni Pelanggan</div>
-        <div class="testimonials-carousel" id="testimonialsCarousel">
-            <div class="testimonial-card">
-                <div class="testimonial-header">
-                    <div class="testimonial-avatar">AD</div>
-                    <div class="testimonial-info">
-                        <h4>Ahmad D.</h4>
-                        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    </div>
-                </div>
-                <p class="testimonial-text">"Panel Pterodactyl-nya super stabil! Bot WhatsApp saya online 24/7 tanpa kendala. Supportnya juga cepat respon."</p>
-                <div class="testimonial-date"><i class="fas fa-clock"></i> 2 jam yang lalu</div>
-            </div>
-            <div class="testimonial-card">
-                <div class="testimonial-header">
-                    <div class="testimonial-avatar" style="background:linear-gradient(135deg,var(--green),var(--accent-secondary));">RS</div>
-                    <div class="testimonial-info">
-                        <h4>Rina S.</h4>
-                        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    </div>
-                </div>
-                <p class="testimonial-text">"Script Lily Gen 2 worth it banget! Fitur lengkap dan auto show JKT48-nya keren. Recommended seller!"</p>
-                <div class="testimonial-date"><i class="fas fa-clock"></i> 5 jam yang lalu</div>
-            </div>
-            <div class="testimonial-card">
-                <div class="testimonial-header">
-                    <div class="testimonial-avatar" style="background:linear-gradient(135deg,var(--orange),var(--red));">MF</div>
-                    <div class="testimonial-info">
-                        <h4>M. Fadli</h4>
-                        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
-                    </div>
-                </div>
-                <p class="testimonial-text">"Topup game cepat banget, langsung masuk. Harga juga paling murah dibanding yang lain. Mantap Joell Shop!"</p>
-                <div class="testimonial-date"><i class="fas fa-clock"></i> 1 hari yang lalu</div>
-            </div>
-            <div class="testimonial-card">
-                <div class="testimonial-header">
-                    <div class="testimonial-avatar" style="background:linear-gradient(135deg,var(--purple),var(--accent));">DK</div>
-                    <div class="testimonial-info">
-                        <h4>Dewi K.</h4>
-                        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    </div>
-                </div>
-                <p class="testimonial-text">"Jasa rename script 100% worth it. Hasilnya bersih dan aman. Bakal repeat order buat project selanjutnya!"</p>
-                <div class="testimonial-date"><i class="fas fa-clock"></i> 2 hari yang lalu</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ORDERS PAGE -->
-    <div class="page" id="page-orders">
-        <div class="tracking-detail-box">
-            <h2><i class="fas fa-shopping-bag" style="color:var(--accent-light);"></i> Pesanan Saya</h2>
-            <p class="subtitle">Riwayat dan status semua pesanan Anda</p>
-            <div id="ordersListContainer">
-                <div class="empty-orders">
-                    <i class="fas fa-box-open"></i>
-                    <h3>Belum ada pesanan</h3>
-                    <p>Yuk mulai berbelanja!</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- PROFILE PAGE -->
-    <div class="page" id="page-profile">
-        <div class="profile-page">
-            <div id="userProfileView" style="display:none;">
-                <div class="profile-header-new">
-                    <img class="profile-cover-new" src="https://files.catbox.moe/iai8aa.png" alt="cover">
-                    <div class="profile-avatar-wrap">
-                        <img id="userProfileImg" src="https://ui-avatars.com/api/?name=User" alt="avatar">
-                        <button class="edit-profile-btn" onclick="openProfileSettings()"><i class="fas fa-edit"></i></button>
-                    </div>
-                </div>
-                <div class="profile-info-new">
-                    <h2 id="userProfileName">User Name</h2>
-                    <p id="userProfileEmail">user@example.com</p>
-                    <div class="profile-stats-new">
-                        <div class="stat-box">
-                            <span class="stat-num" id="statOrderCount">0</span>
-                            <span class="stat-label">Pesanan</span>
-                        </div>
-                        <div class="stat-box">
-                            <span class="stat-num">Verified</span>
-                            <span class="stat-label">Status</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="profile-menu-list">
-                    <div class="menu-item" onclick="navigateTo('orders')">
-                        <i class="fas fa-history"></i>
-                        <span>Riwayat Pesanan</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                    <div class="menu-item" onclick="openProfileSettings()">
-                        <i class="fas fa-user-cog"></i>
-                        <span>Edit Profil</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                    <div class="menu-item" onclick="window.open('https://wa.me/6287751755160','_blank')">
-                        <i class="fab fa-whatsapp"></i>
-                        <span>Bantuan Support</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                    <div class="menu-item logout" id="btnProfileLogoutPage">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Keluar Akun</span>
-                    </div>
-                </div>
-
-                <!-- WITHDRAW SECTION -->
-                <div class="withdraw-section-in-profile" style="margin-top:24px;padding:20px;background:var(--bg-card);border-radius:12px;border:1px solid var(--border-subtle);">
-                    <h3 style="font-size:1rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;border-left:3px solid var(--orange);padding-left:12px;">
-                        <i class="fas fa-money-bill-wave" style="color:var(--orange);"></i> Tarik Saldo
-                    </h3>
-                    
-                    <div class="payment-balance-display" style="margin-bottom:12px;">
-                        <div>
-                            <div class="balance-label">Saldo Anda</div>
-                            <div class="balance-amount" id="profileBalanceAmount">Rp 0</div>
-                        </div>
-                        <button class="balance-refresh" onclick="fetchBalance()" title="Refresh Saldo">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-
-                    <div style="font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">Pilih Metode Penarikan</div>
-                    <div class="withdraw-methods-grid" id="profileWithdrawMethods">
-                        <p style="color:var(--text-muted);text-align:center;grid-column:1/-1;padding:16px;">Memuat metode penarikan...</p>
-                    </div>
-                    <div class="withdraw-info" id="profileWithdrawInfo">Silakan pilih metode penarikan di atas</div>
-
-                    <div class="withdraw-input-group">
-                        <input type="number" id="profileWithdrawAmount" placeholder="Jumlah (min 10.000)" min="10000">
-                        <input type="text" id="profileWithdrawAccount" placeholder="Nomor Rekening / E-Wallet">
-                        <button class="withdraw-btn" id="profileWithdrawBtn" style="background:linear-gradient(135deg,var(--orange),#ea580c);">
-                            <i class="fas fa-arrow-up"></i> Tarik
-                        </button>
-                    </div>
-
-                    <div style="font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-top:16px;margin-bottom:8px;">
-                        <i class="fas fa-history"></i> Riwayat Penarikan
-                    </div>
-                    <div class="withdraw-history" id="profileWithdrawHistory">
-                        <p style="color:var(--text-muted);font-size:0.8rem;text-align:center;">Belum ada riwayat penarikan</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="guestProfileView" class="cart-empty" style="padding: 60px 20px;">
-                <i class="fas fa-user-circle" style="font-size: 4rem; color: var(--accent); margin-bottom: 20px;"></i>
-                <h3>Belum Login</h3>
-                <p>Silakan login untuk melihat dan mengatur profil Anda.</p>
-                <button class="btn-checkout" onclick="document.getElementById('loginOverlay').classList.add('open')" style="margin-top:20px; width:auto; padding: 12px 40px;">LOGIN SEKARANG</button>
-            </div>
-
-            <div class="profile-footer-info" style="margin-top: 40px; padding: 20px; border-top: 1px solid var(--border-subtle); text-align: center;">
-                <p style="font-size: 0.8rem; color: var(--text-muted);">JOELL SHOP v2.4.0 • Digital Solutions</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- TRACKING PAGE -->
-    <div class="page" id="page-tracking">
-        <div class="tracking-detail-box">
-            <h2><i class="fas fa-shipping-fast" style="color:var(--accent-light);"></i> Lacak Pesanan</h2>
-            <p class="subtitle">Masukkan ID pesanan untuk melihat status detail</p>
-            <div style="display:flex;gap:10px;margin-bottom:24px;">
-                <input type="text" id="trackInput" placeholder="JOELL-XXXX-XXXX" style="flex:1;padding:12px 16px;border-radius:60px;border:1px solid var(--border-subtle);background:var(--bg-primary);color:var(--text-primary);font-size:0.9rem;outline:none;font-family:var(--font-mono);">
-                <button id="trackBtn" style="padding:12px 24px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;border:none;border-radius:60px;font-weight:700;cursor:pointer;white-space:nowrap;"><i class="fas fa-search"></i> Lacak</button>
-            </div>
-            <div id="trackResult" style="display:none;">
-                <div style="background:var(--bg-primary);border-radius:var(--radius-xs);padding:16px;border:1px solid var(--border-subtle);margin-bottom:20px;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-                        <span style="font-weight:700;font-family:var(--font-mono);color:var(--accent-light);" id="trackOrderId">#JOELL-0000-0000</span>
-                        <span id="trackStatusBadge" style="background:rgba(16,185,129,0.15);color:var(--green);padding:4px 12px;border-radius:30px;font-size:0.75rem;font-weight:700;"><i class="fas fa-check-circle"></i> Selesai</span>
-                    </div>
-                    <div id="trackProducts" style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:8px;">Panel Pterodactyl 4GB RAM × 1</div>
-                    <div style="color:var(--text-muted);font-size:0.75rem;" id="trackDate">21 Juli 2026 · 14:32 WIB</div>
-                </div>
-                <div class="tracking-timeline" id="trackingTimeline">
-                    <div class="tracking-step completed">
-                        <div class="tracking-dot"><i class="fas fa-check"></i></div>
-                        <div class="tracking-info">
-                            <h4>Pesanan Diterima</h4>
-                            <p>Pesanan Anda telah kami terima dan sedang diproses</p>
-                            <div class="time">21 Jul 2026, 14:32 WIB</div>
-                        </div>
-                    </div>
-                    <div class="tracking-step completed">
-                        <div class="tracking-dot"><i class="fas fa-check"></i></div>
-                        <div class="tracking-info">
-                            <h4>Pembayaran Diverifikasi</h4>
-                            <p>Pembayaran berhasil dikonfirmasi oleh sistem</p>
-                            <div class="time">21 Jul 2026, 14:35 WIB</div>
-                        </div>
-                    </div>
-                    <div class="tracking-step completed">
-                        <div class="tracking-dot"><i class="fas fa-check"></i></div>
-                        <div class="tracking-info">
-                            <h4>Sedang Diproses</h4>
-                            <p>Tim teknis sedang menyiapkan pesanan Anda</p>
-                            <div class="time">21 Jul 2026, 14:40 WIB</div>
-                        </div>
-                    </div>
-                    <div class="tracking-step active">
-                        <div class="tracking-dot"><i class="fas fa-box"></i></div>
-                        <div class="tracking-info">
-                            <h4>Pesanan Selesai</h4>
-                            <p>Detail akses telah dikirim ke akun Anda</p>
-                            <div class="time">21 Jul 2026, 15:00 WIB</div>
-                        </div>
-                    </div>
-                </div>
-                <button id="trackChatBtn" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;border:none;border-radius:60px;font-weight:700;cursor:pointer;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px;">
-                    <i class="fas fa-comments"></i> Chat Admin Terkait Pesanan
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ADMIN PAGE -->
-    <div class="admin-page" id="page-admin">
-        <div id="adminLoginView">
-            <div class="admin-login-box">
-                <div style="font-size:3rem;color:var(--accent-light);margin-bottom:8px;"><i class="fas fa-shield-alt"></i></div>
-                <h2>Admin Panel</h2>
-                <p>Masukkan password untuk mengakses dashboard admin</p>
-                <input type="password" id="adminPasswordInput" placeholder="••••••••">
-                <button id="adminLoginBtn"><i class="fas fa-lock"></i> Masuk Admin</button>
-                <button id="adminBackBtn" style="margin-top:12px;background:transparent;color:var(--text-muted);border:1px solid var(--border-subtle);">Kembali ke Toko</button>
-            </div>
-        </div>
-        <div id="adminDashboardView" style="display:none;">
-            <div class="tracking-detail-box" style="margin-bottom:16px;">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-                    <div>
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <h2><i class="fas fa-shield-alt" style="color:var(--accent-light);"></i> Admin Dashboard</h2>
-                            <span class="badge" id="adminChatBadge" style="display:none;position:static;padding:2px 10px;font-size:0.8rem;">0</span>
-                        </div>
-                        <p class="subtitle">Kelola pesanan dan chat pelanggan</p>
-                    </div>
-                    <button onclick="refreshAdminOrders()" class="header-btn" title="Refresh Data" id="btnRefreshAdmin">
-                        <i class="fas fa-sync-alt"></i>
+                <div id="userSection">
+                    <button class="header-btn" id="loginBtn" title="Login">
+                        <i class="fas fa-sign-in-alt"></i>
                     </button>
                 </div>
             </div>
-            <div class="admin-stats-grid">
-                <div class="admin-stat-card">
-                    <div class="num" id="adminStatTotal">0</div>
-                    <div class="label">Total Pesanan</div>
-                </div>
-                <div class="admin-stat-card">
-                    <div class="num" id="adminStatPending">0</div>
-                    <div class="label">Menunggu</div>
-                </div>
-                <div class="admin-stat-card">
-                    <div class="num" id="adminStatProcessing">0</div>
-                    <div class="label">Diproses</div>
-                </div>
-                <div class="admin-stat-card">
-                    <div class="num" id="adminStatCompleted">0</div>
-                    <div class="label">Selesai</div>
+        </header>
+
+        <!-- ADMIN PAGE -->
+        <div class="admin-page active" id="page-admin">
+            <div id="adminLoginView">
+                <div class="admin-login-box">
+                    <div style="font-size:3rem;color:var(--accent-light);margin-bottom:8px;"><i class="fas fa-shield-alt"></i></div>
+                    <h2>Admin Panel</h2>
+                    <p>Masukkan password untuk mengakses dashboard admin</p>
+                    <input type="password" id="adminPasswordInput" placeholder="••••••••">
+                    <button id="adminLoginBtn"><i class="fas fa-lock"></i> Masuk Admin</button>
+                    <button id="adminBackBtn" style="margin-top:12px;background:transparent;color:var(--text-muted);border:1px solid var(--border-subtle);">Kembali ke Toko</button>
                 </div>
             </div>
-            <div class="admin-section" style="background:rgba(99,102,241,0.05);border:1px solid rgba(99,102,241,0.2);">
-                <h3><i class="fas fa-cloud"></i> Cloud Sync Status</h3>
-                <div id="cloudStatusIndicator" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:rgba(0,0,0,0.2);margin-top:10px;">
-                    <div id="cloudStatusDot" style="width:12px;height:12px;border-radius:50%;background:var(--text-muted);"></div>
-                    <span id="cloudStatusText" style="font-size:0.9rem;color:var(--text-secondary);">Mengecek koneksi database...</span>
-                </div>
-                <p style="color:var(--text-muted);font-size:0.75rem;margin-top:8px;">Database cloud memungkinkan chat real-time antar perangkat berbeda secara otomatis.</p>
-            </div>
-            <div class="admin-section">
-                <h3><i class="fas fa-shopping-bag"></i> Semua Pesanan</h3>
-                <div id="adminOrdersList"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ============================================================ -->
-<!-- CART OVERLAY -->
-<!-- ============================================================ -->
-<div class="cart-overlay" id="cartOverlay">
-    <div class="cart-panel">
-        <div class="cart-header">
-            <div class="cart-title"><i class="fas fa-shopping-cart"></i> Keranjang <span class="cart-badge-total" id="cartBadgeTotal">0</span></div>
-            <button class="cart-close" id="cartCloseBtn" aria-label="Close cart" title="Close cart"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="cart-items-container" id="cartItems"></div>
-        <div class="cart-footer" id="cartFooter">
-            <div class="cart-summary">
-                <div class="summary-row"><span>Subtotal</span><span id="cartSubtotal">Rp 0</span></div>
-                <div class="summary-row"><span>Diskon</span><span id="cartDiscount">Rp 0</span></div>
-                <div class="summary-row"><span>Ongkir</span><span id="cartShipping">Rp 0</span></div>
-                <div class="summary-row total"><span>Total</span><span class="total-price" id="cartTotalDisplay">Rp 0</span></div>
-            </div>
-            <div class="cart-actions">
-                <button class="btn-checkout" id="checkoutBtn"><i class="fas fa-credit-card"></i> Checkout Sekarang</button>
-                <button class="btn-clear" id="clearCartBtn"><i class="fas fa-trash-alt"></i> Kosongkan</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- CHECKOUT MODAL -->
-<div class="modal-overlay" id="checkoutOverlay">
-    <div class="modal-box">
-        <button class="modal-close" id="checkoutCloseBtn" aria-label="Close checkout" title="Close checkout"><i class="fas fa-times"></i></button>
-        <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:4px;"><i class="fas fa-credit-card" style="color:var(--accent-light);"></i> Checkout</h2>
-        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;">Lengkapi data pengiriman pesanan</p>
-        <div class="order-summary-box">
-            <h4><i class="fas fa-shopping-bag"></i> Ringkasan Pesanan</h4>
-            <div id="checkoutItems"></div>
-            <div class="order-item-line total" id="checkoutTotal">Total: Rp 0</div>
-        </div>
-        <form class="checkout-form" id="checkoutForm">
-            <div class="form-group">
-                <label><i class="fas fa-user"></i> Nama Lengkap</label>
-                <input type="text" id="coName" placeholder="Nama penerima" required>
-            </div>
-            <div class="form-group">
-                <label><i class="fas fa-envelope"></i> Email</label>
-                <input type="email" id="coEmail" placeholder="email@example.com" required>
-            </div>
-            <div class="form-group">
-                <label><i class="fas fa-phone"></i> Nomor WhatsApp</label>
-                <input type="tel" id="coPhone" placeholder="08123456789" required>
-            </div>
-            <div class="form-group">
-                <label><i class="fas fa-map-marker-alt"></i> Alamat / Catatan</label>
-                <textarea id="coAddress" rows="3" placeholder="Catatan tambahan untuk pesanan..."></textarea>
-            </div>
-            <button type="submit" class="btn-place-order"><i class="fas fa-check-circle"></i> Buat Pesanan</button>
-        </form>
-    </div>
-</div>
-
-<!-- DETAIL MODAL -->
-<div class="detail-overlay" id="detailOverlay">
-    <div class="detail-modal">
-        <button class="detail-close" id="detailCloseBtn" aria-label="Close details" title="Close details"><i class="fas fa-times"></i></button>
-        <h2 id="detailName">Nama Produk</h2>
-        <div class="price-tag" id="detailPrice">Rp 0</div>
-        <p class="desc" id="detailDesc">Deskripsi produk.</p>
-        <div class="variant-title"><i class="fas fa-layer-group"></i> Pilih Varian:</div>
-        <div class="variant-list" id="variantList"></div>
-        <div class="action-btns">
-            <button class="add-cart-btn" id="addToCartBtn"><i class="fas fa-cart-plus"></i> Keranjang</button>
-            <button class="buy-now-btn" id="buyNowBtn"><i class="fas fa-bolt"></i> Beli Langsung</button>
-        </div>
-    </div>
-</div>
-
-<!-- TOPUP MODAL -->
-<div class="modal-overlay" id="topupOverlay">
-    <div class="modal-box">
-        <button class="modal-close" id="topupCloseBtn" aria-label="Close topup" title="Close topup"><i class="fas fa-times"></i></button>
-        <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:4px;"><i class="fas fa-gamepad" style="color:var(--accent-light);"></i> Topup All Game</h2>
-        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;">Pilih game favoritmu:</p>
-        <div class="topup-grid" id="topupGrid"></div>
-    </div>
-</div>
-
-<!-- ANIME MODAL -->
-<div class="modal-overlay" id="animeOverlay">
-    <div class="modal-box">
-        <button class="modal-close" id="animeCloseBtn" aria-label="Close anime" title="Close anime"><i class="fas fa-times"></i></button>
-        <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:4px;"><i class="fas fa-film" style="color:var(--accent-light);"></i> Info Anime</h2>
-        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:14px;">Cari anime atau lihat jadwal tayang</p>
-        <div class="anime-input-wrap">
-            <input type="text" id="animeInput" placeholder="Cari anime...">
-            <button id="animeSearchBtn"><i class="fas fa-search"></i> Cari</button>
-        </div>
-        <div class="anime-tabs">
-            <button class="anime-tab active" data-tab="latest">Sedang Tayang</button>
-            <button class="anime-tab" data-tab="upcoming">Akan Rilis</button>
-        </div>
-        <div id="animeResult">
-            <div id="animeLatest" class="anime-list"></div>
-            <div id="animeUpcoming" class="anime-list" style="display:none;"></div>
-        </div>
-    </div>
-</div>
-
-<!-- BOT CONTROLLER MODAL -->
-<div class="modal-overlay" id="botControllerOverlay">
-    <div class="modal-box">
-        <button class="modal-close" id="botControllerCloseBtn" aria-label="Close bot controller" title="Close bot controller"><i class="fas fa-times"></i></button>
-        <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:4px;"><i class="fas fa-robot" style="color:var(--accent-light);"></i> Bot Controller</h2>
-        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;">Kelola bot Telegram Anda</p>
-        <div class="bot-tabs">
-            <button class="bot-tab active" data-tab="controller">Controller</button>
-            <button class="bot-tab" data-tab="library">Library</button>
-        </div>
-        <div id="botViewController" class="bot-view">
-            <div class="bot-header-section">
-                <h3><i class="fas fa-shield-alt"></i> Authentication</h3>
-                <p>Masukkan token bot dari @BotFather</p>
-            </div>
-            <div class="bot-input-group">
-                <input type="password" id="botTokenInput" placeholder="123456789:ABCdefGHIjklMNO...">
-                <button class="bot-btn-primary" id="botCheckBtn"><i class="fas fa-plug"></i> Connect</button>
-            </div>
-            <div id="botStatusBox" class="bot-status-banner hidden"></div>
-            <div id="botPanelKontrol" class="bot-panel hidden">
-                <div class="bot-identity">
-                    <div class="bot-identity-left"><div class="bot-status-indicator"></div><span>Connected: <strong id="botName">-</strong></span></div>
-                    <div class="bot-id-text">ID: <span id="botId">-</span></div>
-                </div>
-                <div class="bot-input-group">
-                    <input type="text" id="botPesanInput" placeholder="Ketik pesan...">
-                    <button class="bot-btn-primary" id="botKirimBtn"><i class="fas fa-paper-plane"></i></button>
-                </div>
-                <div class="bot-terminal" id="botLogArea">
-                    <div class="bot-terminal-line"><span class="bot-term-time">[SYS]</span><span class="bot-term-info">Menunggu koneksi...</span></div>
-                </div>
-            </div>
-        </div>
-        <div id="botViewLibrary" class="bot-view hidden">
-            <div class="bot-header-section"><h3><i class="fas fa-history"></i> Riwayat Koneksi</h3><p>Bot yang pernah terhubung</p></div>
-            <div class="bot-list" id="botListContainer"></div>
-        </div>
-    </div>
-</div>
-
-<!-- OSINT MODAL -->
-<div class="modal-overlay" id="osintOverlay">
-    <div class="modal-box" style="max-width:640px;">
-        <button class="modal-close" id="osintCloseBtn" aria-label="Close OSINT" title="Close OSINT"><i class="fas fa-times"></i></button>
-        <div style="font-size:2.2rem;color:var(--accent-light);margin-bottom:4px;"><i class="fas fa-search"></i></div>
-        <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:2px;">WhatsApp OSINT</h2>
-        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;border-bottom:1px solid var(--border-subtle);padding-bottom:12px;"><i class="fas fa-shield-alt" style="color:var(--accent-light);margin-right:6px;"></i>Open-Source Intelligence untuk WhatsApp</p>
-        <div class="osint-form">
-            <div class="form-row">
-                <div class="form-group">
-                    <label><i class="fas fa-phone"></i> Nomor Telepon</label>
-                    <input type="text" id="osintPhone" placeholder="6281234567890">
-                    <small>Kode negara, tanpa tanda +</small>
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-bolt"></i> Endpoint</label>
-                    <select id="osintEndpoint">
-                        <option value="/about">Status Pengguna</option>
-                        <option value="/wspic/b64">Foto Profil</option>
-                        <option value="/bizos">Verifikasi Bisnis</option>
-                        <option value="/devices">Perangkat</option>
-                        <option value="/wspic/dck">OSINT Lengkap</option>
-                        <option value="/privacy">Privasi</option>
-                    </select>
-                </div>
-            </div>
-            <button class="btn-query" id="osintQueryBtn"><i class="fas fa-paper-plane"></i> Jalankan Query</button>
-        </div>
-        <div id="osintResult" class="osint-result hidden">
-            <div class="result-header"><span><i class="fas fa-code"></i> Hasil</span><button class="copy-btn" id="osintResultCopyBtn"><i class="fas fa-copy"></i> Salin</button></div>
-            <div class="result-body" id="osintResultBody"><pre id="osintResultPre">Menunggu query...</pre></div>
-        </div>
-        <div class="osint-badge"><i class="fas fa-code-branch"></i> 6 Endpoint Tersedia</div>
-    </div>
-</div>
-
-<!-- SSWEB MODAL -->
-<div class="modal-overlay" id="sswebOverlay">
-    <div class="modal-box" style="max-width:640px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border-subtle);margin-bottom:12px;">
-            <div style="display:flex;align-items:center;gap:10px;font-size:1.3rem;font-weight:800;"><i class="fas fa-camera" style="color:var(--accent-light);"></i> Screenshot Website</div>
-            <button class="modal-close" id="sswebCloseBtn" aria-label="Close screenshot" title="Close screenshot"><i class="fas fa-times"></i></button>
-        </div>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:12px;">Ambil screenshot dari website mana saja</p>
-        <div class="ssweb-form">
-            <div class="form-group">
-                <label><i class="fas fa-link"></i> URL Website</label>
-                <input type="text" id="sswebUrl" placeholder="https://example.com">
-            </div>
-            <button class="btn-ssweb" id="sswebBtn"><i class="fas fa-paper-plane"></i> Ambil Screenshot</button>
-        </div>
-        <div class="ssweb-result" id="sswebResult">
-            <div class="placeholder"><i class="fas fa-image" style="font-size:2rem;display:block;margin-bottom:8px;"></i>Masukkan URL dan klik tombol</div>
-        </div>
-    </div>
-</div>
-
-<!-- UPLOAD MODAL -->
-<div class="modal-overlay" id="uploadOverlay">
-    <div class="modal-box" style="max-width:560px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border-subtle);margin-bottom:12px;">
-            <div style="display:flex;align-items:center;gap:10px;font-size:1.3rem;font-weight:800;"><i class="fas fa-cloud-upload-alt" style="color:var(--accent-light);"></i> Upload Gambar</div>
-            <button class="modal-close" id="uploadCloseBtn" aria-label="Close upload" title="Close upload"><i class="fas fa-times"></i></button>
-        </div>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:12px;">Upload gambar — dapatkan link permanen</p>
-        <div class="upload-dropzone" id="uploadDropzone">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <p>Klik atau seret gambar ke sini</p>
-            <span class="file-types">PNG · JPG · WEBP · GIF · Maks 10 MB</span>
-        </div>
-        <input type="file" id="uploadFileInput" accept="image/*" style="display:none;">
-        <button class="upload-btn" id="uploadBtn"><i class="fas fa-upload"></i> Upload</button>
-        <div class="upload-progress" id="uploadProgress">
-            <div class="progress-bar"><div class="progress-fill" id="uploadProgressFill"></div></div>
-            <div class="progress-text" id="uploadProgressText">Mengupload...</div>
-        </div>
-        <div class="upload-result" id="uploadResult">
-            <div class="result-link">
-                <input type="text" id="uploadResultLink" readonly>
-                <button class="btn-copy-link" id="uploadCopyBtn"><i class="fas fa-copy"></i> Salin</button>
-            </div>
-            <div class="upload-preview" id="uploadPreview"></div>
-        </div>
-    </div>
-</div>
-
-<!-- LOGIN MODAL -->
-<div class="modal-overlay" id="loginOverlay">
-    <div class="modal-box" style="max-width:440px; border: 1px solid rgba(99, 102, 241, 0.3); box-shadow: 0 0 40px rgba(0,0,0,0.6);">
-        <button class="modal-close" id="loginCloseBtn" aria-label="Close login" title="Close login"><i class="fas fa-times"></i></button>
-        <div class="login-box">
-            <div style="position: relative; display: inline-block; margin-bottom: 20px;">
-                <div style="font-size:4rem; color:var(--accent); filter: drop-shadow(0 0 15px var(--accent-glow));">
-                    <i class="fas fa-shield-halved"></i>
-                </div>
-                <div style="position: absolute; bottom: 0; right: 0; width: 20px; height: 20px; background: var(--green); border-radius: 50%; border: 3px solid var(--bg-card-solid); box-shadow: 0 0 10px var(--green-glow);"></div>
-            </div>
-            <h2 style="font-size: 1.8rem; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 10px; background: linear-gradient(135deg, #fff, var(--accent-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">AKSES PRIORITAS</h2>
-            <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">Gunakan akun Google Anda untuk enkripsi data pesanan dan akses chat eksklusif dengan tim teknis kami.</p>
-            <ul class="login-benefits">
-                <li><i class="fas fa-bolt"></i> <span><strong>Instant Tracking:</strong> Pantau progres pesanan detik demi detik.</span></li>
-                <li><i class="fas fa-headset"></i> <span><strong>Priority Support:</strong> Jalur chat privat langsung ke teknisi.</span></li>
-                <li><i class="fas fa-vault"></i> <span><strong>Secure History:</strong> Backup otomatis semua lisensi & file pesanan.</span></li>
-                <li><i class="fas fa-bell"></i> <span><strong>Smart Alert:</strong> Notifikasi real-time via browser & email.</span></li>
-            </ul>
-            <div id="g_id_onload"
-                 data-client_id="598453625335-6j0qcb9abpbnvtkqsebna4jr8rcbpkuj.apps.googleusercontent.com"
-                 data-context="signin"
-                 data-ux_mode="popup"
-                 data-callback="handleGoogleLogin"
-                 data-auto_prompt="false">
-            </div>
-            <div class="g_id_signin"
-                 data-type="standard"
-                 data-shape="pill"
-                 data-theme="filled_black"
-                 data-text="continue_with"
-                 data-size="large"
-                 data-logo_alignment="left"
-                 style="filter: drop-shadow(0 0 10px rgba(99,102,241,0.3));">
-            </div>
-            <p style="margin-top: 20px; font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">
-                <i class="fas fa-lock" style="margin-right: 4px;"></i> Secured by Google OAuth 2.0 Encryption
-            </p>
-        </div>
-    </div>
-</div>
-
-<!-- ORDER CHAT MODAL -->
-<div class="modal-overlay" id="orderChatOverlay">
-    <div class="modal-box order-chat-modal">
-        <div class="order-chat-header">
-            <button onclick="document.getElementById('orderChatOverlay').classList.remove('open')" style="background:none;border:none;color:#8696a0;font-size:1.2rem;margin-right:10px;cursor:pointer;"><i class="fas fa-arrow-left"></i></button>
-            <img src="https://files.catbox.moe/ijemcy.png" alt="Admin JOELL SHOP">
-            <div class="info">
-                <h3>Admin JOELL SHOP</h3>
-                <p id="orderChatOrderId">Order: #JOELL-0000-0000</p>
-            </div>
-            <button class="modal-close" id="orderChatCloseBtn" aria-label="Close chat" title="Close chat" style="position:static;color:#8696a0;font-size:1.2rem;margin-left:auto;"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="order-chat-messages" id="orderChatMessages"></div>
-        <div class="order-chat-input-wrap">
-            <button class="chat-attach-btn" onclick="document.getElementById('orderChatFile').click()"><i class="fas fa-paperclip"></i></button>
-            <input type="file" id="orderChatFile" accept="image/*" style="display:none;" onchange="handleChatFileUpload(this, 'user')">
-            <div class="input-container">
-                <input type="text" id="orderChatInput" placeholder="Ask me anything...">
-                <button id="orderChatSend"><i class="fas fa-arrow-up"></i></button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ADMIN CHAT MODAL -->
-<div class="modal-overlay" id="adminChatOverlay">
-    <div class="modal-box order-chat-modal">
-        <div class="order-chat-header">
-            <button onclick="document.getElementById('adminChatOverlay').classList.remove('open')" style="background:none;border:none;color:#8696a0;font-size:1.2rem;margin-right:10px;cursor:pointer;"><i class="fas fa-arrow-left"></i></button>
-            <div class="testimonial-avatar" id="adminChatUserImg" style="width:44px;height:44px;font-size:1.2rem;background:linear-gradient(135deg,var(--green),var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i class="fas fa-user"></i></div>
-            <div class="info">
-                <h3 id="adminChatUserName">Chat Pelanggan</h3>
-                <p id="adminChatOrderId">Order: #JOELL-0000-0000</p>
-            </div>
-            <button class="modal-close" id="adminChatCloseBtn" aria-label="Close admin chat" title="Close admin chat" style="position:static;color:#8696a0;font-size:1.2rem;margin-left:auto;"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="order-chat-messages" id="adminChatMessages"></div>
-        <div class="order-chat-input-wrap">
-            <button class="chat-attach-btn" onclick="document.getElementById('adminChatFile').click()" title="Upload Gambar"><i class="fas fa-image"></i></button>
-            <button class="chat-attach-btn" onclick="document.getElementById('adminDocFile').click()" title="Upload File/Script"><i class="fas fa-file-code"></i></button>
-            <input type="file" id="adminChatFile" accept="image/*" style="display:none;" onchange="handleChatFileUpload(this, 'admin')">
-            <input type="file" id="adminDocFile" accept=".json,.zip,.txt,.js,.html" style="display:none;" onchange="handleAdminDocUpload(this)">
-            <div class="input-container">
-                <input type="text" id="adminChatInput" placeholder="Reply to customer...">
-                <button id="adminChatSend"><i class="fas fa-arrow-up"></i></button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- PROFILE SETTINGS MODAL -->
-<div class="modal-overlay" id="profileOverlay">
-    <div class="modal-box" style="max-width:400px; border: 1px solid rgba(99, 102, 241, 0.3);">
-        <button class="modal-close" id="profileCloseBtn" aria-label="Close profile settings" title="Close profile settings"><i class="fas fa-times"></i></button>
-        <div class="profile-settings-box">
-            <h2 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 24px; color: #fff;">PENGATURAN PROFIL</h2>
-            <div class="profile-avatar-edit">
-                <img id="profilePreview" src="https://ui-avatars.com/api/?name=User" alt="avatar">
-                <div class="edit-badge" onclick="document.getElementById('profilePhotoInput').click()"><i class="fas fa-camera"></i></div>
-                <input type="file" id="profilePhotoInput" accept="image/*" style="display:none;" onchange="handleProfilePhotoUpload(this)">
-            </div>
-            <div class="profile-input-group">
-                <label>Nama Tampilan</label>
-                <input type="text" id="profileNameInput" placeholder="Masukkan nama Anda...">
-            </div>
-            <div class="profile-input-group">
-                <label>Email (Read-only)</label>
-                <input type="email" id="profileEmailInput" readonly style="opacity:0.6; cursor:not-allowed;">
-            </div>
-            <div class="profile-actions">
-                <button class="btn-profile-logout" id="profileLogoutBtn">LOGOUT</button>
-                <button class="btn-profile-save" id="profileSaveBtn">SIMPAN</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ============================================================ -->
-<!-- PAYMENT MODAL - CLEAN (TANPA WITHDRAW) -->
-<!-- ============================================================ -->
-<div class="modal-overlay" id="paymentOverlay">
-    <div class="modal-box payment-modal">
-        <button class="modal-close" id="paymentCloseBtn" aria-label="Close payment" title="Close payment"><i class="fas fa-times"></i></button>
-        
-        <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:4px;">
-            <i class="fas fa-credit-card" style="color:var(--accent-light);"></i> Pembayaran
-        </h2>
-        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;">Selesaikan pembayaran pesanan Anda</p>
-        
-        <!-- SALDO -->
-        <div class="payment-section">
-            <div class="section-label"><i class="fas fa-wallet"></i> Saldo Akun</div>
-            <div class="payment-balance-display" id="balanceDisplay">
-                <div>
-                    <div class="balance-label">Saldo Anda</div>
-                    <div class="balance-amount" id="balanceAmount">Rp 0</div>
-                </div>
-                <button class="balance-refresh" id="balanceRefreshBtn" title="Refresh Saldo">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- RINGKASAN PESANAN -->
-        <div class="payment-section">
-            <div class="section-label"><i class="fas fa-shopping-bag"></i> Ringkasan Pesanan</div>
-            <div class="order-summary-box">
-                <div id="paymentOrderItems"></div>
-                <div class="order-item-line total" id="paymentOrderTotal">Total: Rp 0</div>
-            </div>
-        </div>
-
-        <!-- METODE PEMBAYARAN & INVOICE -->
-        <div class="payment-section">
-            <div class="section-label"><i class="fas fa-credit-card"></i> Metode Pembayaran</div>
-            <div class="payment-methods">
-                <button class="payment-method-btn active" data-method="qris">
-                    <i class="fas fa-qrcode"></i> QRIS
-                </button>
-                <button class="payment-method-btn" data-method="bank">
-                    <i class="fas fa-university"></i> Bank Transfer
-                </button>
-            </div>
-
-            <!-- QRIS Section -->
-            <div id="paymentQrisSection">
-                <div class="payment-qris-container" id="qrisContainer">
-                    <div class="qris-placeholder" id="qrisPlaceholder">
-                        <i class="fas fa-qrcode"></i>
-                        <p>Klik tombol "Buat Invoice" untuk mendapatkan QRIS</p>
-                        <small>Pastikan koneksi internet stabil</small>
-                    </div>
-                    <div id="qrisImageWrapper" style="display:none;">
-                        <img id="qrisImage" src="" alt="QRIS Code" loading="lazy">
-                        <p class="qris-success-text">
-                            <i class="fas fa-check-circle"></i> Scan QRIS untuk membayar
-                        </p>
+            <div id="adminDashboardView" style="display:none;">
+                <div class="tracking-detail-box" style="margin-bottom:16px;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                        <div>
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <h2><i class="fas fa-shield-alt" style="color:var(--accent-light);"></i> Admin Dashboard</h2>
+                                <span class="badge" id="adminChatBadge" style="display:none;position:static;padding:2px 10px;font-size:0.8rem;">0</span>
+                            </div>
+                            <p class="subtitle">Kelola pesanan dan chat pelanggan</p>
+                        </div>
+                        <button onclick="refreshAdminOrders()" class="header-btn" title="Refresh Data" id="btnRefreshAdmin">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
                     </div>
                 </div>
-                
-                <div class="payment-details" id="paymentDetails" style="display:none;">
-                    <div class="detail-row">
-                        <span class="label">Invoice ID</span>
-                        <span class="value" id="invoiceId" style="font-family:var(--font-mono);font-size:0.8rem;">-</span>
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card">
+                        <div class="num" id="adminStatTotal">0</div>
+                        <div class="label">Total Pesanan</div>
                     </div>
-                    <div class="detail-row">
-                        <span class="label">Total</span>
-                        <span class="value total" id="invoiceTotal">Rp 0</span>
+                    <div class="admin-stat-card">
+                        <div class="num" id="adminStatPending">0</div>
+                        <div class="label">Menunggu</div>
                     </div>
-                    <div class="detail-row">
-                        <span class="label">Biaya Admin</span>
-                        <span class="value" id="invoiceFee">Rp 0</span>
+                    <div class="admin-stat-card">
+                        <div class="num" id="adminStatProcessing">0</div>
+                        <div class="label">Diproses</div>
                     </div>
-                    <div class="detail-row">
-                        <span class="label">Status</span>
-                        <span class="value"><span class="payment-status-badge pending" id="invoiceStatusBadge">⏳ Menunggu</span></span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">Kadaluarsa</span>
-                        <span class="value" id="invoiceExpiry">-</span>
+                    <div class="admin-stat-card">
+                        <div class="num" id="adminStatCompleted">0</div>
+                        <div class="label">Selesai</div>
                     </div>
                 </div>
-
-                <div class="payment-timer" id="paymentTimer" style="display:none;">
-                    <i class="fas fa-hourglass-half"></i> <span id="timerDisplay">15:00</span>
+                <div class="admin-section" style="background:rgba(99,102,241,0.05);border:1px solid rgba(99,102,241,0.2);">
+                    <h3><i class="fas fa-cloud"></i> Cloud Sync Status</h3>
+                    <div id="cloudStatusIndicator" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:rgba(0,0,0,0.2);margin-top:10px;">
+                        <div id="cloudStatusDot" style="width:12px;height:12px;border-radius:50%;background:var(--text-muted);"></div>
+                        <span id="cloudStatusText" style="font-size:0.9rem;color:var(--text-secondary);">Mengecek koneksi database...</span>
+                    </div>
+                    <p style="color:var(--text-muted);font-size:0.75rem;margin-top:8px;">Database cloud memungkinkan chat real-time antar perangkat berbeda secara otomatis.</p>
                 </div>
-
-                <div class="payment-actions">
-                    <button class="btn-pay" id="createInvoiceBtn"><i class="fas fa-qrcode"></i> Buat Invoice</button>
-                    <button class="btn-check-status" id="checkStatusBtn" style="display:none;"><i class="fas fa-sync-alt"></i> Cek Status</button>
-                    <button class="btn-copy-link" id="copyPaymentLinkBtn" style="display:none;"><i class="fas fa-copy"></i> Salin Link</button>
+                <div class="admin-section">
+                    <h3><i class="fas fa-shopping-bag"></i> Semua Pesanan</h3>
+                    <div id="adminOrdersList"></div>
                 </div>
             </div>
-
-            <!-- Bank Transfer Section -->
-            <div id="paymentBankSection" style="display:none;">
-                <div class="payment-details">
-                    <div class="detail-row">
-                        <span class="label">Bank</span>
-                        <span class="value">BCA</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">Nomor Rekening</span>
-                        <span class="value" style="font-family:var(--font-mono);">1234567890</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">Atas Nama</span>
-                        <span class="value">JOELL SHOP</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">Total</span>
-                        <span class="value total" id="bankTotal">Rp 0</span>
-                    </div>
-                </div>
-                <p style="color:var(--text-muted);font-size:0.8rem;text-align:center;margin:8px 0;">
-                    <i class="fas fa-info-circle"></i> Transfer sesuai total dan kirim bukti ke admin
-                </p>
-                <button class="btn-pay" onclick="copyBankInfo()"><i class="fas fa-copy"></i> Salin Info Bank</button>
-            </div>
-        </div>
-
-        <!-- RIWAYAT INVOICE -->
-        <div class="payment-section" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border-subtle);">
-            <div class="section-label"><i class="fas fa-file-invoice"></i> Riwayat Invoice</div>
-            <div class="invoice-history-list" id="invoiceHistoryList">
-                <div style="text-align:center;padding:20px;color:var(--text-muted);">
-                    <i class="fas fa-file-invoice" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.5;"></i>
-                    <p>Belum ada invoice</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- TOMBOL KE HALAMAN WITHDRAW -->
-        <div style="margin-top:12px;text-align:center;padding-top:12px;border-top:1px solid var(--border-subtle);">
-            <button onclick="closePaymentAndOpenWithdraw()" 
-                    style="background:none;border:none;color:var(--accent-light);cursor:pointer;font-size:0.85rem;font-weight:600;transition:all 0.3s ease;padding:8px 16px;border-radius:30px;">
-                <i class="fas fa-money-bill-wave"></i> Ingin Tarik Saldo? Klik di sini
-            </button>
         </div>
     </div>
-</div>
 
-<!-- TOAST CONTAINER -->
-<div class="toast-container" id="toastContainer"></div>
+    <!-- ADMIN CHAT MODAL (WHATSAPP STYLE) -->
+    <div class="modal-overlay" id="adminChatOverlay">
+        <div class="modal-box order-chat-modal">
+            <div class="order-chat-header">
+                <button onclick="document.getElementById('adminChatOverlay').classList.remove('open')" style="background:none;border:none;color:#8696a0;font-size:1.2rem;margin-right:10px;cursor:pointer;"><i class="fas fa-arrow-left"></i></button>
+                <div class="testimonial-avatar" id="adminChatUserImg" style="width:44px;height:44px;font-size:1.2rem;background:linear-gradient(135deg,var(--green),var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i class="fas fa-user"></i></div>
+                <div class="info">
+                    <h3 id="adminChatUserName">Chat Pelanggan</h3>
+                    <p id="adminChatOrderId">Order: #JOELL-0000-0000</p>
+                </div>
+                <button class="modal-close" id="adminChatCloseBtn" style="position:static;color:#8696a0;font-size:1.2rem;margin-left:auto;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="order-chat-messages" id="adminChatMessages"></div>
+            <div class="order-chat-input-wrap">
+                <button class="chat-attach-btn" onclick="document.getElementById('adminChatFile').click()" title="Upload Gambar"><i class="fas fa-image"></i></button>
+                <button class="chat-attach-btn" onclick="document.getElementById('adminDocFile').click()" title="Upload File/Script"><i class="fas fa-file-code"></i></button>
+                <input type="file" id="adminChatFile" accept="image/*" style="display:none;" onchange="handleChatFileUpload(this, 'admin')">
+                <input type="file" id="adminDocFile" accept=".json,.zip,.txt,.js,.html" style="display:none;" onchange="handleAdminDocUpload(this)">
+                <div class="input-container">
+                    <input type="text" id="adminChatInput" placeholder="Reply to customer...">
+                    <button id="adminChatSend"><i class="fas fa-arrow-up"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<!-- BACK TO TOP -->
-<button class="back-to-top" id="backToTop" title="Kembali ke atas" aria-label="Back to top">
-    <i class="fas fa-arrow-up"></i>
-</button>
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
 
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav" id="bottomNav">
-    <button class="nav-item active" data-page="home" id="navHome"><i class="fas fa-home"></i> Beranda</button>
-    <button class="nav-item" data-page="orders" id="navOrders"><i class="fas fa-shopping-bag"></i> Pesanan <span class="badge" id="navOrdersBadge" style="display:none;">0</span></button>
-    <button class="nav-item" id="navCart" data-page="cart"><i class="fas fa-shopping-cart"></i> Keranjang <span class="badge" id="navCartBadge">0</span></button>
-    <button class="nav-item" data-page="tracking" id="navTracking"><i class="fas fa-shipping-fast"></i> Lacak</button>
-    <button class="nav-item" data-page="profile" id="navProfile"><i class="fas fa-user"></i> Profil</button>
-</nav>
+    <!-- BACK TO TOP -->
+    <button class="back-to-top" id="backToTop" title="Kembali ke atas">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
-<!-- SCRIPTS -->
-
-<script>
-    // ===== STUB FUNCTIONS - prevent errors when external JS is missing =====
-    function doSearch() { 
-        var q = document.getElementById('searchInput'); 
-        if (q && q.value) { 
-            showToast('Mencari: ' + q.value, 'info'); 
-        } else { 
-            showToast('Masukkan kata kunci pencarian', 'warning'); 
-        } 
-    }
-    function openProfileSettings() { 
-        var overlay = document.getElementById('profileOverlay'); 
-        if (overlay) overlay.classList.add('open'); 
-    }
-    function fetchBalance() { 
-        showToast('Memuat saldo...', 'info'); 
-        setTimeout(function() { showToast('Saldo: Rp 0 (Demo)', 'info'); }, 500);
-    }
-    function navigateTo(page) {
-        document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
-        document.querySelectorAll('.admin-page').forEach(function(p) { p.classList.remove('active'); });
-        var target = document.getElementById('page-' + page);
-        if (target) target.classList.add('active');
-        document.querySelectorAll('.bottom-nav .nav-item').forEach(function(item) {
-            item.classList.remove('active');
-            if (item.dataset.page === page) item.classList.add('active');
-        });
-        localStorage.setItem('joellCurrentPage', page);
-    }
-    function renderOrdersList() { console.log('renderOrdersList: stub'); }
-    function renderProfilePage() { console.log('renderProfilePage: stub'); }
-    function updateUserUI() { console.log('updateUserUI: stub'); }
-    function updateCartUI() { console.log('updateCartUI: stub'); }
-    function renderMenus() { console.log('renderMenus: stub - using manual fallback'); }
-    function renderTopupGames() { console.log('renderTopupGames: stub'); }
-    function openDetail(id) { 
-        var overlay = document.getElementById('detailOverlay');
-        if (overlay) overlay.classList.add('open');
-        showToast('Detail produk #' + id, 'info');
-    }
-    function handleGoogleLogin(response) { 
-        console.log('Google login:', response); 
-        showToast('Login Google berhasil!', 'success');
-    }
-    function handleProfilePhotoUpload(input) { 
-        if (input.files && input.files[0]) {
-            showToast('Foto dipilih: ' + input.files[0].name, 'info');
-        }
-    }
-    function handleChatFileUpload(input, role) {
-        if (input.files && input.files[0]) {
-            showToast('File dikirim (' + role + '): ' + input.files[0].name, 'info');
-        }
-    }
-    function handleAdminDocUpload(input) {
-        if (input.files && input.files[0]) {
-            showToast('Dokumen dikirim: ' + input.files[0].name, 'info');
-        }
-    }
-    function refreshAdminOrders() { 
-        showToast('Memuat data pesanan...', 'info'); 
-    }
-    function enterAdminMode() { 
-        console.log('Admin mode activated'); 
-    }
-    function copyBankInfo() {
-        var info = 'Bank: BCA\nNo: 1234567890\nAtas Nama: JOELL SHOP';
-        navigator.clipboard.writeText(info).then(function() {
-            showToast('Info bank disalin!', 'success');
-        }).catch(function() {
-            showToast('Gagal menyalin', 'error');
-        });
-    }
-
-    // Toast system
-    function showToast(message, type) {
-        var container = document.getElementById('toastContainer');
-        if (!container) return;
-        var toast = document.createElement('div');
-        var colors = { success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#6366f1' };
-        var icons = { success: 'fa-check-circle', error: 'fa-times-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
-        toast.style.cssText = 'background:' + (colors[type] || colors.info) + ';color:white;padding:12px 20px;border-radius:8px;font-size:0.9rem;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.3);animation:slideIn 0.3s ease;display:flex;align-items:center;gap:8px;';
-        toast.innerHTML = '<i class="fas ' + (icons[type] || icons.info) + '"></i> ' + message;
-        container.appendChild(toast);
-        setTimeout(function() { toast.style.animation = 'slideOut 0.3s ease'; setTimeout(function() { toast.remove(); }, 300); }, 3000);
-    }
-
-    // Firebase stub
-    if (typeof firebase === 'undefined') {
-        window.firebase = {
-            initializeApp: function() { console.warn('Firebase not loaded'); return {}; },
-            database: function() { 
-                return { ref: function() { return { on: function() {}, once: function() { return Promise.resolve({val: function() { return {}; }}); }, set: function() { return Promise.resolve(); }, push: function() { return { key: 'stub-' + Date.now() }; } }; } }; 
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedPage = localStorage.getItem('joellCurrentPage');
+            if (savedPage && savedPage !== 'admin' && document.getElementById('page-' + savedPage)) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-' + savedPage).classList.add('active');
+                document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.page === savedPage) item.classList.add('active');
+                });
+                document.getElementById('bottomNav').style.display = 'flex';
+                if (savedPage === 'orders') renderOrdersList();
+                if (savedPage === 'profile') renderProfilePage();
+            } else {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-admin').classList.add('active');
+                document.getElementById('bottomNav').style.display = 'none';
+                enterAdminMode();
             }
-        };
-    }
-
-    // Add toast animations
-    var toastStyle = document.createElement('style');
-    toastStyle.textContent = '@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } } @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }';
-    document.head.appendChild(toastStyle);
-</script>
-
-<script src="script.js"></script>
-<script src="payment-api.js"></script>
-
-<!-- ============================================================ -->
-<!-- INISIALISASI MANUAL - MEMASTIKAN SEMUA BERJALAN -->
-<!-- ============================================================ -->
-<script>
-    // ============================================================
-    // INISIALISASI MANUAL - MEMASTIKAN SEMUA BERJALAN
-    // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🔄 Inisialisasi Manual...');
-        
-        // 1. Render Menu Produk
-        if (typeof renderMenus === 'function') {
-            renderMenus();
-            console.log('✅ Menu produk dirender');
-        } else {
-            console.error('❌ renderMenus tidak ditemukan!');
-            // Fallback: render manual
-            renderProductsManually();
-        }
-        
-        // 2. Render Topup Games
-        if (typeof renderTopupGames === 'function') {
-            renderTopupGames();
-            console.log('✅ Topup games dirender');
-        }
-        
-        // 3. Tampilkan Bottom Nav
-        const bottomNav = document.getElementById('bottomNav');
-        if (bottomNav) {
-            bottomNav.style.display = 'flex';
-            console.log('✅ Bottom Nav ditampilkan');
-        }
-        
-        // 4. Update Cart Badge
-        if (typeof updateCartUI === 'function') {
-            updateCartUI();
-            console.log('✅ Cart UI diupdate');
-        }
-        
-        // 5. Render Orders jika ada
-        if (typeof renderOrdersList === 'function') {
-            renderOrdersList();
-        }
-        
-        // 6. Render Profile jika ada
-        if (typeof renderProfilePage === 'function') {
-            renderProfilePage();
-        }
-        
-        // 7. Update User UI
-        if (typeof updateUserUI === 'function') {
-            updateUserUI();
-        }
-        
-        console.log('✅ Inisialisasi Selesai!');
-    });
-
-    // ============================================================
-    // FALLBACK: Render Produk Manual
-    // ============================================================
-    function renderProductsManually() {
-        var products = [
-            { id: 1, name: 'Panel Pterodactyl', icon: 'fa-server', category: 'hosting', badge: 'hot' },
-            { id: 2, name: 'Jasa Pembuatan Fitur', icon: 'fa-microchip', category: 'hosting', badge: 'new' },
-            { id: 3, name: 'Sewa Bot & Jadibot', icon: 'fa-robot', category: 'hosting' },
-            { id: 4, name: 'Script Lily Gen 2', icon: 'fa-database', category: 'hosting', badge: 'pro' },
-            { id: 5, name: 'Jasa Rename Script', icon: 'fa-pen-fancy', category: 'hosting' },
-            { id: 6, name: 'Domain & Hosting', icon: 'fa-globe', category: 'hosting' },
-            { id: 7, name: 'Bot Multi Device', icon: 'fa-code-branch', category: 'script', badge: 'hot' },
-            { id: 8, name: 'Bot RPG', icon: 'fa-gamepad', category: 'script' },
-            { id: 9, name: 'Bot Jaga Group', icon: 'fa-users-cog', category: 'script' },
-            { id: 10, name: 'Bot Downloader', icon: 'fa-download', category: 'script', badge: 'new' },
-            { id: 11, name: 'Bot Auto AI', icon: 'fa-brain', category: 'script', badge: 'pro' },
-            { id: 12, name: 'Bot Auto Order', icon: 'fa-credit-card', category: 'script' },
-            { id: 13, name: 'Topup All Game', icon: 'fa-gamepad', category: 'topup', isTopup: true }
-        ];
-
-        // Filter berdasarkan kategori
-        var hosting = products.filter(function(p) { return p.category === 'hosting'; });
-        var script = products.filter(function(p) { return p.category === 'script'; });
-        var topup = products.filter(function(p) { return p.category === 'topup'; });
-
-        // Render ke grid
-        var hostingGrid = document.getElementById('gridHosting');
-        var scriptGrid = document.getElementById('gridScript');
-        var topupGrid = document.getElementById('gridTopup');
-
-        if (hostingGrid) {
-            hostingGrid.innerHTML = hosting.map(function(p) {
-                var badgeHtml = p.badge ? '<span class="card-badge ' + p.badge + '">' + p.badge.toUpperCase() + '</span>' : '';
-                return '<div class="menu-card" data-id="' + p.id + '">' +
-                    badgeHtml +
-                    '<i class="fas ' + p.icon + '"></i>' +
-                    '<span>' + p.name + '</span>' +
-                '</div>';
-            }).join('');
-        }
-
-        if (scriptGrid) {
-            scriptGrid.innerHTML = script.map(function(p) {
-                var badgeHtml = p.badge ? '<span class="card-badge ' + p.badge + '">' + p.badge.toUpperCase() + '</span>' : '';
-                return '<div class="menu-card" data-id="' + p.id + '">' +
-                    badgeHtml +
-                    '<i class="fas ' + p.icon + '"></i>' +
-                    '<span>' + p.name + '</span>' +
-                '</div>';
-            }).join('');
-        }
-
-        if (topupGrid) {
-            topupGrid.innerHTML = topup.map(function(p) {
-                return '<div class="menu-card" data-id="' + p.id + '" data-topup="true">' +
-                    '<i class="fas ' + p.icon + '"></i>' +
-                    '<span>' + p.name + '</span>' +
-                '</div>';
-            }).join('');
-        }
-
-        // Event listener untuk klik produk
-        document.querySelectorAll('.grid-menu').forEach(function(grid) {
-            grid.addEventListener('click', function(e) {
-                var card = e.target.closest('.menu-card');
-                if (!card) return;
-                var id = parseInt(card.dataset.id);
-                var product = products.find(function(p) { return p.id === id; });
-                if (!product) return;
-                
-                if (product.isTopup) {
-                    var topupOverlay = document.getElementById('topupOverlay');
-                    if (topupOverlay) topupOverlay.classList.add('open');
-                    return;
-                }
-                
-                // Buka detail produk
-                if (typeof openDetail === 'function') {
-                    openDetail(id);
-                } else {
-                    alert('Produk: ' + product.name + '\nKlik "Keranjang" untuk membeli');
-                }
-            });
         });
-
-        console.log('✅ Produk dirender secara manual');
-    }
-
-    // ============================================================
-    // FUNGSI UNTUK MEMISAHKAN WITHDRAW DARI PAYMENT
-    // ============================================================
-    window.closePaymentAndOpenWithdraw = function() {
-        var paymentOverlay = document.getElementById('paymentOverlay');
-        if (paymentOverlay) {
-            paymentOverlay.classList.remove('open');
-        }
-        if (typeof navigateTo === 'function') {
-            navigateTo('profile');
-        } else {
-            // Fallback: buka profile manual
-            document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
-            var profilePage = document.getElementById('page-profile');
-            if (profilePage) profilePage.classList.add('active');
-            document.querySelectorAll('.bottom-nav .nav-item').forEach(function(item) {
-                item.classList.remove('active');
-                if (item.dataset.page === 'profile') item.classList.add('active');
-            });
-        }
-        setTimeout(function() {
-            var withdrawSection = document.querySelector('.withdraw-section-in-profile');
-            if (withdrawSection) {
-                withdrawSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }, 500);
-    };
-</script>
-
+    </script>
 </body>
 </html>
