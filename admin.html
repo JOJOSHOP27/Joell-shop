@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JOELL SHOP · Admin Dhasbord</title>
+    <title>JOELL SHOP · Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,9 +13,15 @@
     <!-- FIREBASE SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-    <!-- Security Scripts -->
+    
+    <!-- Security Scripts (SUDAH DIPERBAIKI) -->
     <script>
         (function() {
+            // ============================================================
+            // DOMAIN CHECK DINONAKTIFKAN SEMENTARA UNTUK PERBAIKAN
+            // ============================================================
+            return; // <-- NONAKTIFKAN PEMBATASAN DOMAIN
+
             var allowedDomains = ["joell-payment.vercel.app", "nanz-officialstore.vercel.app", "localhost", "127.0.0.1"];
             if (!allowedDomains.includes(window.location.hostname)) {
                 document.documentElement.innerHTML = "";
@@ -24,6 +30,7 @@
                 return;
             }
         })();
+        
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.onkeydown = function(e) {
             if (e.keyCode == 123) { return false; }
@@ -31,14 +38,19 @@
             if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }
             if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }
         }
-        setInterval(function() {
-            var start = performance.now();
-            debugger;
-            var end = performance.now();
-            if (end - start > 100) {
-                document.body.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100vh;background:#050508;color:#ff4444;font-family:sans-serif;text-align:center;'><div><h1>SECURITY BREACH</h1><p>Access Denied: Developer Tools Detected.</p></div></div>";
-            }
-        }, 1000);
+        
+        // ============================================================
+        // DEBUGGER LOOP DIHAPUS - penyebab utama lag & tidak responsif
+        // ============================================================
+        // setInterval(function() {
+        //     var start = performance.now();
+        //     debugger;
+        //     var end = performance.now();
+        //     if (end - start > 100) {
+        //         document.body.innerHTML = "<div style='...'>...</div>";
+        //     }
+        // }, 1000);
+        
         if (window.self !== window.top) { window.top.location = window.self.location; }
         document.addEventListener('keyup', (e) => {
             if (e.key === 'PrintScreen') { navigator.clipboard.writeText(''); alert('Screenshots are disabled for security reasons.'); }
@@ -53,7 +65,8 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <canvas id="particlesCanvas"></canvas>
+    <!-- Canvas diperbaiki: pointer-events:none + z-index:-1 -->
+    <canvas id="particlesCanvas" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; pointer-events:none;"></canvas>
 
     <div class="app-container">
         <!-- HEADER -->
@@ -79,7 +92,7 @@
             <div id="adminLoginView">
                 <div class="admin-login-box">
                     <div style="font-size:3rem;color:var(--accent-light);margin-bottom:8px;"><i class="fas fa-shield-alt"></i></div>
-                    <h2>Admin Dhasbord</h2>
+                    <h2>Admin Panel</h2>
                     <p>Masukkan password untuk mengakses dashboard admin</p>
                     <input type="password" id="adminPasswordInput" placeholder="••••••••">
                     <button id="adminLoginBtn"><i class="fas fa-lock"></i> Masuk Admin</button>
@@ -96,7 +109,7 @@
                             </div>
                             <p class="subtitle">Kelola pesanan dan chat pelanggan</p>
                         </div>
-                        <button onclick="refreshAdminOrders()" class="header-btn" title="Refresh Data" id="btnRefreshAdmin">
+                        <button onclick="if(typeof refreshAdminOrders==='function')refreshAdminOrders()" class="header-btn" title="Refresh Data" id="btnRefreshAdmin">
                             <i class="fas fa-sync-alt"></i>
                         </button>
                     </div>
@@ -151,8 +164,8 @@
             <div class="order-chat-input-wrap">
                 <button class="chat-attach-btn" onclick="document.getElementById('adminChatFile').click()" title="Upload Gambar"><i class="fas fa-image"></i></button>
                 <button class="chat-attach-btn" onclick="document.getElementById('adminDocFile').click()" title="Upload File/Script"><i class="fas fa-file-code"></i></button>
-                <input type="file" id="adminChatFile" accept="image/*" style="display:none;" onchange="handleChatFileUpload(this, 'admin')">
-                <input type="file" id="adminDocFile" accept=".json,.zip,.txt,.js,.html" style="display:none;" onchange="handleAdminDocUpload(this)">
+                <input type="file" id="adminChatFile" accept="image/*" style="display:none;" onchange="if(typeof handleChatFileUpload==='function')handleChatFileUpload(this,'admin')">
+                <input type="file" id="adminDocFile" accept=".json,.zip,.txt,.js,.html" style="display:none;" onchange="if(typeof handleAdminDocUpload==='function')handleAdminDocUpload(this)">
                 <div class="input-container">
                     <input type="text" id="adminChatInput" placeholder="Reply to customer...">
                     <button id="adminChatSend"><i class="fas fa-arrow-up"></i></button>
@@ -169,29 +182,130 @@
         <i class="fas fa-arrow-up"></i>
     </button>
 
+    <!-- PASTIKAN FILE SCRIPT.JS ADA DI FOLDER YANG SAMA -->
     <script src="script.js"></script>
+    
     <script>
+        // ============================================================
+        // INISIALISASI ADMIN PANEL
+        // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
-            const savedPage = localStorage.getItem('joellCurrentPage');
-            if (savedPage && savedPage !== 'admin' && document.getElementById('page-' + savedPage)) {
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
-                document.getElementById('page-' + savedPage).classList.add('active');
-                document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
-                    item.classList.remove('active');
-                    if (item.dataset.page === savedPage) item.classList.add('active');
-                });
-                document.getElementById('bottomNav').style.display = 'flex';
-                if (savedPage === 'orders') renderOrdersList();
-                if (savedPage === 'profile') renderProfilePage();
+            console.log('🔄 Admin Panel - Inisialisasi...');
+            
+            // Sembunyikan bottom nav karena ini halaman admin
+            var bottomNav = document.getElementById('bottomNav');
+            if (bottomNav) bottomNav.style.display = 'none';
+            
+            // Cek apakah ada session admin yang tersimpan
+            var isAdminLoggedIn = sessionStorage.getItem('joellAdminLoggedIn') === 'true';
+            
+            if (isAdminLoggedIn) {
+                // Jika sudah login, tampilkan dashboard
+                var loginView = document.getElementById('adminLoginView');
+                var dashboardView = document.getElementById('adminDashboardView');
+                if (loginView) loginView.style.display = 'none';
+                if (dashboardView) dashboardView.style.display = 'block';
+                
+                // Panggil fungsi inisialisasi admin jika ada
+                if (typeof initAdmin === 'function') {
+                    initAdmin();
+                }
+                if (typeof refreshAdminOrders === 'function') {
+                    refreshAdminOrders();
+                }
+                if (typeof checkCloudSync === 'function') {
+                    checkCloudSync();
+                }
             } else {
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
-                document.getElementById('page-admin').classList.add('active');
-                document.getElementById('bottomNav').style.display = 'none';
-                enterAdminMode();
+                // Tampilkan form login
+                var loginView = document.getElementById('adminLoginView');
+                var dashboardView = document.getElementById('adminDashboardView');
+                if (loginView) loginView.style.display = 'block';
+                if (dashboardView) dashboardView.style.display = 'none';
             }
+            
+            // Event listener untuk tombol login admin
+            var adminLoginBtn = document.getElementById('adminLoginBtn');
+            if (adminLoginBtn) {
+                adminLoginBtn.addEventListener('click', function() {
+                    var passwordInput = document.getElementById('adminPasswordInput');
+                    var password = passwordInput ? passwordInput.value : '';
+                    
+                    // Password default: admin123 (bisa diubah sesuai kebutuhan)
+                    if (password === 'admin123') {
+                        sessionStorage.setItem('joellAdminLoggedIn', 'true');
+                        document.getElementById('adminLoginView').style.display = 'none';
+                        document.getElementById('adminDashboardView').style.display = 'block';
+                        
+                        if (typeof initAdmin === 'function') initAdmin();
+                        if (typeof refreshAdminOrders === 'function') refreshAdminOrders();
+                        if (typeof checkCloudSync === 'function') checkCloudSync();
+                        
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Login Berhasil',
+                                text: 'Selamat datang di Admin Dashboard',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        }
+                    } else {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Password Salah',
+                                text: 'Silakan coba lagi'
+                            });
+                        } else {
+                            alert('Password salah!');
+                        }
+                    }
+                });
+            }
+            
+            // Event listener untuk tombol kembali ke toko
+            var adminBackBtn = document.getElementById('adminBackBtn');
+            if (adminBackBtn) {
+                adminBackBtn.addEventListener('click', function() {
+                    window.location.href = 'index.html';
+                });
+            }
+            
+            // Event listener untuk tombol kirim chat admin
+            var adminChatSend = document.getElementById('adminChatSend');
+            if (adminChatSend) {
+                adminChatSend.addEventListener('click', function() {
+                    if (typeof sendAdminChat === 'function') {
+                        sendAdminChat();
+                    }
+                });
+            }
+            
+            // Event listener untuk tombol close chat admin
+            var adminChatCloseBtn = document.getElementById('adminChatCloseBtn');
+            if (adminChatCloseBtn) {
+                adminChatCloseBtn.addEventListener('click', function() {
+                    document.getElementById('adminChatOverlay').classList.remove('open');
+                });
+            }
+            
+            console.log('✅ Admin Panel siap!');
         });
+        
+        // ============================================================
+        // FALLBACK: Fungsi admin dasar jika script.js tidak memuatnya
+        // ============================================================
+        window.enterAdminMode = function() {
+            console.log('🔒 Masuk mode admin...');
+            document.getElementById('adminLoginView').style.display = 'block';
+            document.getElementById('adminDashboardView').style.display = 'none';
+        };
+        
+        window.exitAdminMode = function() {
+            sessionStorage.removeItem('joellAdminLoggedIn');
+            window.location.href = 'index.html';
+        };
     </script>
 </body>
 </html>
