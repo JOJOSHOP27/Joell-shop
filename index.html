@@ -13,45 +13,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     
-    <!-- SECURITY SCRIPTS -->
-    <script>
-        (function() {
-            var allowedDomains = ["joell-payment.vercel.app", "nanz-officialstore.vercel.app", "localhost", "127.0.0.1"];
-            if (!allowedDomains.includes(window.location.hostname)) {
-                document.documentElement.innerHTML = "";
-                alert("Unauthorized Domain: This website is protected. Cloning is strictly prohibited.");
-                window.location.href = "https://nanz-officialstore.vercel.app";
-                return;
-            }
-        })();
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.onkeydown = function(e) {
-            if (e.keyCode == 123) { return false; }
-            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; }
-            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }
-            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }
-        }
-        setInterval(function() {
-            var start = performance.now();
-            debugger;
-            var end = performance.now();
-            if (end - start > 100) {
-                document.body.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100vh;background:#050508;color:#ff4444;font-family:sans-serif;text-align:center;'><div><h1>SECURITY BREACH</h1><p>Access Denied: Developer Tools Detected.</p></div></div>";
-            }
-        }, 1000);
-        if (window.self !== window.top) { window.top.location = window.self.location; }
-        document.addEventListener('keyup', (e) => {
-            if (e.key === 'PrintScreen') { navigator.clipboard.writeText(''); alert('Screenshots are disabled for security reasons.'); }
-        });
-        document.ondragstart = function() { return false; };
-        document.onselectstart = function() { return false; };
-        console.log("%cSTOP!", "color: red; font-size: 50px; font-weight: bold;");
-        console.log("%cIni adalah fitur browser yang ditujukan untuk pengembang. Jika seseorang meminta Anda untuk menyalin-menempelkan sesuatu di sini untuk 'meretas' situs ini, itu adalah penipuan.", "color: white; font-size: 20px;");
-    </script>
-    <meta name="robots" content="noindex, nofollow">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    
-    <!-- STYLES -->
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="payment.css">
 </head>
@@ -61,7 +22,7 @@
 <div class="app-container">
     <!-- HEADER -->
     <header class="top-header">
-        <div class="logo-area" id="logoArea" title="Klik 5x untuk Mode Admin">
+        <div class="logo-area" id="logoArea">
             <img src="https://files.catbox.moe/ijemcy.png" alt="logo" loading="lazy">
             <span>JOELL SHOP</span>
         </div>
@@ -130,32 +91,6 @@
             </div>
         </div>
 
-        <div class="server-status-bar">
-            <div class="server-status-header">
-                <h3><i class="fas fa-server"></i> Server Status</h3>
-                <button class="status-refresh" id="refreshStatus" title="Refresh"><i class="fas fa-sync-alt"></i></button>
-            </div>
-            <div class="server-grid" id="serverGrid">
-                <div class="server-item"><div class="server-dot"></div><div class="server-info"><div class="server-name">Node-1 Jakarta</div><div class="server-meta">Panel Pterodactyl</div></div><div class="server-ping">12ms</div></div>
-                <div class="server-item"><div class="server-dot"></div><div class="server-info"><div class="server-name">Node-2 Singapore</div><div class="server-meta">Bot Hosting</div></div><div class="server-ping">24ms</div></div>
-                <div class="server-item"><div class="server-dot warning"></div><div class="server-info"><div class="server-name">Node-3 Tokyo</div><div class="server-meta">Game Server</div></div><div class="server-ping" style="color:var(--orange)">89ms</div></div>
-                <div class="server-item"><div class="server-dot"></div><div class="server-info"><div class="server-name">API Gateway</div><div class="server-meta">Main API</div></div><div class="server-ping">5ms</div></div>
-            </div>
-        </div>
-
-        <!-- PROMO SECTION -->
-        <div class="promo-section">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-                <i class="fas fa-ticket-alt" style="color:var(--accent-light);"></i>
-                <span style="font-weight:700;font-size:0.9rem;">Punya Kode Promo?</span>
-            </div>
-            <div class="promo-input-wrap">
-                <input type="text" id="promoInput" placeholder="Masukkan kode promo..." style="text-transform:uppercase;">
-                <button id="promoBtn">Gunakan</button>
-            </div>
-            <div class="promo-message" id="promoMessage"></div>
-        </div>
-
         <div class="section-title">Hosting & Kebutuhan Bot</div>
         <div class="grid-menu" id="gridHosting"></div>
 
@@ -176,7 +111,7 @@
                         <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                     </div>
                 </div>
-                <p class="testimonial-text">"Panel Pterodactyl-nya super stabil! Bot WhatsApp saya online 24/7 tanpa kendala. Supportnya juga cepat respon."</p>
+                <p class="testimonial-text">"Panel Pterodactyl-nya super stabil! Bot WhatsApp saya online 24/7 tanpa kendala."</p>
                 <div class="testimonial-date"><i class="fas fa-clock"></i> 2 jam yang lalu</div>
             </div>
             <div class="testimonial-card">
@@ -187,7 +122,7 @@
                         <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                     </div>
                 </div>
-                <p class="testimonial-text">"Script Lily Gen 2 worth it banget! Fitur lengkap dan auto show JKT48-nya keren. Recommended seller!"</p>
+                <p class="testimonial-text">"Script Lily Gen 2 worth it banget! Fitur lengkap dan auto show."</p>
                 <div class="testimonial-date"><i class="fas fa-clock"></i> 5 jam yang lalu</div>
             </div>
             <div class="testimonial-card">
@@ -198,19 +133,8 @@
                         <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
                     </div>
                 </div>
-                <p class="testimonial-text">"Topup game cepat banget, langsung masuk. Harga juga paling murah dibanding yang lain. Mantap Joell Shop!"</p>
+                <p class="testimonial-text">"Topup game cepat banget, langsung masuk. Harga paling murah!"</p>
                 <div class="testimonial-date"><i class="fas fa-clock"></i> 1 hari yang lalu</div>
-            </div>
-            <div class="testimonial-card">
-                <div class="testimonial-header">
-                    <div class="testimonial-avatar" style="background:linear-gradient(135deg,var(--purple),var(--accent));">DK</div>
-                    <div class="testimonial-info">
-                        <h4>Dewi K.</h4>
-                        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    </div>
-                </div>
-                <p class="testimonial-text">"Jasa rename script 100% worth it. Hasilnya bersih dan aman. Bakal repeat order buat project selanjutnya!"</p>
-                <div class="testimonial-date"><i class="fas fa-clock"></i> 2 hari yang lalu</div>
             </div>
         </div>
     </div>
@@ -276,55 +200,12 @@
                         <span>Keluar Akun</span>
                     </div>
                 </div>
-
-                <!-- WITHDRAW SECTION -->
-                <div class="withdraw-section-in-profile" style="margin-top:24px;padding:20px;background:var(--bg-card);border-radius:12px;border:1px solid var(--border-subtle);">
-                    <h3 style="font-size:1rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;border-left:3px solid var(--orange);padding-left:12px;">
-                        <i class="fas fa-money-bill-wave" style="color:var(--orange);"></i> Tarik Saldo
-                    </h3>
-                    
-                    <div class="payment-balance-display" style="margin-bottom:12px;">
-                        <div>
-                            <div class="balance-label">Saldo Anda</div>
-                            <div class="balance-amount" id="profileBalanceAmount">Rp 0</div>
-                        </div>
-                        <button class="balance-refresh" onclick="fetchBalance()" title="Refresh Saldo">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-
-                    <div style="font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">Pilih Metode Penarikan</div>
-                    <div class="withdraw-methods-grid" id="profileWithdrawMethods">
-                        <p style="color:var(--text-muted);text-align:center;grid-column:1/-1;padding:16px;">Memuat metode penarikan...</p>
-                    </div>
-                    <div class="withdraw-info" id="profileWithdrawInfo">Silakan pilih metode penarikan di atas</div>
-
-                    <div class="withdraw-input-group">
-                        <input type="number" id="profileWithdrawAmount" placeholder="Jumlah (min 10.000)" min="10000">
-                        <input type="text" id="profileWithdrawAccount" placeholder="Nomor Rekening / E-Wallet">
-                        <button class="withdraw-btn" id="profileWithdrawBtn" style="background:linear-gradient(135deg,var(--orange),#ea580c);">
-                            <i class="fas fa-arrow-up"></i> Tarik
-                        </button>
-                    </div>
-
-                    <div style="font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-top:16px;margin-bottom:8px;">
-                        <i class="fas fa-history"></i> Riwayat Penarikan
-                    </div>
-                    <div class="withdraw-history" id="profileWithdrawHistory">
-                        <p style="color:var(--text-muted);font-size:0.8rem;text-align:center;">Belum ada riwayat penarikan</p>
-                    </div>
-                </div>
             </div>
-
             <div id="guestProfileView" class="cart-empty" style="padding: 60px 20px;">
                 <i class="fas fa-user-circle" style="font-size: 4rem; color: var(--accent); margin-bottom: 20px;"></i>
                 <h3>Belum Login</h3>
                 <p>Silakan login untuk melihat dan mengatur profil Anda.</p>
                 <button class="btn-checkout" onclick="document.getElementById('loginOverlay').classList.add('open')" style="margin-top:20px; width:auto; padding: 12px 40px;">LOGIN SEKARANG</button>
-            </div>
-
-            <div class="profile-footer-info" style="margin-top: 40px; padding: 20px; border-top: 1px solid var(--border-subtle); text-align: center;">
-                <p style="font-size: 0.8rem; color: var(--text-muted);">JOELL SHOP v2.4.0 • Digital Solutions</p>
             </div>
         </div>
     </div>
@@ -364,14 +245,6 @@
                             <div class="time">21 Jul 2026, 14:35 WIB</div>
                         </div>
                     </div>
-                    <div class="tracking-step completed">
-                        <div class="tracking-dot"><i class="fas fa-check"></i></div>
-                        <div class="tracking-info">
-                            <h4>Sedang Diproses</h4>
-                            <p>Tim teknis sedang menyiapkan pesanan Anda</p>
-                            <div class="time">21 Jul 2026, 14:40 WIB</div>
-                        </div>
-                    </div>
                     <div class="tracking-step active">
                         <div class="tracking-dot"><i class="fas fa-box"></i></div>
                         <div class="tracking-info">
@@ -384,66 +257,6 @@
                 <button id="trackChatBtn" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;border:none;border-radius:60px;font-weight:700;cursor:pointer;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px;">
                     <i class="fas fa-comments"></i> Chat Admin Terkait Pesanan
                 </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ADMIN PAGE -->
-    <div class="admin-page" id="page-admin">
-        <div id="adminLoginView">
-            <div class="admin-login-box">
-                <div style="font-size:3rem;color:var(--accent-light);margin-bottom:8px;"><i class="fas fa-shield-alt"></i></div>
-                <h2>Admin Panel</h2>
-                <p>Masukkan password untuk mengakses dashboard admin</p>
-                <input type="password" id="adminPasswordInput" placeholder="••••••••">
-                <button id="adminLoginBtn"><i class="fas fa-lock"></i> Masuk Admin</button>
-                <button id="adminBackBtn" style="margin-top:12px;background:transparent;color:var(--text-muted);border:1px solid var(--border-subtle);">Kembali ke Toko</button>
-            </div>
-        </div>
-        <div id="adminDashboardView" style="display:none;">
-            <div class="tracking-detail-box" style="margin-bottom:16px;">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-                    <div>
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <h2><i class="fas fa-shield-alt" style="color:var(--accent-light);"></i> Admin Dashboard</h2>
-                            <span class="badge" id="adminChatBadge" style="display:none;position:static;padding:2px 10px;font-size:0.8rem;">0</span>
-                        </div>
-                        <p class="subtitle">Kelola pesanan dan chat pelanggan</p>
-                    </div>
-                    <button onclick="refreshAdminOrders()" class="header-btn" title="Refresh Data" id="btnRefreshAdmin">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="admin-stats-grid">
-                <div class="admin-stat-card">
-                    <div class="num" id="adminStatTotal">0</div>
-                    <div class="label">Total Pesanan</div>
-                </div>
-                <div class="admin-stat-card">
-                    <div class="num" id="adminStatPending">0</div>
-                    <div class="label">Menunggu</div>
-                </div>
-                <div class="admin-stat-card">
-                    <div class="num" id="adminStatProcessing">0</div>
-                    <div class="label">Diproses</div>
-                </div>
-                <div class="admin-stat-card">
-                    <div class="num" id="adminStatCompleted">0</div>
-                    <div class="label">Selesai</div>
-                </div>
-            </div>
-            <div class="admin-section" style="background:rgba(99,102,241,0.05);border:1px solid rgba(99,102,241,0.2);">
-                <h3><i class="fas fa-cloud"></i> Cloud Sync Status</h3>
-                <div id="cloudStatusIndicator" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:rgba(0,0,0,0.2);margin-top:10px;">
-                    <div id="cloudStatusDot" style="width:12px;height:12px;border-radius:50%;background:var(--text-muted);"></div>
-                    <span id="cloudStatusText" style="font-size:0.9rem;color:var(--text-secondary);">Mengecek koneksi database...</span>
-                </div>
-                <p style="color:var(--text-muted);font-size:0.75rem;margin-top:8px;">Database cloud memungkinkan chat real-time antar perangkat berbeda secara otomatis.</p>
-            </div>
-            <div class="admin-section">
-                <h3><i class="fas fa-shopping-bag"></i> Semua Pesanan</h3>
-                <div id="adminOrdersList"></div>
             </div>
         </div>
     </div>
@@ -533,154 +346,6 @@
     </div>
 </div>
 
-<!-- ANIME MODAL -->
-<div class="modal-overlay" id="animeOverlay">
-    <div class="modal-box">
-        <button class="modal-close" id="animeCloseBtn"><i class="fas fa-times"></i></button>
-        <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:4px;"><i class="fas fa-film" style="color:var(--accent-light);"></i> Info Anime</h2>
-        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:14px;">Cari anime atau lihat jadwal tayang</p>
-        <div class="anime-input-wrap">
-            <input type="text" id="animeInput" placeholder="Cari anime...">
-            <button id="animeSearchBtn"><i class="fas fa-search"></i> Cari</button>
-        </div>
-        <div class="anime-tabs">
-            <button class="anime-tab active" data-tab="latest">Sedang Tayang</button>
-            <button class="anime-tab" data-tab="upcoming">Akan Rilis</button>
-        </div>
-        <div id="animeResult">
-            <div id="animeLatest" class="anime-list"></div>
-            <div id="animeUpcoming" class="anime-list" style="display:none;"></div>
-        </div>
-    </div>
-</div>
-
-<!-- BOT CONTROLLER MODAL -->
-<div class="modal-overlay" id="botControllerOverlay">
-    <div class="modal-box">
-        <button class="modal-close" id="botControllerCloseBtn"><i class="fas fa-times"></i></button>
-        <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:4px;"><i class="fas fa-robot" style="color:var(--accent-light);"></i> Bot Controller</h2>
-        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;">Kelola bot Telegram Anda</p>
-        <div class="bot-tabs">
-            <button class="bot-tab active" data-tab="controller">Controller</button>
-            <button class="bot-tab" data-tab="library">Library</button>
-        </div>
-        <div id="botViewController" class="bot-view">
-            <div class="bot-header-section">
-                <h3><i class="fas fa-shield-alt"></i> Authentication</h3>
-                <p>Masukkan token bot dari @BotFather</p>
-            </div>
-            <div class="bot-input-group">
-                <input type="password" id="botTokenInput" placeholder="123456789:ABCdefGHIjklMNO...">
-                <button class="bot-btn-primary" id="botCheckBtn"><i class="fas fa-plug"></i> Connect</button>
-            </div>
-            <div id="botStatusBox" class="bot-status-banner hidden"></div>
-            <div id="botPanelKontrol" class="bot-panel hidden">
-                <div class="bot-identity">
-                    <div class="bot-identity-left"><div class="bot-status-indicator"></div><span>Connected: <strong id="botName">-</strong></span></div>
-                    <div class="bot-id-text">ID: <span id="botId">-</span></div>
-                </div>
-                <div class="bot-input-group">
-                    <input type="text" id="botPesanInput" placeholder="Ketik pesan...">
-                    <button class="bot-btn-primary" id="botKirimBtn"><i class="fas fa-paper-plane"></i></button>
-                </div>
-                <div class="bot-terminal" id="botLogArea">
-                    <div class="bot-terminal-line"><span class="bot-term-time">[SYS]</span><span class="bot-term-info">Menunggu koneksi...</span></div>
-                </div>
-            </div>
-        </div>
-        <div id="botViewLibrary" class="bot-view hidden">
-            <div class="bot-header-section"><h3><i class="fas fa-history"></i> Riwayat Koneksi</h3><p>Bot yang pernah terhubung</p></div>
-            <div class="bot-list" id="botListContainer"></div>
-        </div>
-    </div>
-</div>
-
-<!-- OSINT MODAL -->
-<div class="modal-overlay" id="osintOverlay">
-    <div class="modal-box" style="max-width:640px;">
-        <button class="modal-close" id="osintCloseBtn"><i class="fas fa-times"></i></button>
-        <div style="font-size:2.2rem;color:var(--accent-light);margin-bottom:4px;"><i class="fas fa-search"></i></div>
-        <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:2px;">WhatsApp OSINT</h2>
-        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;border-bottom:1px solid var(--border-subtle);padding-bottom:12px;"><i class="fas fa-shield-alt" style="color:var(--accent-light);margin-right:6px;"></i>Open-Source Intelligence untuk WhatsApp</p>
-        <div class="osint-form">
-            <div class="form-row">
-                <div class="form-group">
-                    <label><i class="fas fa-phone"></i> Nomor Telepon</label>
-                    <input type="text" id="osintPhone" placeholder="6281234567890">
-                    <small>Kode negara, tanpa tanda +</small>
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-bolt"></i> Endpoint</label>
-                    <select id="osintEndpoint">
-                        <option value="/about">Status Pengguna</option>
-                        <option value="/wspic/b64">Foto Profil</option>
-                        <option value="/bizos">Verifikasi Bisnis</option>
-                        <option value="/devices">Perangkat</option>
-                        <option value="/wspic/dck">OSINT Lengkap</option>
-                        <option value="/privacy">Privasi</option>
-                    </select>
-                </div>
-            </div>
-            <button class="btn-query" id="osintQueryBtn"><i class="fas fa-paper-plane"></i> Jalankan Query</button>
-        </div>
-        <div id="osintResult" class="osint-result hidden">
-            <div class="result-header"><span><i class="fas fa-code"></i> Hasil</span><button class="copy-btn" id="osintResultCopyBtn"><i class="fas fa-copy"></i> Salin</button></div>
-            <div class="result-body" id="osintResultBody"><pre id="osintResultPre">Menunggu query...</pre></div>
-        </div>
-        <div class="osint-badge"><i class="fas fa-code-branch"></i> 6 Endpoint Tersedia</div>
-    </div>
-</div>
-
-<!-- SSWEB MODAL -->
-<div class="modal-overlay" id="sswebOverlay">
-    <div class="modal-box" style="max-width:640px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border-subtle);margin-bottom:12px;">
-            <div style="display:flex;align-items:center;gap:10px;font-size:1.3rem;font-weight:800;"><i class="fas fa-camera" style="color:var(--accent-light);"></i> Screenshot Website</div>
-            <button class="modal-close" id="sswebCloseBtn"><i class="fas fa-times"></i></button>
-        </div>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:12px;">Ambil screenshot dari website mana saja</p>
-        <div class="ssweb-form">
-            <div class="form-group">
-                <label><i class="fas fa-link"></i> URL Website</label>
-                <input type="text" id="sswebUrl" placeholder="https://example.com">
-            </div>
-            <button class="btn-ssweb" id="sswebBtn"><i class="fas fa-paper-plane"></i> Ambil Screenshot</button>
-        </div>
-        <div class="ssweb-result" id="sswebResult">
-            <div class="placeholder"><i class="fas fa-image" style="font-size:2rem;display:block;margin-bottom:8px;"></i>Masukkan URL dan klik tombol</div>
-        </div>
-    </div>
-</div>
-
-<!-- UPLOAD MODAL -->
-<div class="modal-overlay" id="uploadOverlay">
-    <div class="modal-box" style="max-width:560px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border-subtle);margin-bottom:12px;">
-            <div style="display:flex;align-items:center;gap:10px;font-size:1.3rem;font-weight:800;"><i class="fas fa-cloud-upload-alt" style="color:var(--accent-light);"></i> Upload Gambar</div>
-            <button class="modal-close" id="uploadCloseBtn"><i class="fas fa-times"></i></button>
-        </div>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:12px;">Upload gambar — dapatkan link permanen</p>
-        <div class="upload-dropzone" id="uploadDropzone">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <p>Klik atau seret gambar ke sini</p>
-            <span class="file-types">PNG · JPG · WEBP · GIF · Maks 10 MB</span>
-        </div>
-        <input type="file" id="uploadFileInput" accept="image/*" style="display:none;">
-        <button class="upload-btn" id="uploadBtn"><i class="fas fa-upload"></i> Upload</button>
-        <div class="upload-progress" id="uploadProgress">
-            <div class="progress-bar"><div class="progress-fill" id="uploadProgressFill"></div></div>
-            <div class="progress-text" id="uploadProgressText">Mengupload...</div>
-        </div>
-        <div class="upload-result" id="uploadResult">
-            <div class="result-link">
-                <input type="text" id="uploadResultLink" readonly>
-                <button class="btn-copy-link" id="uploadCopyBtn"><i class="fas fa-copy"></i> Salin</button>
-            </div>
-            <div class="upload-preview" id="uploadPreview"></div>
-        </div>
-    </div>
-</div>
-
 <!-- LOGIN MODAL -->
 <div class="modal-overlay" id="loginOverlay">
     <div class="modal-box" style="max-width:440px; border: 1px solid rgba(99, 102, 241, 0.3); box-shadow: 0 0 40px rgba(0,0,0,0.6);">
@@ -723,96 +388,15 @@
     </div>
 </div>
 
-<!-- ORDER CHAT MODAL -->
-<div class="modal-overlay" id="orderChatOverlay">
-    <div class="modal-box order-chat-modal">
-        <div class="order-chat-header">
-            <button onclick="document.getElementById('orderChatOverlay').classList.remove('open')" style="background:none;border:none;color:#8696a0;font-size:1.2rem;margin-right:10px;cursor:pointer;"><i class="fas fa-arrow-left"></i></button>
-            <img src="https://files.catbox.moe/ijemcy.png" alt="admin">
-            <div class="info">
-                <h3>Admin JOELL SHOP</h3>
-                <p id="orderChatOrderId">Order: #JOELL-0000-0000</p>
-            </div>
-            <button class="modal-close" id="orderChatCloseBtn" style="position:static;color:#8696a0;font-size:1.2rem;margin-left:auto;"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="order-chat-messages" id="orderChatMessages"></div>
-        <div class="order-chat-input-wrap">
-            <button class="chat-attach-btn" onclick="document.getElementById('orderChatFile').click()"><i class="fas fa-paperclip"></i></button>
-            <input type="file" id="orderChatFile" accept="image/*" style="display:none;" onchange="handleChatFileUpload(this, 'user')">
-            <div class="input-container">
-                <input type="text" id="orderChatInput" placeholder="Ask me anything...">
-                <button id="orderChatSend"><i class="fas fa-arrow-up"></i></button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ADMIN CHAT MODAL -->
-<div class="modal-overlay" id="adminChatOverlay">
-    <div class="modal-box order-chat-modal">
-        <div class="order-chat-header">
-            <button onclick="document.getElementById('adminChatOverlay').classList.remove('open')" style="background:none;border:none;color:#8696a0;font-size:1.2rem;margin-right:10px;cursor:pointer;"><i class="fas fa-arrow-left"></i></button>
-            <div class="testimonial-avatar" id="adminChatUserImg" style="width:44px;height:44px;font-size:1.2rem;background:linear-gradient(135deg,var(--green),var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i class="fas fa-user"></i></div>
-            <div class="info">
-                <h3 id="adminChatUserName">Chat Pelanggan</h3>
-                <p id="adminChatOrderId">Order: #JOELL-0000-0000</p>
-            </div>
-            <button class="modal-close" id="adminChatCloseBtn" style="position:static;color:#8696a0;font-size:1.2rem;margin-left:auto;"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="order-chat-messages" id="adminChatMessages"></div>
-        <div class="order-chat-input-wrap">
-            <button class="chat-attach-btn" onclick="document.getElementById('adminChatFile').click()" title="Upload Gambar"><i class="fas fa-image"></i></button>
-            <button class="chat-attach-btn" onclick="document.getElementById('adminDocFile').click()" title="Upload File/Script"><i class="fas fa-file-code"></i></button>
-            <input type="file" id="adminChatFile" accept="image/*" style="display:none;" onchange="handleChatFileUpload(this, 'admin')">
-            <input type="file" id="adminDocFile" accept=".json,.zip,.txt,.js,.html" style="display:none;" onchange="handleAdminDocUpload(this)">
-            <div class="input-container">
-                <input type="text" id="adminChatInput" placeholder="Reply to customer...">
-                <button id="adminChatSend"><i class="fas fa-arrow-up"></i></button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- PROFILE SETTINGS MODAL -->
-<div class="modal-overlay" id="profileOverlay">
-    <div class="modal-box" style="max-width:400px; border: 1px solid rgba(99, 102, 241, 0.3);">
-        <button class="modal-close" id="profileCloseBtn"><i class="fas fa-times"></i></button>
-        <div class="profile-settings-box">
-            <h2 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 24px; color: #fff;">PENGATURAN PROFIL</h2>
-            <div class="profile-avatar-edit">
-                <img id="profilePreview" src="https://ui-avatars.com/api/?name=User" alt="avatar">
-                <div class="edit-badge" onclick="document.getElementById('profilePhotoInput').click()"><i class="fas fa-camera"></i></div>
-                <input type="file" id="profilePhotoInput" accept="image/*" style="display:none;" onchange="handleProfilePhotoUpload(this)">
-            </div>
-            <div class="profile-input-group">
-                <label>Nama Tampilan</label>
-                <input type="text" id="profileNameInput" placeholder="Masukkan nama Anda...">
-            </div>
-            <div class="profile-input-group">
-                <label>Email (Read-only)</label>
-                <input type="email" id="profileEmailInput" readonly style="opacity:0.6; cursor:not-allowed;">
-            </div>
-            <div class="profile-actions">
-                <button class="btn-profile-logout" id="profileLogoutBtn">LOGOUT</button>
-                <button class="btn-profile-save" id="profileSaveBtn">SIMPAN</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ============================================================ -->
-<!-- PAYMENT MODAL - CLEAN (TANPA WITHDRAW) -->
-<!-- ============================================================ -->
+<!-- PAYMENT MODAL -->
 <div class="modal-overlay" id="paymentOverlay">
     <div class="modal-box payment-modal">
         <button class="modal-close" id="paymentCloseBtn"><i class="fas fa-times"></i></button>
-        
         <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:4px;">
             <i class="fas fa-credit-card" style="color:var(--accent-light);"></i> Pembayaran
         </h2>
         <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;">Selesaikan pembayaran pesanan Anda</p>
         
-        <!-- SALDO -->
         <div class="payment-section">
             <div class="section-label"><i class="fas fa-wallet"></i> Saldo Akun</div>
             <div class="payment-balance-display" id="balanceDisplay">
@@ -826,7 +410,6 @@
             </div>
         </div>
 
-        <!-- RINGKASAN PESANAN -->
         <div class="payment-section">
             <div class="section-label"><i class="fas fa-shopping-bag"></i> Ringkasan Pesanan</div>
             <div class="order-summary-box">
@@ -835,7 +418,6 @@
             </div>
         </div>
 
-        <!-- METODE PEMBAYARAN & INVOICE -->
         <div class="payment-section">
             <div class="section-label"><i class="fas fa-credit-card"></i> Metode Pembayaran</div>
             <div class="payment-methods">
@@ -847,7 +429,6 @@
                 </button>
             </div>
 
-            <!-- QRIS Section -->
             <div id="paymentQrisSection">
                 <div class="payment-qris-container" id="qrisContainer">
                     <div class="qris-placeholder" id="qrisPlaceholder">
@@ -897,7 +478,6 @@
                 </div>
             </div>
 
-            <!-- Bank Transfer Section -->
             <div id="paymentBankSection" style="display:none;">
                 <div class="payment-details">
                     <div class="detail-row">
@@ -924,7 +504,6 @@
             </div>
         </div>
 
-        <!-- RIWAYAT INVOICE -->
         <div class="payment-section" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border-subtle);">
             <div class="section-label"><i class="fas fa-file-invoice"></i> Riwayat Invoice</div>
             <div class="invoice-history-list" id="invoiceHistoryList">
@@ -933,14 +512,6 @@
                     <p>Belum ada invoice</p>
                 </div>
             </div>
-        </div>
-
-        <!-- TOMBOL KE HALAMAN WITHDRAW -->
-        <div style="margin-top:12px;text-align:center;padding-top:12px;border-top:1px solid var(--border-subtle);">
-            <button onclick="closePaymentAndOpenWithdraw()" 
-                    style="background:none;border:none;color:var(--accent-light);cursor:pointer;font-size:0.85rem;font-weight:600;transition:all 0.3s ease;padding:8px 16px;border-radius:30px;">
-                <i class="fas fa-money-bill-wave"></i> Ingin Tarik Saldo? Klik di sini
-            </button>
         </div>
     </div>
 </div>
@@ -965,180 +536,5 @@
 <!-- SCRIPTS -->
 <script src="script.js"></script>
 <script src="payment-api.js"></script>
-
-<!-- ============================================================ -->
-<!-- INISIALISASI MANUAL - MEMASTIKAN SEMUA BERJALAN -->
-<!-- ============================================================ -->
-<script>
-    // ============================================================
-    // INISIALISASI MANUAL - MEMASTIKAN SEMUA BERJALAN
-    // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🔄 Inisialisasi Manual...');
-        
-        // 1. Render Menu Produk
-        if (typeof renderMenus === 'function') {
-            renderMenus();
-            console.log('✅ Menu produk dirender');
-        } else {
-            console.error('❌ renderMenus tidak ditemukan!');
-            // Fallback: render manual
-            renderProductsManually();
-        }
-        
-        // 2. Render Topup Games
-        if (typeof renderTopupGames === 'function') {
-            renderTopupGames();
-            console.log('✅ Topup games dirender');
-        }
-        
-        // 3. Tampilkan Bottom Nav
-        const bottomNav = document.getElementById('bottomNav');
-        if (bottomNav) {
-            bottomNav.style.display = 'flex';
-            console.log('✅ Bottom Nav ditampilkan');
-        }
-        
-        // 4. Update Cart Badge
-        if (typeof updateCartUI === 'function') {
-            updateCartUI();
-            console.log('✅ Cart UI diupdate');
-        }
-        
-        // 5. Render Orders jika ada
-        if (typeof renderOrdersList === 'function') {
-            renderOrdersList();
-        }
-        
-        // 6. Render Profile jika ada
-        if (typeof renderProfilePage === 'function') {
-            renderProfilePage();
-        }
-        
-        // 7. Update User UI
-        if (typeof updateUserUI === 'function') {
-            updateUserUI();
-        }
-        
-        console.log('✅ Inisialisasi Selesai!');
-    });
-
-    // ============================================================
-    // FALLBACK: Render Produk Manual
-    // ============================================================
-    function renderProductsManually() {
-        var products = [
-            { id: 1, name: 'Panel Pterodactyl', icon: 'fa-server', category: 'hosting', badge: 'hot' },
-            { id: 2, name: 'Jasa Pembuatan Fitur', icon: 'fa-microchip', category: 'hosting', badge: 'new' },
-            { id: 3, name: 'Sewa Bot & Jadibot', icon: 'fa-robot', category: 'hosting' },
-            { id: 4, name: 'Script Lily Gen 2', icon: 'fa-database', category: 'hosting', badge: 'pro' },
-            { id: 5, name: 'Jasa Rename Script', icon: 'fa-pen-fancy', category: 'hosting' },
-            { id: 6, name: 'Domain & Hosting', icon: 'fa-globe', category: 'hosting' },
-            { id: 7, name: 'Bot Multi Device', icon: 'fa-code-branch', category: 'script', badge: 'hot' },
-            { id: 8, name: 'Bot RPG', icon: 'fa-gamepad', category: 'script' },
-            { id: 9, name: 'Bot Jaga Group', icon: 'fa-users-cog', category: 'script' },
-            { id: 10, name: 'Bot Downloader', icon: 'fa-download', category: 'script', badge: 'new' },
-            { id: 11, name: 'Bot Auto AI', icon: 'fa-brain', category: 'script', badge: 'pro' },
-            { id: 12, name: 'Bot Auto Order', icon: 'fa-credit-card', category: 'script' },
-            { id: 13, name: 'Topup All Game', icon: 'fa-gamepad', category: 'topup', isTopup: true }
-        ];
-
-        // Filter berdasarkan kategori
-        var hosting = products.filter(function(p) { return p.category === 'hosting'; });
-        var script = products.filter(function(p) { return p.category === 'script'; });
-        var topup = products.filter(function(p) { return p.category === 'topup'; });
-
-        // Render ke grid
-        var hostingGrid = document.getElementById('gridHosting');
-        var scriptGrid = document.getElementById('gridScript');
-        var topupGrid = document.getElementById('gridTopup');
-
-        if (hostingGrid) {
-            hostingGrid.innerHTML = hosting.map(function(p) {
-                var badgeHtml = p.badge ? '<span class="card-badge ' + p.badge + '">' + p.badge.toUpperCase() + '</span>' : '';
-                return '<div class="menu-card" data-id="' + p.id + '">' +
-                    badgeHtml +
-                    '<i class="fas ' + p.icon + '"></i>' +
-                    '<span>' + p.name + '</span>' +
-                '</div>';
-            }).join('');
-        }
-
-        if (scriptGrid) {
-            scriptGrid.innerHTML = script.map(function(p) {
-                var badgeHtml = p.badge ? '<span class="card-badge ' + p.badge + '">' + p.badge.toUpperCase() + '</span>' : '';
-                return '<div class="menu-card" data-id="' + p.id + '">' +
-                    badgeHtml +
-                    '<i class="fas ' + p.icon + '"></i>' +
-                    '<span>' + p.name + '</span>' +
-                '</div>';
-            }).join('');
-        }
-
-        if (topupGrid) {
-            topupGrid.innerHTML = topup.map(function(p) {
-                return '<div class="menu-card" data-id="' + p.id + '" data-topup="true">' +
-                    '<i class="fas ' + p.icon + '"></i>' +
-                    '<span>' + p.name + '</span>' +
-                '</div>';
-            }).join('');
-        }
-
-        // Event listener untuk klik produk
-        document.querySelectorAll('.grid-menu').forEach(function(grid) {
-            grid.addEventListener('click', function(e) {
-                var card = e.target.closest('.menu-card');
-                if (!card) return;
-                var id = parseInt(card.dataset.id);
-                var product = products.find(function(p) { return p.id === id; });
-                if (!product) return;
-                
-                if (product.isTopup) {
-                    var topupOverlay = document.getElementById('topupOverlay');
-                    if (topupOverlay) topupOverlay.classList.add('open');
-                    return;
-                }
-                
-                // Buka detail produk
-                if (typeof openDetail === 'function') {
-                    openDetail(id);
-                } else {
-                    alert('Produk: ' + product.name + '\nKlik "Keranjang" untuk membeli');
-                }
-            });
-        });
-
-        console.log('✅ Produk dirender secara manual');
-    }
-
-    // ============================================================
-    // FUNGSI UNTUK MEMISAHKAN WITHDRAW DARI PAYMENT
-    // ============================================================
-    window.closePaymentAndOpenWithdraw = function() {
-        var paymentOverlay = document.getElementById('paymentOverlay');
-        if (paymentOverlay) {
-            paymentOverlay.classList.remove('open');
-        }
-        if (typeof navigateTo === 'function') {
-            navigateTo('profile');
-        } else {
-            // Fallback: buka profile manual
-            document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
-            var profilePage = document.getElementById('page-profile');
-            if (profilePage) profilePage.classList.add('active');
-            document.querySelectorAll('.bottom-nav .nav-item').forEach(function(item) {
-                item.classList.remove('active');
-                if (item.dataset.page === 'profile') item.classList.add('active');
-            });
-        }
-        setTimeout(function() {
-            var withdrawSection = document.querySelector('.withdraw-section-in-profile');
-            if (withdrawSection) {
-                withdrawSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }, 500);
-    };
-</script>
-
 </body>
 </html>
