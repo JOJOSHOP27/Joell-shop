@@ -1,12 +1,9 @@
 /* ============================================================
-   PAYMENT SYSTEM STYLES (FIXED)
+   PAYMENT SYSTEM STYLES (QRIS FIXED)
    ============================================================ */
 
-.payment-modal .modal-box {
-    max-width: 520px;
-}
+.payment-modal .modal-box { max-width: 520px; }
 
-/* Payment Methods Grid */
 .payment-methods {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -29,10 +26,7 @@
     gap: 10px;
 }
 
-.payment-method-btn:hover {
-    border-color: var(--accent);
-}
-
+.payment-method-btn:hover { border-color: var(--accent); }
 .payment-method-btn.active {
     border-color: var(--accent);
     background: rgba(99,102,241,0.1);
@@ -55,26 +49,31 @@
     transition: all 0.3s ease;
 }
 
-.payment-qris-container .qris-placeholder {
+.qris-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     color: var(--text-muted);
     font-size: 0.9rem;
+    padding: 20px;
+    text-align: center;
 }
 
-.payment-qris-container .qris-placeholder i {
+.qris-placeholder i {
     font-size: 3rem;
     display: block;
     margin-bottom: 12px;
     color: var(--accent-light);
 }
 
-.payment-qris-container .qris-placeholder small {
+.qris-placeholder small {
     display: block;
     margin-top: 4px;
     font-size: 0.7rem;
     color: var(--text-muted);
 }
 
-/* QRIS Image */
 #qrisImageWrapper {
     width: 100%;
     display: flex;
@@ -93,13 +92,16 @@
     padding: 12px;
     box-shadow: 0 4px 24px rgba(0,0,0,0.15);
     border: 1px solid #e5e7eb;
+    display: block;
+    margin: 0 auto;
 }
 
-#qrisImageWrapper .qris-success-text {
+.qris-success-text {
     margin-top: 8px;
     font-size: 0.8rem;
     color: var(--green);
     font-weight: 600;
+    text-align: center;
 }
 
 /* Payment Details */
@@ -119,25 +121,11 @@
     border-bottom: 1px solid var(--border-subtle);
 }
 
-.payment-details .detail-row:last-child {
-    border-bottom: none;
-}
+.payment-details .detail-row:last-child { border-bottom: none; }
+.payment-details .detail-row .label { color: var(--text-muted); }
+.payment-details .detail-row .value { font-weight: 700; color: var(--text-primary); }
+.payment-details .detail-row .value.total { color: var(--accent-light); font-size: 1.1rem; }
 
-.payment-details .detail-row .label {
-    color: var(--text-muted);
-}
-
-.payment-details .detail-row .value {
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.payment-details .detail-row .value.total {
-    color: var(--accent-light);
-    font-size: 1.1rem;
-}
-
-/* Status Badge */
 .payment-status-badge {
     display: inline-flex;
     align-items: center;
@@ -148,20 +136,9 @@
     font-weight: 700;
 }
 
-.payment-status-badge.pending {
-    background: rgba(251,191,36,0.15);
-    color: #fbbf24;
-}
-
-.payment-status-badge.paid {
-    background: rgba(16,185,129,0.15);
-    color: #10b981;
-}
-
-.payment-status-badge.expired {
-    background: rgba(239,68,68,0.15);
-    color: #ef4444;
-}
+.payment-status-badge.pending { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.payment-status-badge.paid { background: rgba(16,185,129,0.15); color: #10b981; }
+.payment-status-badge.expired { background: rgba(239,68,68,0.15); color: #ef4444; }
 
 /* Payment Timer */
 .payment-timer {
@@ -176,9 +153,7 @@
     border-radius: 12px;
 }
 
-.payment-timer.expired {
-    color: #ef4444;
-}
+.payment-timer.expired { color: #ef4444; }
 
 /* Payment Actions */
 .payment-actions {
@@ -205,10 +180,7 @@
     box-shadow: 0 0 30px var(--green-glow);
 }
 
-.payment-actions .btn-pay:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
+.payment-actions .btn-pay:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .payment-actions .btn-check-status {
     padding: 14px 20px;
@@ -220,10 +192,7 @@
     cursor: pointer;
 }
 
-.payment-actions .btn-check-status:hover {
-    border-color: var(--accent);
-    color: var(--accent-light);
-}
+.payment-actions .btn-check-status:hover { border-color: var(--accent); color: var(--accent-light); }
 
 .payment-actions .btn-copy-link {
     padding: 14px 20px;
@@ -235,10 +204,7 @@
     cursor: pointer;
 }
 
-.payment-actions .btn-copy-link:hover {
-    border-color: var(--accent);
-    color: var(--accent-light);
-}
+.payment-actions .btn-copy-link:hover { border-color: var(--accent); color: var(--accent-light); }
 
 /* Balance Display */
 .payment-balance-display {
@@ -266,19 +232,11 @@
     font-size: 1rem;
 }
 
-.payment-balance-display .balance-refresh.spinning {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
+.payment-balance-display .balance-refresh.spinning { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* Section Label */
-.payment-section {
-    margin-bottom: 20px;
-}
-
+.payment-section { margin-bottom: 20px; }
 .payment-section .section-label {
     font-size: 0.85rem;
     font-weight: 700;
@@ -290,10 +248,7 @@
     border-left: 3px solid var(--accent);
     padding-left: 12px;
 }
-
-.payment-section .section-label i {
-    color: var(--accent-light);
-}
+.payment-section .section-label i { color: var(--accent-light); }
 
 /* Invoice History */
 .invoice-history-list {
@@ -329,20 +284,9 @@
     border-radius: 30px;
 }
 
-.invoice-history-item .ih-status.pending {
-    background: rgba(251,191,36,0.15);
-    color: #fbbf24;
-}
-
-.invoice-history-item .ih-status.paid {
-    background: rgba(16,185,129,0.15);
-    color: #10b981;
-}
-
-.invoice-history-item .ih-status.expired {
-    background: rgba(239,68,68,0.15);
-    color: #ef4444;
-}
+.invoice-history-item .ih-status.pending { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.invoice-history-item .ih-status.paid { background: rgba(16,185,129,0.15); color: #10b981; }
+.invoice-history-item .ih-status.expired { background: rgba(239,68,68,0.15); color: #ef4444; }
 
 .invoice-history-item .ih-left {
     display: flex;
@@ -365,16 +309,8 @@
 
 /* Responsive */
 @media (max-width: 500px) {
-    .payment-methods {
-        grid-template-columns: 1fr 1fr;
-    }
-    .payment-actions {
-        flex-direction: column;
-    }
-    .payment-actions .btn-pay {
-        width: 100%;
-    }
-    #qrisImageWrapper img {
-        max-width: 200px;
-    }
-   }
+    .payment-methods { grid-template-columns: 1fr 1fr; }
+    .payment-actions { flex-direction: column; }
+    .payment-actions .btn-pay { width: 100%; }
+    #qrisImageWrapper img { max-width: 200px; }
+}
