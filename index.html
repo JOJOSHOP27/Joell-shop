@@ -86,8 +86,8 @@
         <div class="search-wrap">
             <div class="search-box">
                 <i class="fas fa-search" style="color:var(--text-muted);margin-right:10px;"></i>
-                <input type="text" id="searchInput" placeholder="Cari produk digital..." onkeyup="if(event.key==='Enter') doSearch()">
-                <button onclick="doSearch()">Cari</button>
+                <input type="text" id="searchInput" placeholder="Cari produk digital...">
+                <button id="searchBtn">Cari</button>
             </div>
         </div>
 
@@ -180,17 +180,17 @@
                     </div>
                 </div>
                 <div class="profile-menu-list">
-                    <div class="menu-item" onclick="navigateTo('orders')">
+                    <div class="menu-item" id="profileMenuOrders">
                         <i class="fas fa-history"></i>
                         <span>Riwayat Pesanan</span>
                         <i class="fas fa-chevron-right"></i>
                     </div>
-                    <div class="menu-item" onclick="openProfileSettings()">
+                    <div class="menu-item" id="profileMenuEdit">
                         <i class="fas fa-user-cog"></i>
                         <span>Edit Profil</span>
                         <i class="fas fa-chevron-right"></i>
                     </div>
-                    <div class="menu-item" onclick="window.open('https://wa.me/6287751755160','_blank')">
+                    <div class="menu-item" id="profileMenuSupport">
                         <i class="fab fa-whatsapp"></i>
                         <span>Bantuan Support</span>
                         <i class="fas fa-chevron-right"></i>
@@ -205,7 +205,7 @@
                 <i class="fas fa-user-circle" style="font-size: 4rem; color: var(--accent); margin-bottom: 20px;"></i>
                 <h3>Belum Login</h3>
                 <p>Silakan login untuk melihat dan mengatur profil Anda.</p>
-                <button class="btn-checkout" onclick="document.getElementById('loginOverlay').classList.add('open')" style="margin-top:20px; width:auto; padding: 12px 40px;">LOGIN SEKARANG</button>
+                <button class="btn-checkout" id="guestLoginBtn" style="margin-top:20px; width:auto; padding: 12px 40px;">LOGIN SEKARANG</button>
             </div>
         </div>
     </div>
@@ -500,7 +500,7 @@
                 <p style="color:var(--text-muted);font-size:0.8rem;text-align:center;margin:8px 0;">
                     <i class="fas fa-info-circle"></i> Transfer sesuai total dan kirim bukti ke admin
                 </p>
-                <button class="btn-pay" onclick="copyBankInfo()"><i class="fas fa-copy"></i> Salin Info Bank</button>
+                <button class="btn-pay" id="copyBankBtn"><i class="fas fa-copy"></i> Salin Info Bank</button>
             </div>
         </div>
 
@@ -528,7 +528,7 @@
 <nav class="bottom-nav" id="bottomNav">
     <button class="nav-item active" data-page="home" id="navHome"><i class="fas fa-home"></i> Beranda</button>
     <button class="nav-item" data-page="orders" id="navOrders"><i class="fas fa-shopping-bag"></i> Pesanan <span class="badge" id="navOrdersBadge" style="display:none;">0</span></button>
-    <button class="nav-item" id="navCart" data-page="cart"><i class="fas fa-shopping-cart"></i> Keranjang <span class="badge" id="navCartBadge">0</span></button>
+    <button class="nav-item" id="navCart"><i class="fas fa-shopping-cart"></i> Keranjang <span class="badge" id="navCartBadge">0</span></button>
     <button class="nav-item" data-page="tracking" id="navTracking"><i class="fas fa-shipping-fast"></i> Lacak</button>
     <button class="nav-item" data-page="profile" id="navProfile"><i class="fas fa-user"></i> Profil</button>
 </nav>
@@ -536,5 +536,85 @@
 <!-- SCRIPTS -->
 <script src="script.js"></script>
 <script src="payment-api.js"></script>
+
+<script>
+    // ============================================================
+    // INISIALISASI TAMBAHAN - MEMASTIKAN SEMUA BERJALAN
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🔄 Inisialisasi Tambahan...');
+        
+        // Pastikan render menu dipanggil
+        if (typeof renderMenus === 'function') {
+            renderMenus();
+        }
+        
+        // Pastikan render topup dipanggil
+        if (typeof renderTopupGames === 'function') {
+            renderTopupGames();
+        }
+        
+        // Pastikan navigasi berfungsi
+        setupNavigation();
+        
+        console.log('✅ Inisialisasi Selesai!');
+    });
+
+    function setupNavigation() {
+        // Navigasi bottom nav
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const page = this.dataset.page;
+                if (page && typeof navigateTo === 'function') {
+                    navigateTo(page);
+                } else {
+                    // Fallback navigasi manual
+                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                    const target = document.getElementById('page-' + page);
+                    if (target) target.classList.add('active');
+                    document.querySelectorAll('.bottom-nav .nav-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+        
+        // Profile menu orders
+        const profileMenuOrders = document.getElementById('profileMenuOrders');
+        if (profileMenuOrders) {
+            profileMenuOrders.addEventListener('click', function() {
+                if (typeof navigateTo === 'function') {
+                    navigateTo('orders');
+                }
+            });
+        }
+        
+        // Guest login button
+        const guestLoginBtn = document.getElementById('guestLoginBtn');
+        if (guestLoginBtn) {
+            guestLoginBtn.addEventListener('click', function() {
+                const loginOverlay = document.getElementById('loginOverlay');
+                if (loginOverlay) loginOverlay.classList.add('open');
+            });
+        }
+        
+        // Search button
+        const searchBtn = document.getElementById('searchBtn');
+        if (searchBtn) {
+            searchBtn.addEventListener('click', function() {
+                if (typeof doSearch === 'function') {
+                    doSearch();
+                }
+            });
+        }
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter' && typeof doSearch === 'function') {
+                    doSearch();
+                }
+            });
+        }
+    }
+</script>
 </body>
 </html>
