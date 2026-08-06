@@ -82,7 +82,6 @@
             </div>
         </div>
 
-        <!-- SEARCH BAR -->
         <div class="search-wrap">
             <div class="search-box">
                 <i class="fas fa-search" style="color:var(--text-muted);margin-right:10px;"></i>
@@ -100,9 +99,8 @@
         <div class="section-title">Topup Game</div>
         <div class="grid-menu" id="gridTopup"></div>
 
-        <!-- TESTIMONIALS -->
         <div class="section-title">Testimoni Pelanggan</div>
-        <div class="testimonials-carousel" id="testimonialsCarousel">
+        <div class="testimonials-carousel">
             <div class="testimonial-card">
                 <div class="testimonial-header">
                     <div class="testimonial-avatar">AD</div>
@@ -228,7 +226,7 @@
                     <div id="trackProducts" style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:8px;">Panel Pterodactyl 4GB RAM × 1</div>
                     <div style="color:var(--text-muted);font-size:0.75rem;" id="trackDate">21 Juli 2026 · 14:32 WIB</div>
                 </div>
-                <div class="tracking-timeline" id="trackingTimeline">
+                <div class="tracking-timeline">
                     <div class="tracking-step completed">
                         <div class="tracking-dot"><i class="fas fa-check"></i></div>
                         <div class="tracking-info">
@@ -262,9 +260,9 @@
     </div>
 </div>
 
-<!-- ============================================================ -->
+<!-- ==================== MODALS ==================== -->
+
 <!-- CART OVERLAY -->
-<!-- ============================================================ -->
 <div class="cart-overlay" id="cartOverlay">
     <div class="cart-panel">
         <div class="cart-header">
@@ -516,6 +514,48 @@
     </div>
 </div>
 
+<!-- ADMIN MODAL (tersembunyi, diakses via logo 5x) -->
+<div id="adminPageContainer" style="display:none;">
+    <div class="admin-page" id="page-admin">
+        <div id="adminLoginView">
+            <div class="admin-login-box">
+                <div style="font-size:3rem;color:var(--accent-light);margin-bottom:8px;"><i class="fas fa-shield-alt"></i></div>
+                <h2>Admin Panel</h2>
+                <p>Masukkan password untuk mengakses dashboard admin</p>
+                <input type="password" id="adminPasswordInput" placeholder="••••••••">
+                <button id="adminLoginBtn"><i class="fas fa-lock"></i> Masuk Admin</button>
+                <button id="adminBackBtn" style="margin-top:12px;background:transparent;color:var(--text-muted);border:1px solid var(--border-subtle);">Kembali ke Toko</button>
+            </div>
+        </div>
+        <div id="adminDashboardView" style="display:none;">
+            <div class="tracking-detail-box" style="margin-bottom:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                    <div>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <h2><i class="fas fa-shield-alt" style="color:var(--accent-light);"></i> Admin Dashboard</h2>
+                            <span class="badge" id="adminChatBadge" style="display:none;position:static;padding:2px 10px;font-size:0.8rem;">0</span>
+                        </div>
+                        <p class="subtitle">Kelola pesanan dan chat pelanggan</p>
+                    </div>
+                    <button onclick="refreshAdminOrders()" class="header-btn" title="Refresh Data">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="admin-stats-grid">
+                <div class="admin-stat-card"><div class="num" id="adminStatTotal">0</div><div class="label">Total Pesanan</div></div>
+                <div class="admin-stat-card"><div class="num" id="adminStatPending">0</div><div class="label">Menunggu</div></div>
+                <div class="admin-stat-card"><div class="num" id="adminStatProcessing">0</div><div class="label">Diproses</div></div>
+                <div class="admin-stat-card"><div class="num" id="adminStatCompleted">0</div><div class="label">Selesai</div></div>
+            </div>
+            <div class="admin-section">
+                <h3><i class="fas fa-shopping-bag"></i> Semua Pesanan</h3>
+                <div id="adminOrdersList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
 
@@ -533,88 +573,7 @@
     <button class="nav-item" data-page="profile" id="navProfile"><i class="fas fa-user"></i> Profil</button>
 </nav>
 
-<!-- SCRIPTS -->
 <script src="script.js"></script>
 <script src="payment-api.js"></script>
-
-<script>
-    // ============================================================
-    // INISIALISASI TAMBAHAN - MEMASTIKAN SEMUA BERJALAN
-    // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🔄 Inisialisasi Tambahan...');
-        
-        // Pastikan render menu dipanggil
-        if (typeof renderMenus === 'function') {
-            renderMenus();
-        }
-        
-        // Pastikan render topup dipanggil
-        if (typeof renderTopupGames === 'function') {
-            renderTopupGames();
-        }
-        
-        // Pastikan navigasi berfungsi
-        setupNavigation();
-        
-        console.log('✅ Inisialisasi Selesai!');
-    });
-
-    function setupNavigation() {
-        // Navigasi bottom nav
-        document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const page = this.dataset.page;
-                if (page && typeof navigateTo === 'function') {
-                    navigateTo(page);
-                } else {
-                    // Fallback navigasi manual
-                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                    const target = document.getElementById('page-' + page);
-                    if (target) target.classList.add('active');
-                    document.querySelectorAll('.bottom-nav .nav-item').forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
-                }
-            });
-        });
-        
-        // Profile menu orders
-        const profileMenuOrders = document.getElementById('profileMenuOrders');
-        if (profileMenuOrders) {
-            profileMenuOrders.addEventListener('click', function() {
-                if (typeof navigateTo === 'function') {
-                    navigateTo('orders');
-                }
-            });
-        }
-        
-        // Guest login button
-        const guestLoginBtn = document.getElementById('guestLoginBtn');
-        if (guestLoginBtn) {
-            guestLoginBtn.addEventListener('click', function() {
-                const loginOverlay = document.getElementById('loginOverlay');
-                if (loginOverlay) loginOverlay.classList.add('open');
-            });
-        }
-        
-        // Search button
-        const searchBtn = document.getElementById('searchBtn');
-        if (searchBtn) {
-            searchBtn.addEventListener('click', function() {
-                if (typeof doSearch === 'function') {
-                    doSearch();
-                }
-            });
-        }
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.addEventListener('keyup', function(e) {
-                if (e.key === 'Enter' && typeof doSearch === 'function') {
-                    doSearch();
-                }
-            });
-        }
-    }
-</script>
 </body>
 </html>
