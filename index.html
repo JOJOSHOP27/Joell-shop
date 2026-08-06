@@ -22,18 +22,14 @@
 <div class="app-container">
     <!-- HEADER -->
     <header class="top-header">
-        <div class="logo-area" id="logoArea">
+        <div class="logo-area" id="logoArea" title="Klik 5x untuk Admin Panel">
             <img src="https://files.catbox.moe/ijemcy.png" alt="logo" loading="lazy">
             <span>JOELL SHOP</span>
         </div>
         <div class="header-actions">
-            <button class="header-btn" id="themeToggle" title="Toggle Dark/Light Mode">
-                <i class="fas fa-moon"></i>
-            </button>
+            <button class="header-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
             <div id="userSection">
-                <button class="header-btn" id="loginBtn" title="Login">
-                    <i class="fas fa-sign-in-alt"></i>
-                </button>
+                <button class="header-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i></button>
             </div>
         </div>
     </header>
@@ -42,11 +38,9 @@
     <div class="page active" id="page-home">
         <div class="hero-section">
             <div class="hero-video-wrap">
-                <video src="https://files.catbox.moe/trw5j2.mp4" autoplay loop playsinline muted class="hero-video" id="heroVideo"></video>
+                <video src="https://files.catbox.moe/trw5j2.mp4" autoplay loop playsinline muted class="hero-video"></video>
                 <div class="hero-overlay"></div>
-                <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound">
-                    <i class="fas fa-volume-mute"></i>
-                </button>
+                <button class="sound-toggle" id="soundToggle"><i class="fas fa-volume-mute"></i></button>
             </div>
         </div>
 
@@ -60,14 +54,12 @@
             </div>
         </div>
 
-        <div class="flash-sale-bar" id="flashSaleBar">
+        <div class="flash-sale-bar">
             <div class="flash-sale-info">
                 <i class="fas fa-fire"></i>
-                <div class="flash-sale-text">
-                    <span class="highlight">FLASH SALE</span> — Diskon 50% Panel Pterodactyl!
-                </div>
+                <div class="flash-sale-text"><span class="highlight">FLASH SALE</span> — Diskon 50% Panel Pterodactyl!</div>
             </div>
-            <div class="countdown-timer" id="countdownTimer">
+            <div class="countdown-timer">
                 <div class="countdown-item"><span class="num" id="cdHours">04</span><span class="label">Jam</span></div>
                 <div class="countdown-item"><span class="num" id="cdMinutes">32</span><span class="label">Menit</span></div>
                 <div class="countdown-item"><span class="num" id="cdSeconds">15</span><span class="label">Detik</span></div>
@@ -178,25 +170,10 @@
                     </div>
                 </div>
                 <div class="profile-menu-list">
-                    <div class="menu-item" id="profileMenuOrders">
-                        <i class="fas fa-history"></i>
-                        <span>Riwayat Pesanan</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                    <div class="menu-item" id="profileMenuEdit">
-                        <i class="fas fa-user-cog"></i>
-                        <span>Edit Profil</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                    <div class="menu-item" id="profileMenuSupport">
-                        <i class="fab fa-whatsapp"></i>
-                        <span>Bantuan Support</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                    <div class="menu-item logout" id="btnProfileLogoutPage">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Keluar Akun</span>
-                    </div>
+                    <div class="menu-item" id="profileMenuOrders"><i class="fas fa-history"></i><span>Riwayat Pesanan</span><i class="fas fa-chevron-right"></i></div>
+                    <div class="menu-item" id="profileMenuEdit"><i class="fas fa-user-cog"></i><span>Edit Profil</span><i class="fas fa-chevron-right"></i></div>
+                    <div class="menu-item" id="profileMenuSupport"><i class="fab fa-whatsapp"></i><span>Bantuan Support</span><i class="fas fa-chevron-right"></i></div>
+                    <div class="menu-item logout" id="btnProfileLogoutPage"><i class="fas fa-sign-out-alt"></i><span>Keluar Akun</span></div>
                 </div>
             </div>
             <div id="guestProfileView" class="cart-empty" style="padding: 60px 20px;">
@@ -260,9 +237,7 @@
     </div>
 </div>
 
-<!-- ==================== MODALS ==================== -->
-
-<!-- CART OVERLAY -->
+<!-- ==================== CART OVERLAY ==================== -->
 <div class="cart-overlay" id="cartOverlay">
     <div class="cart-panel">
         <div class="cart-header">
@@ -285,7 +260,7 @@
     </div>
 </div>
 
-<!-- CHECKOUT MODAL -->
+<!-- ==================== CHECKOUT MODAL ==================== -->
 <div class="modal-overlay" id="checkoutOverlay">
     <div class="modal-box">
         <button class="modal-close" id="checkoutCloseBtn"><i class="fas fa-times"></i></button>
@@ -318,7 +293,7 @@
     </div>
 </div>
 
-<!-- DETAIL MODAL -->
+<!-- ==================== DETAIL MODAL ==================== -->
 <div class="detail-overlay" id="detailOverlay">
     <div class="detail-modal">
         <button class="detail-close" id="detailCloseBtn"><i class="fas fa-times"></i></button>
@@ -334,7 +309,7 @@
     </div>
 </div>
 
-<!-- TOPUP MODAL -->
+<!-- ==================== TOPUP MODAL ==================== -->
 <div class="modal-overlay" id="topupOverlay">
     <div class="modal-box">
         <button class="modal-close" id="topupCloseBtn"><i class="fas fa-times"></i></button>
@@ -344,7 +319,7 @@
     </div>
 </div>
 
-<!-- LOGIN MODAL -->
+<!-- ==================== LOGIN MODAL ==================== -->
 <div class="modal-overlay" id="loginOverlay">
     <div class="modal-box" style="max-width:440px; border: 1px solid rgba(99, 102, 241, 0.3); box-shadow: 0 0 40px rgba(0,0,0,0.6);">
         <button class="modal-close" id="loginCloseBtn"><i class="fas fa-times"></i></button>
@@ -386,7 +361,7 @@
     </div>
 </div>
 
-<!-- PAYMENT MODAL -->
+<!-- ==================== PAYMENT MODAL ==================== -->
 <div class="modal-overlay" id="paymentOverlay">
     <div class="modal-box payment-modal">
         <button class="modal-close" id="paymentCloseBtn"><i class="fas fa-times"></i></button>
@@ -402,9 +377,7 @@
                     <div class="balance-label">Saldo Anda</div>
                     <div class="balance-amount" id="balanceAmount">Rp 0</div>
                 </div>
-                <button class="balance-refresh" id="balanceRefreshBtn" title="Refresh Saldo">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
+                <button class="balance-refresh" id="balanceRefreshBtn"><i class="fas fa-sync-alt"></i></button>
             </div>
         </div>
 
@@ -419,12 +392,8 @@
         <div class="payment-section">
             <div class="section-label"><i class="fas fa-credit-card"></i> Metode Pembayaran</div>
             <div class="payment-methods">
-                <button class="payment-method-btn active" data-method="qris">
-                    <i class="fas fa-qrcode"></i> QRIS
-                </button>
-                <button class="payment-method-btn" data-method="bank">
-                    <i class="fas fa-university"></i> Bank Transfer
-                </button>
+                <button class="payment-method-btn active" data-method="qris"><i class="fas fa-qrcode"></i> QRIS</button>
+                <button class="payment-method-btn" data-method="bank"><i class="fas fa-university"></i> Bank Transfer</button>
             </div>
 
             <div id="paymentQrisSection">
@@ -436,33 +405,16 @@
                     </div>
                     <div id="qrisImageWrapper" style="display:none;">
                         <img id="qrisImage" src="" alt="QRIS Code" loading="lazy">
-                        <p class="qris-success-text">
-                            <i class="fas fa-check-circle"></i> Scan QRIS untuk membayar
-                        </p>
+                        <p class="qris-success-text"><i class="fas fa-check-circle"></i> Scan QRIS untuk membayar</p>
                     </div>
                 </div>
                 
                 <div class="payment-details" id="paymentDetails" style="display:none;">
-                    <div class="detail-row">
-                        <span class="label">Invoice ID</span>
-                        <span class="value" id="invoiceId" style="font-family:var(--font-mono);font-size:0.8rem;">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">Total</span>
-                        <span class="value total" id="invoiceTotal">Rp 0</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">Biaya Admin</span>
-                        <span class="value" id="invoiceFee">Rp 0</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">Status</span>
-                        <span class="value"><span class="payment-status-badge pending" id="invoiceStatusBadge">⏳ Menunggu</span></span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">Kadaluarsa</span>
-                        <span class="value" id="invoiceExpiry">-</span>
-                    </div>
+                    <div class="detail-row"><span class="label">Invoice ID</span><span class="value" id="invoiceId" style="font-family:var(--font-mono);font-size:0.8rem;">-</span></div>
+                    <div class="detail-row"><span class="label">Total</span><span class="value total" id="invoiceTotal">Rp 0</span></div>
+                    <div class="detail-row"><span class="label">Biaya Admin</span><span class="value" id="invoiceFee">Rp 0</span></div>
+                    <div class="detail-row"><span class="label">Status</span><span class="value"><span class="payment-status-badge pending" id="invoiceStatusBadge">⏳ Menunggu</span></span></div>
+                    <div class="detail-row"><span class="label">Kadaluarsa</span><span class="value" id="invoiceExpiry">-</span></div>
                 </div>
 
                 <div class="payment-timer" id="paymentTimer" style="display:none;">
@@ -478,22 +430,10 @@
 
             <div id="paymentBankSection" style="display:none;">
                 <div class="payment-details">
-                    <div class="detail-row">
-                        <span class="label">Bank</span>
-                        <span class="value">BCA</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">Nomor Rekening</span>
-                        <span class="value" style="font-family:var(--font-mono);">1234567890</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">Atas Nama</span>
-                        <span class="value">JOELL SHOP</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">Total</span>
-                        <span class="value total" id="bankTotal">Rp 0</span>
-                    </div>
+                    <div class="detail-row"><span class="label">Bank</span><span class="value">BCA</span></div>
+                    <div class="detail-row"><span class="label">Nomor Rekening</span><span class="value" style="font-family:var(--font-mono);">1234567890</span></div>
+                    <div class="detail-row"><span class="label">Atas Nama</span><span class="value">JOELL SHOP</span></div>
+                    <div class="detail-row"><span class="label">Total</span><span class="value total" id="bankTotal">Rp 0</span></div>
                 </div>
                 <p style="color:var(--text-muted);font-size:0.8rem;text-align:center;margin:8px 0;">
                     <i class="fas fa-info-circle"></i> Transfer sesuai total dan kirim bukti ke admin
@@ -514,57 +454,13 @@
     </div>
 </div>
 
-<!-- ADMIN MODAL (tersembunyi, diakses via logo 5x) -->
-<div id="adminPageContainer" style="display:none;">
-    <div class="admin-page" id="page-admin">
-        <div id="adminLoginView">
-            <div class="admin-login-box">
-                <div style="font-size:3rem;color:var(--accent-light);margin-bottom:8px;"><i class="fas fa-shield-alt"></i></div>
-                <h2>Admin Panel</h2>
-                <p>Masukkan password untuk mengakses dashboard admin</p>
-                <input type="password" id="adminPasswordInput" placeholder="••••••••">
-                <button id="adminLoginBtn"><i class="fas fa-lock"></i> Masuk Admin</button>
-                <button id="adminBackBtn" style="margin-top:12px;background:transparent;color:var(--text-muted);border:1px solid var(--border-subtle);">Kembali ke Toko</button>
-            </div>
-        </div>
-        <div id="adminDashboardView" style="display:none;">
-            <div class="tracking-detail-box" style="margin-bottom:16px;">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-                    <div>
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <h2><i class="fas fa-shield-alt" style="color:var(--accent-light);"></i> Admin Dashboard</h2>
-                            <span class="badge" id="adminChatBadge" style="display:none;position:static;padding:2px 10px;font-size:0.8rem;">0</span>
-                        </div>
-                        <p class="subtitle">Kelola pesanan dan chat pelanggan</p>
-                    </div>
-                    <button onclick="refreshAdminOrders()" class="header-btn" title="Refresh Data">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="admin-stats-grid">
-                <div class="admin-stat-card"><div class="num" id="adminStatTotal">0</div><div class="label">Total Pesanan</div></div>
-                <div class="admin-stat-card"><div class="num" id="adminStatPending">0</div><div class="label">Menunggu</div></div>
-                <div class="admin-stat-card"><div class="num" id="adminStatProcessing">0</div><div class="label">Diproses</div></div>
-                <div class="admin-stat-card"><div class="num" id="adminStatCompleted">0</div><div class="label">Selesai</div></div>
-            </div>
-            <div class="admin-section">
-                <h3><i class="fas fa-shopping-bag"></i> Semua Pesanan</h3>
-                <div id="adminOrdersList"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- TOAST CONTAINER -->
+<!-- ==================== TOAST ==================== -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- BACK TO TOP -->
-<button class="back-to-top" id="backToTop" title="Kembali ke atas">
-    <i class="fas fa-arrow-up"></i>
-</button>
+<!-- ==================== BACK TO TOP ==================== -->
+<button class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></button>
 
-<!-- BOTTOM NAV -->
+<!-- ==================== BOTTOM NAV ==================== -->
 <nav class="bottom-nav" id="bottomNav">
     <button class="nav-item active" data-page="home" id="navHome"><i class="fas fa-home"></i> Beranda</button>
     <button class="nav-item" data-page="orders" id="navOrders"><i class="fas fa-shopping-bag"></i> Pesanan <span class="badge" id="navOrdersBadge" style="display:none;">0</span></button>
