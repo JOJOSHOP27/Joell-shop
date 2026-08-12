@@ -13,7 +13,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     
-    <!-- SECURITY SCRIPTS -->
     <script>
         (function() {
             var allowedDomains = ["joell-payment.vercel.app", "nanz-officialstore.vercel.app", "localhost", "127.0.0.1"];
@@ -45,13 +44,10 @@
         });
         document.ondragstart = function() { return false; };
         document.onselectstart = function() { return false; };
-        console.log("%cSTOP!", "color: red; font-size: 50px; font-weight: bold;");
-        console.log("%cIni adalah fitur browser yang ditujukan untuk pengembang. Jika seseorang meminta Anda untuk menyalin-menempelkan sesuatu di sini untuk 'meretas' situs ini, itu adalah penipuan.", "color: white; font-size: 20px;");
     </script>
     <meta name="robots" content="noindex, nofollow">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     
-    <!-- STYLES -->
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="payment.css">
 </head>
@@ -80,7 +76,6 @@
     <!-- PROFILE PAGE -->
     <div class="page active" id="page-profile">
         <div class="profile-page">
-            <!-- User Profile View -->
             <div id="userProfileView" style="display:none;">
                 <div class="profile-header-new">
                     <img class="profile-cover-new" src="https://files.catbox.moe/iai8aa.png" alt="cover">
@@ -125,9 +120,6 @@
                     </div>
                 </div>
 
-                <!-- ========================================================== -->
-                <!-- WITHDRAW SECTION DI HALAMAN PROFIL -->
-                <!-- ========================================================== -->
                 <div class="withdraw-section-in-profile" style="margin-top:24px;padding:20px;background:var(--bg-card);border-radius:12px;border:1px solid var(--border-subtle);">
                     <h3 style="font-size:1rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;border-left:3px solid var(--orange);padding-left:12px;">
                         <i class="fas fa-money-bill-wave" style="color:var(--orange);"></i> Tarik Saldo
@@ -145,7 +137,6 @@
 
                     <div style="font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">Pilih Metode Penarikan</div>
                     <div class="withdraw-methods-grid" id="profileWithdrawMethods">
-                        <!-- Akan diisi dari API -->
                         <p style="color:var(--text-muted);text-align:center;grid-column:1/-1;padding:16px;">Memuat metode penarikan...</p>
                     </div>
                     <div class="withdraw-info" id="profileWithdrawInfo">Silakan pilih metode penarikan di atas</div>
@@ -167,7 +158,6 @@
                 </div>
             </div>
 
-            <!-- Guest Profile View (Login Prompt) -->
             <div id="guestProfileView" class="cart-empty" style="padding: 60px 20px;">
                 <i class="fas fa-user-circle" style="font-size: 4rem; color: var(--accent); margin-bottom: 20px;"></i>
                 <h3>Belum Login</h3>
@@ -175,7 +165,6 @@
                 <button class="btn-checkout" onclick="document.getElementById('loginOverlay').classList.add('open')" style="margin-top:20px; width:auto; padding: 12px 40px;">LOGIN SEKARANG</button>
             </div>
 
-            <!-- Footer Info -->
             <div class="profile-footer-info" style="margin-top: 40px; padding: 20px; border-top: 1px solid var(--border-subtle); text-align: center;">
                 <p style="font-size: 0.8rem; color: var(--text-muted);">JOELL SHOP v2.4.0 • Digital Solutions</p>
             </div>
@@ -269,7 +258,6 @@
     <button class="nav-item active" data-page="profile" id="navProfile"><i class="fas fa-user"></i> Profil</button>
 </nav>
 
-<!-- SCRIPTS -->
 <script src="script.js"></script>
 <script src="payment-api.js"></script>
 
@@ -301,4 +289,4 @@
     });
 </script>
 </body>
-    </html>
+</html>
