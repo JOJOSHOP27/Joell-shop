@@ -6,6 +6,7 @@ function requestNotificationPermission() {
         Notification.requestPermission();
     }
 }
+
 function sendBrowserNotification(title, message, orderId = null) {
     if ("Notification" in window && Notification.permission === "granted") {
         const notification = new Notification(title, {
@@ -25,6 +26,7 @@ function sendBrowserNotification(title, message, orderId = null) {
         };
     }
 }
+
 requestNotificationPermission();
 
 // ============================================================
@@ -38,9 +40,7 @@ const CONFIG = {
         'FLASH25': { discount: 0.25, type: 'percent', max: 25000, desc: 'Diskon 25%' }
     },
     imgurClientId: '546c25a59c58ad7',
-    osintApiKey: 'a306d58d00msh5264c55372d6410p14feb6jsn101a605f6cd6',
-    adminPassword: 'joelladmin2026',
-    screenshotApiKey: 'LXZ_d7347e2859884015'  // API Key Screenshot
+    adminPassword: 'joelladmin2026'
 };
 
 const topupGames = [
@@ -112,20 +112,18 @@ const products = [
 //  STATE
 // ============================================================
 let cart = JSON.parse(localStorage.getItem('joellCart')) || [];
-let wishlist = JSON.parse(localStorage.getItem('joellWishlist')) || [];
 let orders = JSON.parse(localStorage.getItem('joellOrders')) || [];
 let currentUser = JSON.parse(localStorage.getItem('joellUser')) || null;
 let currentProductId = null;
 let selectedVariant = null;
 let activePromo = null;
-let currentFilter = 'all';
 let currentOrderChatId = null;
 let isAdminLoggedIn = false;
 let currentAdminChatId = null;
 let logoClickCount = 0;
 
 // ============================================================
-//  FIREBASE REALTIME DATABASE
+//  FIREBASE REAL-TIME DATABASE
 // ============================================================
 const _0x4f2a = ["QUl6YVN5RG9HNkdQQkRVUnZCQ3piT09TQ1FMSmtucnVGeXM0WEV3", "am9lbGwtc2hvcC1kYjNhNi5maXJlYmFzZWFwcC5jb20=", "am9lbGwtc2hvcC1kYjNhNg==", "am9lbGwtc2hvcC1kYjNhNi5maXJlYmFzZXN0b3JhZ2UuYXBw", "MTAxNjIzOTA2NjI0MA==", "MToxMDE2MjM5MDY2MjQwOndlYjoxODk4ZWM4MGU4OWU0NTg3MjRhYTY1", "aHR0cHM6Ly9qb2VsbC1zaG9wLWRiM2E2LWRlZmF1bHQtcnRkYi5hc2lhLXNvdXRoZWFzdDEuZmlyZWJhc2VkYXRhYmFzZS5hcHAv"];
 const firebaseConfig = {
@@ -142,9 +140,11 @@ let db;
 function initCloudSync() {
     const statusDot = document.getElementById('cloudStatusDot');
     const statusText = document.getElementById('cloudStatusText');
+    
     try {
         firebase.initializeApp(firebaseConfig);
         db = firebase.database();
+        
         const connectedRef = db.ref(".info/connected");
         connectedRef.on("value", (snap) => {
             if (snap.val() === true) {
@@ -157,12 +157,14 @@ function initCloudSync() {
                 console.log("Cloud Disconnected");
             }
         });
+
         db.ref('orders').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 const oldOrders = JSON.parse(JSON.stringify(orders));
                 orders = data;
                 localStorage.setItem('joellOrders', JSON.stringify(orders));
+                
                 renderOrdersList();
                 if (isAdminLoggedIn) {
                     renderAdminOrders();
@@ -171,6 +173,7 @@ function initCloudSync() {
                 if (currentOrderChatId) renderOrderChatMessages();
                 if (currentAdminChatId) renderAdminChatMessages();
                 updateUnreadBadges();
+                
                 if (document.hidden) {
                     orders.forEach(newOrder => {
                         const oldOrder = oldOrders.find(o => o.id === newOrder.id);
@@ -195,9 +198,6 @@ function syncOrdersToCloud() {
             console.log("Cloud Sync Success");
         }).catch(e => {
             console.error("Sync Error:", e);
-            if (e.code === 'PERMISSION_DENIED') {
-                showToast('Cloud Error', 'Izin ditolak, data disimpan lokal.', 'warning', 4000);
-            }
         });
     }
 }
@@ -205,75 +205,8 @@ function syncOrdersToCloud() {
 initCloudSync();
 updateUnreadBadges();
 
-let bc;
-try {
-    bc = new BroadcastChannel('joell_shop_channel');
-    bc.onmessage = (event) => {
-        if (event.data.type === 'orders_updated' || event.data.type === 'chat_updated') {
-            orders = JSON.parse(localStorage.getItem('joellOrders')) || [];
-            renderOrdersList();
-            if (isAdminLoggedIn) renderAdminOrders();
-            if (currentOrderChatId === event.data.orderId) renderOrderChatMessages();
-            if (currentAdminChatId === event.data.orderId) renderAdminChatMessages();
-            if (document.hidden && event.data.type === 'chat_updated') {
-                const order = orders.find(o => o.id === event.data.orderId);
-                if (order && order.chat && order.chat.length > 0) {
-                    const lastMsg = order.chat[order.chat.length - 1];
-                    sendBrowserNotification(`Pesan Baru: #${event.data.orderId}`, lastMsg.text || 'Mengirim file...', event.data.orderId);
-                }
-            }
-        }
-    };
-} catch(e) {}
-
-function broadcastOrders() {
-    syncOrdersToCloud();
-    if (bc) bc.postMessage({ type: 'orders_updated' });
-}
-function broadcastChat(orderId) {
-    syncOrdersToCloud();
-    if (bc) bc.postMessage({ type: 'chat_updated', orderId });
-    updateUnreadBadges();
-}
-
-function updateUnreadBadges() {
-    if (!orders || !Array.isArray(orders)) return;
-    let totalUnreadUser = 0;
-    let totalUnreadAdmin = 0;
-    orders.forEach(order => {
-        if (!order.chat || !Array.isArray(order.chat)) return;
-        const lastMsg = order.chat[order.chat.length - 1];
-        if (!lastMsg) return;
-        if (lastMsg.from === 'admin') {
-            if (currentUser && order.userId === currentUser.id) {
-                totalUnreadUser++;
-            }
-        } else if (lastMsg.from === 'user') {
-            totalUnreadAdmin++;
-        }
-    });
-    const navBadge = document.getElementById('navOrdersBadge');
-    if (navBadge) {
-        if (totalUnreadUser > 0) {
-            navBadge.textContent = totalUnreadUser;
-            navBadge.style.display = 'block';
-        } else {
-            navBadge.style.display = 'none';
-        }
-    }
-    const adminBadge = document.getElementById('adminChatBadge');
-    if (adminBadge) {
-        if (totalUnreadAdmin > 0) {
-            adminBadge.textContent = totalUnreadAdmin;
-            adminBadge.style.display = 'block';
-        } else {
-            adminBadge.style.display = 'none';
-        }
-    }
-}
-
 // ============================================================
-//  GOOGLE LOGIN & PROFILE
+//  GOOGLE LOGIN
 // ============================================================
 function handleGoogleLogin(response) {
     const credential = response.credential;
@@ -302,6 +235,7 @@ function openProfileSettings() {
 document.getElementById('profileCloseBtn').addEventListener('click', () => {
     document.getElementById('profileOverlay').classList.remove('open');
 });
+
 document.getElementById('profileLogoutBtn').addEventListener('click', () => {
     if (confirm('Apakah Anda yakin ingin keluar?')) {
         currentUser = null;
@@ -311,6 +245,7 @@ document.getElementById('profileLogoutBtn').addEventListener('click', () => {
         showToast('Logout', 'Anda telah keluar', 'info');
     }
 });
+
 document.getElementById('profileSaveBtn').addEventListener('click', () => {
     const newName = document.getElementById('profileNameInput').value.trim();
     if (!newName) { showToast('Error', 'Nama tidak boleh kosong', 'error'); return; }
@@ -359,7 +294,7 @@ function updateUserUI() {
 }
 
 // ============================================================
-//  THEME
+//  THEME MANAGER
 // ============================================================
 const themeToggle = document.getElementById('themeToggle');
 const savedTheme = localStorage.getItem('joellTheme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
@@ -380,11 +315,12 @@ function updateThemeIcon(theme) {
 }
 
 // ============================================================
-//  PARTICLES
+//  PARTICLES BACKGROUND
 // ============================================================
 const pCanvas = document.getElementById('particlesCanvas');
 const pCtx = pCanvas.getContext('2d');
 let particles = [];
+
 function resizeParticles() {
     pCanvas.width = window.innerWidth;
     pCanvas.height = window.innerHeight;
@@ -416,7 +352,9 @@ class Particle {
         pCtx.fill();
     }
 }
+
 for (let i = 0; i < 50; i++) particles.push(new Particle());
+
 function animateParticles() {
     pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
     particles.forEach(p => { p.update(); p.draw(); });
@@ -428,7 +366,9 @@ animateParticles();
 //  TYPING EFFECT
 // ============================================================
 const typingTexts = ['Bot WhatsApp', 'Hosting Panel', 'Topup Game', 'Script Premium'];
-let typingIndex = 0, charIndex = 0, isDeleting = false;
+let typingIndex = 0;
+let charIndex = 0;
+let isDeleting = false;
 const typingElement = document.getElementById('typingText');
 
 function typeEffect() {
@@ -454,7 +394,7 @@ function typeEffect() {
 typeEffect();
 
 // ============================================================
-//  COUNTDOWN
+//  COUNTDOWN TIMER
 // ============================================================
 function updateCountdown() {
     const now = new Date();
@@ -474,15 +414,17 @@ setInterval(updateCountdown, 1000);
 updateCountdown();
 
 // ============================================================
-//  TOAST
+//  TOAST SYSTEM
 // ============================================================
 function showToast(title, message, type = 'info', duration = 3000) {
     const container = document.getElementById('toastContainer');
+    if (!container) return;
+    
     const toast = document.createElement('div');
     toast.className = 'toast';
     const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle', warning: 'fa-exclamation-circle' };
     toast.innerHTML = `
-        <div class="toast-icon ${type}"><i class="fas ${icons[type]}"></i></div>
+        <div class="toast-icon ${type}"><i class="fas ${icons[type] || icons.info}"></i></div>
         <div class="toast-content"><h4>${title}</h4><p>${message}</p></div>
     `;
     container.appendChild(toast);
@@ -493,9 +435,11 @@ function showToast(title, message, type = 'info', duration = 3000) {
 }
 
 // ============================================================
-//  PROMO
+//  PROMO CODE
 // ============================================================
-document.getElementById('promoBtn').addEventListener('click', () => {
+const promoBtn = document.getElementById('promoBtn');
+if (promoBtn) {
+promoBtn.addEventListener('click', () => {
     const code = document.getElementById('promoInput').value.trim().toUpperCase();
     const msgEl = document.getElementById('promoMessage');
     if (!code) { msgEl.textContent = 'Masukkan kode promo'; msgEl.className = 'promo-message error'; return; }
@@ -511,11 +455,14 @@ document.getElementById('promoBtn').addEventListener('click', () => {
         msgEl.className = 'promo-message error';
     }
 });
+}
 
 // ============================================================
 //  SERVER STATUS REFRESH
 // ============================================================
-document.getElementById('refreshStatus').addEventListener('click', function() {
+const refreshStatusBtn = document.getElementById('refreshStatus');
+if (refreshStatusBtn) {
+refreshStatusBtn.addEventListener('click', function() {
     this.classList.add('spinning');
     setTimeout(() => {
         this.classList.remove('spinning');
@@ -528,12 +475,14 @@ document.getElementById('refreshStatus').addEventListener('click', function() {
         showToast('Server Status', 'Status server diperbarui', 'success');
     }, 1000);
 });
+}
 
 // ============================================================
 //  RENDER FUNCTIONS
 // ============================================================
 function renderTopupGames() {
     const grid = document.getElementById('topupGrid');
+    if (!grid) return;
     grid.innerHTML = topupGames.map(g => `
         <div class="topup-item" onclick="window.open('${g.url}', '_blank')">
             <img src="${g.logo}" alt="${g.name}" loading="lazy">
@@ -543,22 +492,20 @@ function renderTopupGames() {
 }
 
 function renderMenus() {
-    document.getElementById('gridHosting').innerHTML = renderMenuCards(products.filter(p => p.category === 'hosting'));
-    document.getElementById('gridScript').innerHTML = renderMenuCards(products.filter(p => p.category === 'script'));
-    document.getElementById('gridTopup').innerHTML = renderMenuCards(products.filter(p => p.category === 'topup'));
+    const hostingGrid = document.getElementById('gridHosting');
+    const scriptGrid = document.getElementById('gridScript');
+    const topupGrid = document.getElementById('gridTopup');
+    
+    if (hostingGrid) hostingGrid.innerHTML = renderMenuCards(products.filter(p => p.category === 'hosting'));
+    if (scriptGrid) scriptGrid.innerHTML = renderMenuCards(products.filter(p => p.category === 'script'));
+    if (topupGrid) topupGrid.innerHTML = renderMenuCards(products.filter(p => p.category === 'topup'));
 }
 
 function renderMenuCards(productList) {
     return productList.map(p => {
         const badgeHtml = p.badge ? `<span class="card-badge ${p.badge}">${p.badge.toUpperCase()}</span>` : '';
-        const isTopup = p.isTopup || false;
-        const isAnime = p.isAnime || false;
-        const isBot = p.isBotController || false;
-        const isOsint = p.isOsint || false;
-        const isSsweb = p.isSsweb || false;
-        const isUpload = p.isUpload || false;
         return `
-            <div class="menu-card" data-id="${p.id}" data-topup="${isTopup}" data-anime="${isAnime}" data-bot="${isBot}" data-osint="${isOsint}" data-ssweb="${isSsweb}" data-upload="${isUpload}">
+            <div class="menu-card" data-id="${p.id}" data-topup="${p.isTopup||false}">
                 ${badgeHtml}
                 <i class="fas ${p.icon}"></i>
                 <span>${p.name}</span>
@@ -568,14 +515,20 @@ function renderMenuCards(productList) {
 }
 
 // ============================================================
-//  CART
+//  CART FUNCTIONS
 // ============================================================
 function updateCartUI() {
     const count = cart.reduce((a, i) => a + i.qty, 0);
-    document.getElementById('navCartBadge').textContent = count;
-    document.getElementById('cartBadgeTotal').textContent = count;
+    const navBadge = document.getElementById('navCartBadge');
+    const totalBadge = document.getElementById('cartBadgeTotal');
+    if (navBadge) navBadge.textContent = count;
+    if (totalBadge) totalBadge.textContent = count;
+    
     const container = document.getElementById('cartItems');
     const footer = document.getElementById('cartFooter');
+
+    if (!container) return;
+
     if (cart.length === 0) {
         container.innerHTML = `
             <div class="cart-empty">
@@ -583,10 +536,11 @@ function updateCartUI() {
                 <h3>Keranjang kosong</h3>
                 <p>Yuk, isi dengan produk favoritmu!</p>
             </div>`;
-        footer.style.display = 'none';
+        if (footer) footer.style.display = 'none';
         return;
     }
-    footer.style.display = 'block';
+    if (footer) footer.style.display = 'block';
+    
     let subtotal = 0;
     container.innerHTML = cart.map((item, idx) => {
         const sub = item.price * item.qty;
@@ -611,6 +565,7 @@ function updateCartUI() {
             </div>
         `;
     }).join('');
+
     let discount = 0;
     if (activePromo) {
         if (activePromo.type === 'percent') {
@@ -620,14 +575,22 @@ function updateCartUI() {
         }
     }
     const total = Math.max(0, subtotal - discount);
-    document.getElementById('cartSubtotal').textContent = 'Rp ' + subtotal.toLocaleString();
-    document.getElementById('cartDiscount').textContent = discount > 0 ? '- Rp ' + discount.toLocaleString() : 'Rp 0';
-    document.getElementById('cartShipping').textContent = 'Rp 0';
-    document.getElementById('cartTotalDisplay').textContent = 'Rp ' + total.toLocaleString();
+
+    const subtotalEl = document.getElementById('cartSubtotal');
+    const discountEl = document.getElementById('cartDiscount');
+    const shippingEl = document.getElementById('cartShipping');
+    const totalEl = document.getElementById('cartTotalDisplay');
+    
+    if (subtotalEl) subtotalEl.textContent = 'Rp ' + subtotal.toLocaleString();
+    if (discountEl) discountEl.textContent = discount > 0 ? '- Rp ' + discount.toLocaleString() : 'Rp 0';
+    if (shippingEl) shippingEl.textContent = 'Rp 0';
+    if (totalEl) totalEl.textContent = 'Rp ' + total.toLocaleString();
+    
     localStorage.setItem('joellCart', JSON.stringify(cart));
 }
 
 function updateQty(idx, delta) {
+    if (!cart[idx]) return;
     if (cart[idx].qty + delta < 1) {
         removeItem(idx);
         return;
@@ -656,7 +619,9 @@ function addToCart(productId, variantName, variantPrice) {
     showToast('Keranjang', `${p.name} ditambahkan!`, 'success');
 }
 
-document.getElementById('clearCartBtn').addEventListener('click', () => {
+const clearCartBtn = document.getElementById('clearCartBtn');
+if (clearCartBtn) {
+clearCartBtn.addEventListener('click', () => {
     if (!cart.length) return;
     if (confirm('Kosongkan keranjang?')) {
         cart = [];
@@ -667,6 +632,7 @@ document.getElementById('clearCartBtn').addEventListener('click', () => {
         showToast('Keranjang', 'Keranjang dikosongkan', 'info');
     }
 });
+}
 
 // ============================================================
 //  DETAIL MODAL
@@ -703,13 +669,17 @@ function selectVariant(el, index) {
     document.getElementById('detailPrice').textContent = priceText;
 }
 
-document.getElementById('addToCartBtn').addEventListener('click', () => {
+const addToCartBtn = document.getElementById('addToCartBtn');
+if (addToCartBtn) {
+addToCartBtn.addEventListener('click', () => {
     if (!selectedVariant) { showToast('Error', 'Pilih varian dulu', 'error'); return; }
     addToCart(currentProductId, selectedVariant.name, selectedVariant.price);
     document.getElementById('detailOverlay').classList.remove('open');
 });
 
-document.getElementById('buyNowBtn').addEventListener('click', () => {
+const buyNowBtn = document.getElementById('buyNowBtn');
+if (buyNowBtn) {
+buyNowBtn.addEventListener('click', () => {
     if (!selectedVariant) { showToast('Error', 'Pilih varian dulu', 'error'); return; }
     addToCart(currentProductId, selectedVariant.name, selectedVariant.price);
     document.getElementById('detailOverlay').classList.remove('open');
@@ -717,9 +687,11 @@ document.getElementById('buyNowBtn').addEventListener('click', () => {
 });
 
 // ============================================================
-//  CHECKOUT & INVOICE
+//  CHECKOUT SYSTEM
 // ============================================================
-document.getElementById('checkoutBtn').addEventListener('click', () => {
+const checkoutBtn = document.getElementById('checkoutBtn');
+if (checkoutBtn) {
+checkoutBtn.addEventListener('click', () => {
     if (!cart.length) { showToast('Error', 'Keranjang kosong', 'error'); return; }
     if (!currentUser) {
         showToast('Login Diperlukan', 'Silakan login untuk checkout', 'warning');
@@ -733,33 +705,40 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
         total += sub;
         return `<div class="order-item-line">${item.name} (${item.variant}) x${item.qty} = Rp ${sub.toLocaleString()}</div>`;
     }).join('');
-    document.getElementById('checkoutTotal').textContent = 'Total: Rp ' + total.toLocaleString();
-    document.getElementById('coName').value = currentUser.name || '';
-    document.getElementById('coEmail').value = currentUser.email || '';
-    document.getElementById('cartOverlay').classList.remove('open');
-    document.getElementById('checkoutOverlay').classList.add('open');
+    const checkoutTotalEl = document.getElementById('checkoutTotal');
+    if (checkoutTotalEl) checkoutTotalEl.textContent = 'Total: Rp ' + total.toLocaleString();
+    const coNameEl = document.getElementById('coName');
+    if (coNameEl) coNameEl.value = currentUser.name || '';
+    const coEmailEl = document.getElementById('coEmail');
+    if (coEmailEl) coEmailEl.value = currentUser.email || '';
+    const cartOverlay = document.getElementById('cartOverlay');
+    if (cartOverlay) cartOverlay.classList.remove('open');
+    const checkoutOverlay = document.getElementById('checkoutOverlay');
+    if (checkoutOverlay) checkoutOverlay.classList.add('open');
 });
 
-document.getElementById('checkoutForm').addEventListener('submit', (e) => {
+document.getElementById('checkoutForm').addEventListener('submit', function(e) {
     e.preventDefault();
     if (!cart.length) return;
+    
     const orderId = 'JOELL-' + Math.random().toString(36).substr(2, 4).toUpperCase() + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
     const total = cart.reduce((a, i) => a + i.price * i.qty, 0);
+    
     const order = {
         id: orderId,
-        userId: currentUser.id,
-        userName: document.getElementById('coName').value,
-        userEmail: document.getElementById('coEmail').value,
-        userPhone: document.getElementById('coPhone').value,
-        address: document.getElementById('coAddress').value,
+        userId: currentUser ? currentUser.id : 'guest',
+        userName: document.getElementById('coName').value || '',
+        userEmail: document.getElementById('coEmail').value || '',
+        userPhone: document.getElementById('coPhone').value || '',
+        address: document.getElementById('coAddress').value || '',
         payment: 'online',
         items: [...cart],
         total: total,
         status: 'pending',
-        statusLabel: 'Menunggu',
+        statusLabel: 'Menunggu Pembayaran',
         createdAt: new Date().toISOString(),
         timeline: [
-            { step: 'Pesanan Diterima', desc: 'Pesanan berhasil dibuat', time: new Date().toLocaleString('id-ID'), completed: true },
+            { step: 'Menunggu Pembayaran', desc: 'Silakan selesaikan pembayaran', time: '-', completed: false },
             { step: 'Pembayaran Diverifikasi', desc: 'Menunggu konfirmasi pembayaran', time: '-', completed: false },
             { step: 'Sedang Diproses', desc: 'Tim menyiapkan pesanan Anda', time: '-', completed: false },
             { step: 'Pesanan Selesai', desc: 'Detail produk dikirim ke akun Anda', time: '-', completed: false }
@@ -767,96 +746,35 @@ document.getElementById('checkoutForm').addEventListener('submit', (e) => {
         chat: [
             { 
                 from: 'admin', 
-                text: `Halo ${currentUser.name}! Terima kasih telah memesan. Tim kami akan segera memproses pesanan #${orderId}.<br><br>Silakan selesaikan pembayaran Anda dengan scan QRIS di bawah.`,
-                time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+                text: `Halo ${document.getElementById('coName').value || 'Pelanggan'}! Terima kasih telah memesan. Silakan selesaikan pembayaran Anda.`,
+                time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) 
             }
         ]
     };
+    
     orders.unshift(order);
     localStorage.setItem('joellOrders', JSON.stringify(orders));
-    broadcastOrders();
+    syncOrdersToCloud();
+    
     cart = [];
     activePromo = null;
     localStorage.setItem('joellCart', JSON.stringify(cart));
     updateCartUI();
+    
     document.getElementById('checkoutOverlay').classList.remove('open');
-    showInvoice(order); // Tampilkan invoice QRIS
-});
-
-// ============================================================
-//  INVOICE & QRIS
-// ============================================================
-function showInvoice(order) {
-    document.getElementById('invoiceOrderId').textContent = order.id;
-    document.getElementById('invoiceDate').textContent = new Date(order.createdAt).toLocaleString('id-ID');
-    document.getElementById('invoiceName').textContent = order.userName;
-    document.getElementById('invoiceEmail').textContent = order.userEmail;
-    document.getElementById('invoicePhone').textContent = order.userPhone || '-';
-    document.getElementById('invoiceAddress').textContent = order.address || '-';
-
-    const list = document.getElementById('invoiceItemsList');
-    list.innerHTML = order.items.map(item => `
-        <div style="display:flex;justify-content:space-between;font-size:0.85rem;color:var(--text-secondary);">
-            <span>${item.name} (${item.variant}) × ${item.qty}</span>
-            <span>Rp ${(item.price * item.qty).toLocaleString()}</span>
-        </div>
-    `).join('');
-    document.getElementById('invoiceTotal').textContent = 'Rp ' + order.total.toLocaleString();
-
-    // QRIS
-    const qrData = `JOELL-ORDER-${order.id}`;
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData)}&size=200x200&bgcolor=ffffff&color=000000`;
-    const qrisImg = document.getElementById('qrisImage');
-    qrisImg.src = qrUrl;
-    qrisImg.onerror = function() {
-        this.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Ym94PSIwIDAgMjAwIDIwMCI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNmZmYiLz48dGV4dCB4PSI1MCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMwMDAiPk9SREVSPC90ZXh0Pjwvc3ZnPg==';
-    };
-
-    document.getElementById('invoiceOverlay').classList.add('open');
-}
-
-document.getElementById('invoicePayBtn').addEventListener('click', function() {
-    const orderId = document.getElementById('invoiceOrderId').textContent;
-    const order = orders.find(o => o.id === orderId);
-    if (!order) return;
-
-    this.disabled = true;
-    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-
-    order.status = 'processing';
-    order.statusLabel = 'Diproses';
-    if (order.timeline[1]) {
-        order.timeline[1].completed = true;
-        order.timeline[1].time = new Date().toLocaleString('id-ID');
-    }
-    if (order.timeline[2]) {
-        order.timeline[2].completed = true;
-        order.timeline[2].time = new Date().toLocaleString('id-ID');
-    }
-    if (!order.chat) order.chat = [];
-    order.chat.push({
-        from: 'admin',
-        text: '✅ Pembayaran Anda telah dikonfirmasi. Pesanan sedang diproses oleh tim teknis.',
-        time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
-    });
-
-    localStorage.setItem('joellOrders', JSON.stringify(orders));
-    broadcastOrders();
-    document.getElementById('invoiceOverlay').classList.remove('open');
-    showToast('Berhasil', 'Pembayaran berhasil dikonfirmasi. Pesanan sedang diproses.', 'success', 5000);
-
-    setTimeout(() => {
+    
+    if (typeof window.openPaymentModal === 'function') {
+        setTimeout(() => {
+            window.openPaymentModal(order);
+        }, 300);
+    } else {
+        showToast('Pesanan Dibuat', `ID: ${orderId}. Selesaikan pembayaran.`, 'success', 5000);
         navigateTo('orders');
-        setTimeout(() => openOrderChat(order.id), 300);
-    }, 500);
-
-    this.disabled = false;
-    this.innerHTML = '<i class="fas fa-check-circle"></i> Saya Sudah Bayar';
+        setTimeout(() => openOrderChat(orderId), 500);
+    }
+    renderOrdersList();
 });
-
-document.getElementById('invoiceCloseBtn').addEventListener('click', function() {
-    document.getElementById('invoiceOverlay').classList.remove('open');
-});
+}
 
 // ============================================================
 //  ORDERS & TRACKING
@@ -876,6 +794,7 @@ function getRelativeTime(timestamp) {
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
+
     if (seconds < 60) return 'Baru saja';
     if (minutes < 60) return `${minutes} menit lalu`;
     if (hours < 24) return `${hours} jam lalu`;
@@ -885,7 +804,10 @@ function getRelativeTime(timestamp) {
 
 function renderOrdersList() {
     const container = document.getElementById('ordersListContainer');
+    if (!container) return;
+    
     const myOrders = currentUser ? orders.filter(o => o.userId === currentUser.id) : [];
+
     if (!myOrders.length) {
         container.innerHTML = `
             <div class="empty-orders">
@@ -895,15 +817,31 @@ function renderOrdersList() {
             </div>`;
         return;
     }
-    const statusClass = { 'pending': 'pending', 'read': 'read', 'processing': 'processing', 'shipped': 'shipped', 'completed': 'completed' };
-    const statusLabel = { 'pending': 'Menunggu', 'read': 'Dibaca', 'processing': 'Diproses', 'shipped': 'Dikirim', 'completed': 'Selesai' };
+
+    const statusClass = {
+        'pending': 'pending',
+        'read': 'read',
+        'processing': 'processing',
+        'shipped': 'shipped',
+        'completed': 'completed'
+    };
+    const statusLabel = {
+        'pending': 'Menunggu',
+        'read': 'Dibaca',
+        'processing': 'Diproses',
+        'shipped': 'Dikirim',
+        'completed': 'Selesai'
+    };
 
     function getUnreadCount(order) {
         if (!order.chat || !Array.isArray(order.chat) || order.chat.length === 0) return 0;
         let count = 0;
         for (let i = order.chat.length - 1; i >= 0; i--) {
-            if (order.chat[i].from === 'admin') count++;
-            else break;
+            if (order.chat[i].from === 'admin') {
+                count++;
+            } else {
+                break;
+            }
         }
         return count;
     }
@@ -960,7 +898,7 @@ function deleteOrder(orderId) {
         if (result.isConfirmed) {
             orders = orders.filter(o => o.id !== orderId);
             localStorage.setItem('joellOrders', JSON.stringify(orders));
-            broadcastOrders();
+            syncOrdersToCloud();
             renderOrdersList();
             if (isAdminLoggedIn) {
                 renderAdminOrders();
@@ -984,9 +922,10 @@ function renderOrderChatMessages() {
     const order = orders.find(o => o.id === currentOrderChatId);
     if (!order) return;
     const container = document.getElementById('orderChatMessages');
+    if (!container) return;
+    
     container.innerHTML = order.chat.map(c => {
         const isAdmin = c.from === 'admin';
-        const payBtnHtml = c.paymentBtn ? `<a href="https://joell-payment.vercel.app" target="_blank" class="chat-payment-btn"><i class="fas fa-credit-card"></i> PAYMENT</a>` : '';
         const imgHtml = c.image ? `
             <div class="chat-img-container">
                 <img src="${c.image}" alt="chat-img" onclick="window.open('${c.image}', '_blank')">
@@ -1004,15 +943,16 @@ function renderOrderChatMessages() {
                     </a>
                 </div>
             </div>` : '';
+        
         const avatar = isAdmin ? 
             `<div class="chat-avatar" style="background:var(--accent);"><i class="fas fa-robot"></i></div>` : 
             `<div class="chat-avatar" style="background:var(--purple);">${currentUser ? currentUser.name.charAt(0) : 'U'}</div>`;
+
         return `
             <div class="chat-row ${isAdmin ? 'admin-row' : 'user-row'}">
                 ${avatar}
                 <div class="msg ${isAdmin ? 'admin' : 'user'}">
                     ${c.text || ''}
-                    ${payBtnHtml}
                     ${imgHtml}
                     ${fileHtml}
                     <span class="time">${c.time}</span>
@@ -1023,47 +963,42 @@ function renderOrderChatMessages() {
     container.scrollTop = container.scrollHeight;
 }
 
-document.getElementById('orderChatSend').addEventListener('click', () => {
+const orderChatSendBtn = document.getElementById('orderChatSend');
+if (orderChatSendBtn) {
+orderChatSendBtn.addEventListener('click', () => {
     const input = document.getElementById('orderChatInput');
     const text = input.value.trim();
     if (!text || !currentOrderChatId) return;
     const order = orders.find(o => o.id === currentOrderChatId);
     if (!order) return;
+    
     order.chat.push({
         from: 'user',
         text: text,
         time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
     });
     localStorage.setItem('joellOrders', JSON.stringify(orders));
-    broadcastChat(currentOrderChatId);
+    syncOrdersToCloud();
     input.value = '';
     renderOrderChatMessages();
-    setTimeout(() => {
-        order.chat.push({
-            from: 'admin',
-            text: 'Terima kasih! Admin akan membalas secepatnya. Mohon ditunggu ya.',
-            time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
-        });
-        localStorage.setItem('joellOrders', JSON.stringify(orders));
-        broadcastChat(currentOrderChatId);
-        if (document.getElementById('orderChatOverlay').classList.contains('open')) {
-            renderOrderChatMessages();
-        }
-    }, 2000);
 });
+}
 
-document.getElementById('orderChatInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') document.getElementById('orderChatSend').click();
-});
-
-document.getElementById('trackBtn').addEventListener('click', () => {
+// ============================================================
+//  TRACKING
+// ============================================================
+const trackBtn = document.getElementById('trackBtn');
+if (trackBtn) {
+trackBtn.addEventListener('click', () => {
     const input = document.getElementById('trackInput').value.trim();
     if (!input) { showToast('Error', 'Masukkan ID pesanan', 'error'); return; }
+    
     const order = orders.find(o => o.id === input.replace('#', ''));
     if (!order) {
         showToast('Tidak Ditemukan', 'ID pesanan tidak valid', 'error');
         return;
     }
+    
     document.getElementById('trackOrderId').textContent = '#' + order.id;
     const statusConfig = {
         'pending': { label: 'Menunggu', color: 'var(--gold)', bg: 'rgba(251,191,36,0.15)', border: 'rgba(251,191,36,0.2)' },
@@ -1078,8 +1013,10 @@ document.getElementById('trackBtn').addEventListener('click', () => {
     badge.style.background = cfg.bg;
     badge.style.color = cfg.color;
     badge.style.border = `1px solid ${cfg.border}`;
+    
     document.getElementById('trackProducts').textContent = order.items.map(i => `${i.name} (${i.variant}) x${i.qty}`).join(', ');
     document.getElementById('trackDate').textContent = new Date(order.createdAt).toLocaleString('id-ID');
+    
     const timeline = document.getElementById('trackingTimeline');
     timeline.innerHTML = order.timeline.map((t, i) => {
         const isCompleted = t.completed;
@@ -1095,18 +1032,26 @@ document.getElementById('trackBtn').addEventListener('click', () => {
             </div>
         `;
     }).join('');
-    document.getElementById('trackChatBtn').onclick = () => {
-        document.getElementById('trackResult').style.display = 'none';
-        openOrderChat(order.id);
-    };
+    
+    const trackChatBtn = document.getElementById('trackChatBtn');
+    if (trackChatBtn) {
+        trackChatBtn.onclick = () => {
+            document.getElementById('trackResult').style.display = 'none';
+            openOrderChat(order.id);
+        };
+    }
+    
     document.getElementById('trackResult').style.display = 'block';
     showToast('Tracking', 'Data pesanan ditemukan', 'success');
 });
+}
 
 // ============================================================
-//  ADMIN PANEL
+//  ADMIN PANEL SYSTEM
 // ============================================================
-document.getElementById('logoArea').addEventListener('click', () => {
+const logoArea = document.getElementById('logoArea');
+if (logoArea) {
+logoArea.addEventListener('click', () => {
     logoClickCount++;
     if (logoClickCount >= 5) {
         logoClickCount = 0;
@@ -1114,6 +1059,7 @@ document.getElementById('logoArea').addEventListener('click', () => {
     }
     setTimeout(() => { if (logoClickCount > 0) logoClickCount--; }, 2000);
 });
+}
 
 function enterAdminMode() {
     localStorage.setItem('joellCurrentPage', 'admin');
@@ -1125,19 +1071,24 @@ function enterAdminMode() {
     window.scrollTo(0,0);
 }
 
-document.getElementById('adminBackBtn').addEventListener('click', () => {
+const adminBackBtn = document.getElementById('adminBackBtn');
+if (adminBackBtn) {
+adminBackBtn.addEventListener('click', () => {
     localStorage.removeItem('joellCurrentPage');
     document.getElementById('page-admin').classList.remove('active');
     document.getElementById('page-home').classList.add('active');
-    document.getElementById('bottomNav').style.display = 'flex';
+    const bottomNav = document.getElementById('bottomNav');
+    if (bottomNav) bottomNav.style.display = 'flex';
     isAdminLoggedIn = false;
 });
+}
 
-document.getElementById('adminLoginBtn').addEventListener('click', () => {
+const adminLoginBtn = document.getElementById('adminLoginBtn');
+if (adminLoginBtn) {
+adminLoginBtn.addEventListener('click', () => {
     const input = document.getElementById('adminPasswordInput').value;
     if (input === CONFIG.adminPassword) {
         isAdminLoggedIn = true;
-        localStorage.setItem('joellAdminLoggedIn', 'true');
         document.getElementById('adminLoginView').style.display = 'none';
         document.getElementById('adminDashboardView').style.display = 'block';
         showToast('Admin', 'Login berhasil! Selamat datang, Admin.', 'success');
@@ -1147,10 +1098,7 @@ document.getElementById('adminLoginBtn').addEventListener('click', () => {
         showToast('Error', 'Password salah!', 'error');
     }
 });
-
-document.getElementById('adminPasswordInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') document.getElementById('adminLoginBtn').click();
-});
+}
 
 function updateAdminStats() {
     document.getElementById('adminStatTotal').textContent = orders.length;
@@ -1162,6 +1110,7 @@ function updateAdminStats() {
 function refreshAdminOrders() {
     const btn = document.getElementById('btnRefreshAdmin');
     if (btn) btn.querySelector('i').classList.add('fa-spin');
+    
     if (db) {
         db.ref('orders').once('value').then((snapshot) => {
             const data = snapshot.val();
@@ -1183,6 +1132,8 @@ function refreshAdminOrders() {
 
 function renderAdminOrders() {
     const container = document.getElementById('adminOrdersList');
+    if (!container) return;
+    
     if (!orders.length) {
         container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px;">Belum ada pesanan</p>';
         return;
@@ -1211,10 +1162,7 @@ function renderAdminOrders() {
                 <div style="display:flex;justify-content:space-between;align-items:center;">
                     <div style="display:flex;flex-direction:column;gap:2px;">
                         <span style="font-weight:800;color:var(--accent-light);">Rp ${o.total.toLocaleString()}</span>
-                        <div style="display:flex;flex-direction:column;gap:0px;">
-                            <span class="realtime-time" data-time="${o.createdAt}" style="font-size:0.75rem;color:var(--text-primary);font-weight:600;">${getRelativeTime(o.createdAt)}</span>
-                            <span style="font-size:0.65rem;color:var(--text-muted);">${new Date(o.createdAt).toLocaleString('id-ID', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'})}</span>
-                        </div>
+                        <span class="realtime-time" data-time="${o.createdAt}" style="font-size:0.75rem;color:var(--text-primary);font-weight:600;">${getRelativeTime(o.createdAt)}</span>
                     </div>
                     <div style="display:flex;gap:8px;">
                         <button onclick="deleteOrder('${o.id}')" style="background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;gap:6px;">
@@ -1239,8 +1187,9 @@ function updateOrderStatus(orderId, newStatus) {
     if (newStatus === 'read' && order.timeline[1]) { order.timeline[1].completed = true; order.timeline[1].time = new Date().toLocaleString('id-ID'); }
     if (newStatus === 'processing' && order.timeline[2]) { order.timeline[2].completed = true; order.timeline[2].time = new Date().toLocaleString('id-ID'); }
     if (newStatus === 'completed' && order.timeline[3]) { order.timeline[3].completed = true; order.timeline[3].time = new Date().toLocaleString('id-ID'); }
+    
     localStorage.setItem('joellOrders', JSON.stringify(orders));
-    broadcastOrders();
+    syncOrdersToCloud();
     updateAdminStats();
     showToast('Status Updated', `Order #${orderId} → ${order.statusLabel}`, 'success');
 }
@@ -1251,13 +1200,12 @@ function openAdminChat(orderId) {
     currentAdminChatId = orderId;
     document.getElementById('adminChatUserName').textContent = order.userName;
     document.getElementById('adminChatOrderId').textContent = 'Order: #' + orderId;
+    
     const userImg = document.getElementById('adminChatUserImg');
     if (userImg) {
         userImg.innerHTML = `<img src="https://ui-avatars.com/api/?name=${encodeURIComponent(order.userName)}&background=random" style="width:100%;height:100%;border-radius:50%;">`;
     }
-    if (order.chat.length > 0 && order.chat[order.chat.length - 1].from === 'user') {
-        broadcastChat(orderId);
-    }
+
     renderAdminChatMessages();
     document.getElementById('adminChatOverlay').classList.add('open');
     updateUnreadBadges();
@@ -1267,9 +1215,10 @@ function renderAdminChatMessages() {
     const order = orders.find(o => o.id === currentAdminChatId);
     if (!order) return;
     const container = document.getElementById('adminChatMessages');
+    if (!container) return;
+    
     container.innerHTML = order.chat.map(c => {
         const isAdmin = c.from === 'admin';
-        const payBtnHtml = c.paymentBtn ? `<a href="https://joell-payment.vercel.app" target="_blank" class="chat-payment-btn"><i class="fas fa-credit-card"></i> PAYMENT</a>` : '';
         const imgHtml = c.image ? `
             <div class="chat-img-container">
                 <img src="${c.image}" alt="chat-img" onclick="window.open('${c.image}', '_blank')">
@@ -1287,15 +1236,16 @@ function renderAdminChatMessages() {
                     </a>
                 </div>
             </div>` : '';
+
         const avatar = isAdmin ? 
             `<div class="chat-avatar" style="background:var(--accent);"><i class="fas fa-robot"></i></div>` : 
             `<div class="chat-avatar" style="background:var(--purple);">${order.userName.charAt(0)}</div>`;
+
         return `
             <div class="chat-row ${isAdmin ? 'user-row' : 'admin-row'}">
                 ${avatar}
                 <div class="msg ${isAdmin ? 'user' : 'admin'}">
                     ${c.text || ''}
-                    ${payBtnHtml}
                     ${imgHtml}
                     ${fileHtml}
                     <span class="time">${c.time}</span>
@@ -1309,18 +1259,21 @@ function renderAdminChatMessages() {
 async function handleAdminDocUpload(input) {
     const file = input.files[0];
     if (!file) return;
+    
     const orderId = currentAdminChatId;
     if (!orderId) {
-        showToast('Error', 'ID Pesanan tidak ditemukan. Silakan buka chat ulang.', 'error');
+        showToast('Error', 'ID Pesanan tidak ditemukan.', 'error');
         input.value = '';
         return;
     }
+    
     const orderIndex = orders.findIndex(o => o.id === orderId);
     if (orderIndex === -1) {
         showToast('Error', 'Data pesanan tidak ditemukan.', 'error');
         input.value = '';
         return;
     }
+
     if (file.size <= 500 * 1024) {
         showToast('Admin', 'Mengkonversi file ke base64...', 'info');
         try {
@@ -1334,44 +1287,48 @@ async function handleAdminDocUpload(input) {
                     fileName: file.name,
                     time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
                 };
+                
                 if (!orders[orderIndex].chat) orders[orderIndex].chat = [];
                 orders[orderIndex].chat.push(newMessage);
+                
                 localStorage.setItem('joellOrders', JSON.stringify(orders));
-                broadcastChat(orderId);
+                syncOrdersToCloud();
                 renderAdminChatMessages();
                 showToast('Berhasil', 'File berhasil dikirim (Base64)!', 'success');
             };
-            reader.onerror = function() { showToast('Error', 'Gagal membaca file.', 'error'); };
             reader.readAsDataURL(file);
         } catch (err) {
-            showToast('Error', 'Gagal memproses file: ' + err.message, 'error');
+            showToast('Error', 'Gagal memproses file.', 'error');
         } finally {
             input.value = '';
         }
         return;
     }
+
     if (file.size > 20 * 1024 * 1024) {
-        showToast('Error', 'File terlalu besar. Maksimal 20MB untuk upload eksternal.', 'error');
+        showToast('Error', 'File terlalu besar. Maksimal 20MB.', 'error');
         input.value = '';
         return;
     }
-    showToast('Admin', 'Sedang mengupload file ke server...', 'info');
+
+    showToast('Admin', 'Sedang mengupload file...', 'info');
+    
     const formData = new FormData();
     formData.append('file', file);
+    
     try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000);
         const response = await fetch('https://file.io/?expires=1w&autoDelete=false', {
             method: 'POST',
-            body: formData,
-            signal: controller.signal
+            body: formData
         });
-        clearTimeout(timeoutId);
+        
         if (!response.ok) throw new Error(`Server error: ${response.status}`);
         const result = await response.json();
+        
         if (result.success || result.link) {
             const fileUrl = result.link || result.url || result.file;
-            if (!fileUrl) throw new Error('URL file tidak ditemukan dalam response.');
+            if (!fileUrl) throw new Error('URL file tidak ditemukan.');
+            
             const newMessage = {
                 from: 'admin',
                 text: `📄 File: ${file.name}`,
@@ -1379,50 +1336,28 @@ async function handleAdminDocUpload(input) {
                 fileName: file.name,
                 time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
             };
+            
             if (!orders[orderIndex].chat) orders[orderIndex].chat = [];
             orders[orderIndex].chat.push(newMessage);
+            
             localStorage.setItem('joellOrders', JSON.stringify(orders));
-            broadcastChat(orderId);
+            syncOrdersToCloud();
             renderAdminChatMessages();
             showToast('Berhasil', 'File berhasil dikirim!', 'success');
         } else {
-            throw new Error(result.message || 'Gagal mengunggah file ke server.');
+            throw new Error(result.message || 'Gagal mengunggah file.');
         }
     } catch (error) {
         console.error("File Upload Error:", error);
-        if (file.size <= 2 * 1024 * 1024) {
-            showToast('Info', 'Server upload gagal, mencoba base64 fallback...', 'warning');
-            try {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const base64 = e.target.result;
-                    const newMessage = {
-                        from: 'admin',
-                        text: `📄 File: ${file.name}`,
-                        file: base64,
-                        fileName: file.name,
-                        time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
-                    };
-                    if (!orders[orderIndex].chat) orders[orderIndex].chat = [];
-                    orders[orderIndex].chat.push(newMessage);
-                    localStorage.setItem('joellOrders', JSON.stringify(orders));
-                    broadcastChat(orderId);
-                    renderAdminChatMessages();
-                    showToast('Berhasil', 'File berhasil dikirim (Base64 Fallback)!', 'success');
-                };
-                reader.readAsDataURL(file);
-            } catch (fbErr) {
-                showToast('Error', 'Fallback juga gagal: ' + fbErr.message, 'error');
-            }
-        } else {
-            showToast('Error', 'Gagal upload: ' + error.message + '. File >2MB tidak bisa fallback ke base64.', 'error', 5000);
-        }
+        showToast('Error', 'Gagal upload: ' + error.message, 'error', 5000);
     } finally {
         input.value = '';
     }
 }
 
-document.getElementById('adminChatSend').addEventListener('click', () => {
+const adminChatSendBtn = document.getElementById('adminChatSend');
+if (adminChatSendBtn) {
+adminChatSendBtn.addEventListener('click', () => {
     const input = document.getElementById('adminChatInput');
     const text = input.value.trim();
     if (!text || !currentAdminChatId) return;
@@ -1434,344 +1369,85 @@ document.getElementById('adminChatSend').addEventListener('click', () => {
         time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
     });
     localStorage.setItem('joellOrders', JSON.stringify(orders));
-    broadcastChat(currentAdminChatId);
+    syncOrdersToCloud();
     input.value = '';
     renderAdminChatMessages();
     showToast('Chat', 'Balasan terkirim ke pelanggan', 'success');
 });
+}
 
-document.getElementById('adminChatInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') document.getElementById('adminChatSend').click();
-});
-
-// ============================================================
-//  CHAT FILE UPLOAD (GAMBAR)
-// ============================================================
-async function handleChatFileUpload(input, senderType) {
+function handleChatFileUpload(input, senderType) {
     const file = input.files[0];
     if (!file) return;
+
     if (file.size > 10 * 1024 * 1024) {
         showToast('Error', 'Gambar terlalu besar (Maks 10MB)', 'error');
         input.value = '';
         return;
     }
+
     const orderId = senderType === 'user' ? currentOrderChatId : currentAdminChatId;
     if (!orderId) {
         showToast('Error', 'Sesi chat tidak ditemukan.', 'error');
         input.value = '';
         return;
     }
+
     const orderIndex = orders.findIndex(o => o.id === orderId);
     if (orderIndex === -1) {
         showToast('Error', 'Data pesanan tidak ditemukan.', 'error');
         input.value = '';
         return;
     }
+
     showToast('Chat', 'Sedang mengirim gambar...', 'info');
+
     const formData = new FormData();
     formData.append('image', file);
+
     try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000);
-        const response = await fetch('https://api.imgur.com/3/image', {
+        fetch('https://api.imgur.com/3/image', {
             method: 'POST',
             headers: { 'Authorization': 'Client-ID ' + CONFIG.imgurClientId },
-            body: formData,
-            signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const result = await response.json();
-        if (result.success && result.data && result.data.link) {
-            const newMessage = {
-                from: senderType,
-                text: '',
-                image: result.data.link,
-                time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
-            };
-            if (!orders[orderIndex].chat) orders[orderIndex].chat = [];
-            orders[orderIndex].chat.push(newMessage);
-            localStorage.setItem('joellOrders', JSON.stringify(orders));
-            broadcastChat(orderId);
-            if (senderType === 'user') renderOrderChatMessages();
-            else renderAdminChatMessages();
-            showToast('Berhasil', 'Gambar berhasil dikirim!', 'success');
-        } else {
-            throw new Error('Gagal mendapatkan link gambar dari Imgur.');
-        }
-    } catch (error) {
-        console.error("Image Upload Error:", error);
-        if (file.size <= 2 * 1024 * 1024) {
-            showToast('Info', 'Imgur gagal, mencoba base64 fallback...', 'warning');
-            try {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const base64 = e.target.result;
-                    const newMessage = {
-                        from: senderType,
-                        text: '',
-                        image: base64,
-                        time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
-                    };
-                    if (!orders[orderIndex].chat) orders[orderIndex].chat = [];
-                    orders[orderIndex].chat.push(newMessage);
-                    localStorage.setItem('joellOrders', JSON.stringify(orders));
-                    broadcastChat(orderId);
-                    if (senderType === 'user') renderOrderChatMessages();
-                    else renderAdminChatMessages();
-                    showToast('Berhasil', 'Gambar berhasil dikirim (Base64)!', 'success');
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+        })
+        .then(result => {
+            if (result.success && result.data && result.data.link) {
+                const newMessage = {
+                    from: senderType,
+                    text: '',
+                    image: result.data.link,
+                    time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
                 };
-                reader.readAsDataURL(file);
-            } catch (fbErr) {
-                showToast('Error', 'Fallback juga gagal: ' + fbErr.message, 'error');
+
+                if (!orders[orderIndex].chat) orders[orderIndex].chat = [];
+                orders[orderIndex].chat.push(newMessage);
+
+                localStorage.setItem('joellOrders', JSON.stringify(orders));
+                syncOrdersToCloud();
+
+                if (senderType === 'user') renderOrderChatMessages();
+                else renderAdminChatMessages();
+
+                showToast('Berhasil', 'Gambar berhasil dikirim!', 'success');
+            } else {
+                throw new Error('Gagal mendapatkan link gambar.');
             }
-        } else {
-            showToast('Error', 'Gagal kirim gambar: ' + error.message + '. Gambar >2MB tidak bisa fallback.', 'error', 5000);
-        }
+        })
+        .catch(error => {
+            console.error("Image Upload Error:", error);
+            showToast('Error', 'Gagal kirim gambar: ' + error.message, 'error', 5000);
+        });
+    } catch (error) {
+        showToast('Error', 'Gagal kirim gambar: ' + error.message, 'error', 5000);
     } finally {
         input.value = '';
     }
 }
-
-// ============================================================
-//  ANIME
-// ============================================================
-async function getLatestAnime() {
-    try {
-        const res = await fetch('https://api.jikan.moe/v4/seasons/now?limit=10');
-        const data = await res.json();
-        return data.data || [];
-    } catch { return []; }
-}
-async function getUpcomingAnime() {
-    try {
-        const res = await fetch('https://api.jikan.moe/v4/seasons/upcoming?limit=10');
-        const data = await res.json();
-        return data.data || [];
-    } catch { return []; }
-}
-
-function renderAnimeList(list, containerId) {
-    const container = document.getElementById(containerId);
-    if (!list.length) {
-        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px;">Tidak ada data</p>';
-        return;
-    }
-    container.innerHTML = list.map(anime => {
-        const title = anime.title || 'Unknown';
-        const image = anime.images?.jpg?.image_url || '';
-        const score = anime.score || 'N/A';
-        const episodes = anime.episodes || '?';
-        const type = anime.type || 'TV';
-        return `
-            <div class="anime-card">
-                <div class="poster">${image ? `<img src="${image}" alt="${title}" loading="lazy">` : '<div class="fallback"><i class="fas fa-film"></i></div>'}</div>
-                <div class="info">
-                    <div class="title">${title}</div>
-                    <div class="meta">
-                        <span class="badge episode-badge"><i class="fas fa-play-circle"></i> EP${episodes}</span>
-                        <span class="badge"><i class="fas fa-tv"></i> ${type}</span>
-                    </div>
-                    <div class="rating">
-                        <span class="score"><i class="fas fa-star"></i> ${score}</span>
-                    </div>
-                    <button class="btn-watch" onclick="window.open('https://www.google.com/search?q=nonton+${encodeURIComponent(title)}+streaming+sub+indo','_blank')">
-                        <i class="fas fa-play"></i> Nonton
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-async function loadAnime() {
-    const [latest, upcoming] = await Promise.all([getLatestAnime(), getUpcomingAnime()]);
-    renderAnimeList(latest, 'animeLatest');
-    renderAnimeList(upcoming, 'animeUpcoming');
-}
-
-function openAnime() {
-    document.getElementById('animeOverlay').classList.add('open');
-    loadAnime();
-}
-
-// ============================================================
-//  BOT CONTROLLER
-// ============================================================
-(function() {
-    const tokenInput = document.getElementById('botTokenInput');
-    const checkBtn = document.getElementById('botCheckBtn');
-    const statusBox = document.getElementById('botStatusBox');
-    const panel = document.getElementById('botPanelKontrol');
-    const logArea = document.getElementById('botLogArea');
-    let currentToken = '', currentChatId = null;
-
-    function addLog(type, text) {
-        const time = new Date().toLocaleTimeString('id-ID', {hour12:false});
-        const colors = { INFO: 'bot-term-info', SUCCESS: 'bot-term-success', ERROR: 'bot-term-error', WARN: 'bot-term-warn' };
-        logArea.innerHTML += `<div class="bot-terminal-line"><span class="bot-term-time">[${time}]</span><span class="${colors[type]||'bot-term-info'}">[${type}]</span><span class="bot-term-text">${text}</span></div>`;
-        logArea.scrollTop = logArea.scrollHeight;
-    }
-
-    async function botCheck(token) {
-        try {
-            const res = await fetch(`https://api.telegram.org/bot${token}/getMe`);
-            const data = await res.json();
-            return data.ok ? { valid: true, bot: data.result } : { valid: false, error: data.description };
-        } catch { return { valid: false, error: 'Network error' }; }
-    }
-
-    checkBtn.addEventListener('click', async () => {
-        const token = tokenInput.value.trim();
-        if (!token) { statusBox.className = 'bot-status-banner error'; statusBox.innerHTML = '<span>Token diperlukan</span>'; statusBox.classList.remove('hidden'); return; }
-        statusBox.className = 'bot-status-banner info'; statusBox.innerHTML = '<span><i class="fas fa-spinner fa-spin"></i> Menghubungkan...</span>'; statusBox.classList.remove('hidden');
-        const result = await botCheck(token);
-        if (!result.valid) {
-            statusBox.className = 'bot-status-banner error'; statusBox.innerHTML = `<span>Gagal: ${result.error}</span>`;
-            panel.classList.add('hidden');
-            return;
-        }
-        currentToken = token;
-        document.getElementById('botName').textContent = result.bot.first_name || 'Bot';
-        document.getElementById('botId').textContent = result.bot.id;
-        statusBox.className = 'bot-status-banner success'; statusBox.innerHTML = '<span><i class="fas fa-check-circle"></i> Terhubung!</span>';
-        panel.classList.remove('hidden');
-        addLog('SUCCESS', 'Bot terautentikasi');
-    });
-
-    document.getElementById('botKirimBtn').addEventListener('click', async () => {
-        const text = document.getElementById('botPesanInput').value.trim();
-        if (!text) { addLog('ERROR', 'Pesan kosong'); return; }
-        if (!currentToken) { addLog('ERROR', 'Belum terhubung'); return; }
-        addLog('INFO', 'Mengirim pesan...');
-        try {
-            const form = new FormData();
-            form.append('chat_id', currentChatId || '123456789');
-            form.append('text', text);
-            const res = await fetch(`https://api.telegram.org/bot${currentToken}/sendMessage`, { method: 'POST', body: form });
-            const data = await res.json();
-            if (data.ok) { addLog('SUCCESS', 'Pesan terkirim'); document.getElementById('botPesanInput').value = ''; }
-            else { addLog('ERROR', data.description); }
-        } catch { addLog('ERROR', 'Gagal mengirim'); }
-    });
-})();
-
-// ============================================================
-//  OSINT
-// ============================================================
-(function() {
-    const queryBtn = document.getElementById('osintQueryBtn');
-    queryBtn.addEventListener('click', async () => {
-        const phone = document.getElementById('osintPhone').value.trim();
-        const endpoint = document.getElementById('osintEndpoint').value;
-        if (!phone) { showToast('Error', 'Masukkan nomor telepon', 'error'); return; }
-        queryBtn.disabled = true; queryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-        document.getElementById('osintResult').classList.remove('hidden');
-        document.getElementById('osintResultPre').textContent = 'Mengirim request...';
-        try {
-            const clean = phone.replace(/[^0-9]/g, '');
-            let url = 'https://whatsapp-osint.p.rapidapi.com' + endpoint;
-            const headers = { 'x-rapidapi-key': CONFIG.osintApiKey, 'x-rapidapi-host': 'whatsapp-osint.p.rapidapi.com' };
-            const options = { method: 'GET', headers };
-            if (endpoint === '/bizos') {
-                options.method = 'POST';
-                options.headers['Content-Type'] = 'application/json';
-                options.body = JSON.stringify({ phone: clean });
-            } else { url += '?phone=' + clean; }
-            const res = await fetch(url, options);
-            const data = await res.json();
-            document.getElementById('osintResultPre').textContent = JSON.stringify(data, null, 2);
-        } catch (e) {
-            document.getElementById('osintResultPre').textContent = 'Error: ' + e.message;
-        } finally {
-            queryBtn.disabled = false;
-            queryBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Jalankan Query';
-        }
-    });
-})();
-
-// ============================================================
-//  SSWEB (Screenshot) - Menggunakan API Key yang diberikan
-// ============================================================
-(function() {
-    document.getElementById('sswebBtn').addEventListener('click', async () => {
-        const url = document.getElementById('sswebUrl').value.trim();
-        const result = document.getElementById('sswebResult');
-        if (!url) { result.innerHTML = '<div class="error">Masukkan URL</div>'; return; }
-        let finalUrl;
-        try { finalUrl = new URL(url); } catch { try { finalUrl = new URL('https://' + url); } catch { result.innerHTML = '<div class="error">URL tidak valid</div>'; return; } }
-        result.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Mengambil screenshot...</div>';
-        try {
-            const apiKey = CONFIG.screenshotApiKey;
-            const apiUrl = `https://api.screenshotmachine.com/?key=${apiKey}&url=${encodeURIComponent(finalUrl.href)}&dimension=1024x768&cacheLimit=0`;
-            const res = await fetch(apiUrl);
-            if (res.ok) {
-                const blob = await res.blob();
-                const reader = new FileReader();
-                reader.onload = () => {
-                    result.innerHTML = `<img src="${reader.result}" alt="screenshot" loading="lazy"><div style="margin-top:12px;display:flex;gap:10px;"><a href="${reader.result}" download="screenshot.png" class="btn-download-ss"><i class="fas fa-download"></i> Download</a><button onclick="window.open('${reader.result}','_blank')" class="btn-open-ss"><i class="fas fa-external-link-alt"></i> Buka</button></div>`;
-                };
-                reader.readAsDataURL(blob);
-            } else {
-                throw new Error('Gagal');
-            }
-        } catch {
-            result.innerHTML = '<div class="error">Gagal mengambil screenshot. Coba lagi.</div>';
-        }
-    });
-})();
-
-// ============================================================
-//  UPLOAD
-// ============================================================
-(function() {
-    const dropzone = document.getElementById('uploadDropzone');
-    const fileInput = document.getElementById('uploadFileInput');
-    let selectedFile = null;
-
-    dropzone.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (e) => { if (e.target.files[0]) { selectedFile = e.target.files[0]; updateDropzone(); } });
-    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
-    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
-    dropzone.addEventListener('drop', (e) => {
-        e.preventDefault(); dropzone.classList.remove('dragover');
-        if (e.dataTransfer.files[0]) { selectedFile = e.dataTransfer.files[0]; fileInput.files = e.dataTransfer.files; updateDropzone(); }
-    });
-
-    function updateDropzone() {
-        dropzone.innerHTML = `<i class="fas fa-file-image" style="color:var(--accent-light);"></i><p style="font-weight:700;color:var(--text-primary);">${selectedFile.name}</p><span class="file-types">${(selectedFile.size/1024/1024).toFixed(2)} MB</span>`;
-    }
-
-    document.getElementById('uploadBtn').addEventListener('click', async () => {
-        if (!selectedFile) { showToast('Error', 'Pilih file dulu', 'error'); return; }
-        if (selectedFile.size > 10 * 1024 * 1024) { showToast('Error', 'Maksimal 10MB', 'error'); return; }
-        const progressDiv = document.getElementById('uploadProgress');
-        const progressFill = document.getElementById('uploadProgressFill');
-        progressDiv.style.display = 'block';
-        const formData = new FormData();
-        formData.append('image', selectedFile);
-        try {
-            const res = await fetch('https://api.imgur.com/3/image', {
-                method: 'POST',
-                headers: { 'Authorization': 'Client-ID ' + CONFIG.imgurClientId },
-                body: formData
-            });
-            const json = await res.json();
-            if (json.success && json.data?.link) {
-                document.getElementById('uploadResultLink').value = json.data.link;
-                document.getElementById('uploadResult').style.display = 'block';
-                document.getElementById('uploadPreview').innerHTML = `<img src="${json.data.link}" alt="preview">`;
-                progressFill.style.width = '100%';
-                showToast('Upload', 'Berhasil upload!', 'success');
-            } else { throw new Error('Gagal'); }
-        } catch { showToast('Error', 'Gagal upload', 'error'); }
-    });
-
-    document.getElementById('uploadCopyBtn').addEventListener('click', () => {
-        const link = document.getElementById('uploadResultLink').value;
-        if (link) navigator.clipboard.writeText(link).then(() => showToast('Copied', 'Link disalin!', 'success'));
-    });
-})();
 
 // ============================================================
 //  NAVIGATION
@@ -1782,6 +1458,7 @@ function navigateTo(page) {
         return;
     }
     localStorage.setItem('joellCurrentPage', page);
+
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById('page-' + page);
@@ -1789,8 +1466,10 @@ function navigateTo(page) {
     document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
         item.classList.toggle('active', item.dataset.page === page);
     });
-    document.getElementById('cartOverlay').classList.remove('open');
-    document.getElementById('bottomNav').style.display = 'flex';
+    const cartOverlay = document.getElementById('cartOverlay');
+    if (cartOverlay) cartOverlay.classList.remove('open');
+    const bottomNav = document.getElementById('bottomNav');
+    if (bottomNav) bottomNav.style.display = 'flex';
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (page === 'orders') renderOrdersList();
     if (page === 'profile') renderProfilePage();
@@ -1800,12 +1479,17 @@ function renderProfilePage() {
     const userView = document.getElementById('userProfileView');
     const guestView = document.getElementById('guestProfileView');
     if (currentUser) {
-        userView.style.display = 'block'; guestView.style.display = 'none';
-        document.getElementById('userProfileImg').src = currentUser.picture;
-        document.getElementById('userProfileName').textContent = currentUser.name;
-        document.getElementById('userProfileEmail').textContent = currentUser.email;
+        if (userView) userView.style.display = 'block';
+        if (guestView) guestView.style.display = 'none';
+        const userProfileImg = document.getElementById('userProfileImg');
+        if (userProfileImg) userProfileImg.src = currentUser.picture;
+        const userProfileName = document.getElementById('userProfileName');
+        if (userProfileName) userProfileName.textContent = currentUser.name;
+        const userProfileEmail = document.getElementById('userProfileEmail');
+        if (userProfileEmail) userProfileEmail.textContent = currentUser.email;
         const userOrders = orders.filter(o => o.userId === currentUser.id);
-        document.getElementById('statOrderCount').textContent = userOrders.length;
+        const statOrderCount = document.getElementById('statOrderCount');
+        if (statOrderCount) statOrderCount.textContent = userOrders.length;
         document.getElementById('btnProfileLogoutPage').onclick = () => {
             if (confirm('Apakah Anda yakin ingin keluar?')) {
                 currentUser = null; localStorage.removeItem('joellUser');
@@ -1814,7 +1498,8 @@ function renderProfilePage() {
             }
         };
     } else {
-        userView.style.display = 'none'; guestView.style.display = 'block';
+        if (userView) userView.style.display = 'none';
+        if (guestView) guestView.style.display = 'block';
     }
 }
 
@@ -1825,29 +1510,43 @@ function doSearch() {
     const cats = ['hosting', 'script', 'topup'];
     cats.forEach(cat => {
         const filtered = products.filter(p => {
-            const matchCat = currentFilter === 'all' || p.category === currentFilter;
             const matchText = p.name.toLowerCase().includes(keyword) || p.desc.toLowerCase().includes(keyword);
-            return p.category === cat && matchCat && matchText;
+            return p.category === cat && matchText;
         });
-        document.getElementById('grid' + cat.charAt(0).toUpperCase() + cat.slice(1)).innerHTML = renderMenuCards(filtered);
+        const grid = document.getElementById('grid' + cat.charAt(0).toUpperCase() + cat.slice(1));
+        if (grid) grid.innerHTML = renderMenuCards(filtered);
     });
-    navigateTo('home');
 }
 
-document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
+// ============================================================
+//  EVENT LISTENERS - NAVIGATION
+// ============================================================
+const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+if (navItems.length > 0) {
+navItems.forEach(btn => {
     btn.addEventListener('click', (e) => {
         e.preventDefault();
         const page = btn.dataset.page;
-        if (page === 'cart') { document.getElementById('cartOverlay').classList.toggle('open'); return; }
+        if (page === 'cart') {
+            const cartOverlay = document.getElementById('cartOverlay');
+            if (cartOverlay) cartOverlay.classList.toggle('open');
+            return;
+        }
         if (page) {
             localStorage.setItem('joellCurrentPage', page);
             navigateTo(page);
         }
     });
 });
+}
 
-document.getElementById('cartCloseBtn').addEventListener('click', () => document.getElementById('cartOverlay').classList.remove('open'));
-document.getElementById('cartOverlay').addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('open'); });
+const cartCloseBtn = document.getElementById('cartCloseBtn');
+if (cartCloseBtn) {
+cartCloseBtn.addEventListener('click', () => {
+    const cartOverlay = document.getElementById('cartOverlay');
+    if (cartOverlay) cartOverlay.classList.remove('open');
+});
+}
 
 document.querySelectorAll('.grid-menu').forEach(grid => {
     grid.addEventListener('click', (e) => {
@@ -1856,94 +1555,64 @@ document.querySelectorAll('.grid-menu').forEach(grid => {
         const id = parseInt(card.dataset.id);
         const product = products.find(p => p.id === id);
         if (!product) return;
-        if (product.isUpload) { document.getElementById('uploadOverlay').classList.add('open'); return; }
-        if (product.isSsweb) { document.getElementById('sswebOverlay').classList.add('open'); return; }
-        if (product.isOsint) { document.getElementById('osintOverlay').classList.add('open'); return; }
-        if (product.isTopup) { document.getElementById('topupOverlay').classList.add('open'); return; }
-        if (product.isAnime) { openAnime(); return; }
-        if (product.isBotController) { document.getElementById('botControllerOverlay').classList.add('open'); return; }
+        if (product.isTopup) { 
+            const el = document.getElementById('topupOverlay'); 
+            if (el) el.classList.add('open'); 
+            return; 
+        }
         openDetail(id);
     });
 });
 
 document.querySelectorAll('.detail-close, .modal-close').forEach(btn => {
-    btn.addEventListener('click', () => btn.closest('.detail-overlay, .modal-overlay').classList.remove('open'));
-});
-document.querySelectorAll('.detail-overlay, .modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
-});
-
-document.querySelectorAll('.anime-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-        document.querySelectorAll('.anime-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById('animeLatest').style.display = tab.dataset.tab === 'latest' ? 'block' : 'none';
-        document.getElementById('animeUpcoming').style.display = tab.dataset.tab === 'upcoming' ? 'block' : 'none';
+    btn.addEventListener('click', () => {
+        const parent = btn.closest('.detail-overlay, .modal-overlay');
+        if (parent) parent.classList.remove('open');
     });
 });
 
-document.getElementById('animeSearchBtn').addEventListener('click', async () => {
-    const query = document.getElementById('animeInput').value.trim();
-    if (!query) return;
-    document.getElementById('animeResult').innerHTML = '<p style="color:var(--text-muted);text-align:center;"><i class="fas fa-spinner fa-spin"></i> Mencari...</p>';
-    try {
-        const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=6`);
-        const data = await res.json();
-        if (data.data?.length) {
-            const container = document.createElement('div');
-            container.className = 'anime-list';
-            container.id = 'animeSearchResult';
-            renderAnimeList(data.data, 'animeSearchResult');
-            document.getElementById('animeResult').innerHTML = '';
-            document.getElementById('animeResult').appendChild(container);
-        } else {
-            document.getElementById('animeResult').innerHTML = '<p style="color:var(--text-muted);text-align:center;">Tidak ditemukan</p>';
-        }
-    } catch {
-        document.getElementById('animeResult').innerHTML = '<p style="color:var(--red);text-align:center;">Gagal mengambil data</p>';
-    }
-});
-
-document.querySelectorAll('.bot-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-        document.querySelectorAll('.bot-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById('botViewController').classList.toggle('hidden', tab.dataset.tab !== 'controller');
-        document.getElementById('botViewLibrary').classList.toggle('hidden', tab.dataset.tab !== 'library');
-    });
-});
-
-// Video sound toggle
+// ============================================================
+//  VIDEO & BACK TO TOP
+// ============================================================
 (function() {
     const video = document.getElementById('heroVideo');
     const toggle = document.getElementById('soundToggle');
-    const icon = toggle.querySelector('i');
-    let muted = true;
-    video.muted = true;
-    toggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        muted = !muted;
-        video.muted = muted;
-        icon.className = muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
-        toggle.classList.toggle('unmuted', !muted);
-    });
+    if (video && toggle) {
+        const icon = toggle.querySelector('i');
+        let muted = true;
+        video.muted = true;
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            muted = !muted;
+            video.muted = muted;
+            icon.className = muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+            toggle.classList.toggle('unmuted', !muted);
+        });
+    }
 })();
 
-// Back to top
 const backToTop = document.getElementById('backToTop');
+if (backToTop) {
 window.addEventListener('scroll', () => {
     backToTop.classList.toggle('visible', window.scrollY > 300);
 });
 backToTop.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 });
+}
 
+// ============================================================
+//  ESCAPE KEY
+// ============================================================
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         document.querySelectorAll('.detail-overlay.open, .modal-overlay.open, .cart-overlay.open').forEach(el => el.classList.remove('open'));
     }
 });
 
+// ============================================================
+//  REAL-TIME TIME UPDATER
+// ============================================================
 setInterval(() => {
     document.querySelectorAll('.realtime-time').forEach(el => {
         const timestamp = parseInt(el.dataset.time);
@@ -1951,9 +1620,42 @@ setInterval(() => {
     });
 }, 60000);
 
-// Init
-updateUserUI();
-renderTopupGames();
-renderMenus();
-updateCartUI();
-showToast('Selamat Datang', 'JOELL SHOP siap melayani!', 'success', 4000);
+// ============================================================
+//  INIT
+// ============================================================
+try {
+    updateUserUI();
+    renderTopupGames();
+    renderMenus();
+    updateCartUI();
+    showToast('Selamat Datang', 'JOELL SHOP siap melayani!', 'success', 4000);
+} catch(e) {
+    console.warn('Init error:', e);
+}
+
+// ============================================================
+//  FUNGSI UNTUK MEMISAHKAN WITHDRAW DARI PAYMENT
+// ============================================================
+window.closePaymentAndOpenWithdraw = function() {
+    const paymentOverlay = document.getElementById('paymentOverlay');
+    if (paymentOverlay) {
+        paymentOverlay.classList.remove('open');
+    }
+    if (typeof navigateTo === 'function') {
+        navigateTo('profile');
+    } else {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const profilePage = document.getElementById('page-profile');
+        if (profilePage) profilePage.classList.add('active');
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(function(item) {
+            item.classList.remove('active');
+            if (item.dataset.page === 'profile') item.classList.add('active');
+        });
+    }
+    setTimeout(() => {
+        const withdrawSection = document.querySelector('.withdraw-section-in-profile');
+        if (withdrawSection) {
+            withdrawSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 500);
+};
