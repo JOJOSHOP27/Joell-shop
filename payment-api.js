@@ -1,8 +1,3 @@
-// ============================================================
-// PAYMENT API - LZPedia Integration (FIXED v3.0 - Privacy Focused)
-// API Key: LXZ_6d2cebe4c33643b0
-// ============================================================
-
 const PAYMENT_API = {
     config: {
         apiKey: 'LXZ_6d2cebe4c33643b0',
