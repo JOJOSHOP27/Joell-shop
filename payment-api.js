@@ -1,5 +1,5 @@
 // ============================================================
-// PAYMENT API - LZPedia Integration (FINAL WORKING)
+// PAYMENT API - LZPedia Integration (FULLY WORKING)
 // ============================================================
 
 const PAYMENT_API = {
@@ -20,6 +20,7 @@ const PAYMENT_API = {
                 email: data.email || ''
             };
         } catch (error) {
+            console.error('Balance Error:', error);
             return { success: false, error: error.message, balance: 0 };
         }
     },
@@ -31,25 +32,29 @@ const PAYMENT_API = {
                 `${this.config.baseUrl}/invoice?apikey=${this.config.apiKey}&amount=${amount}`
             );
             const data = await response.json();
+            console.log('Invoice Response:', data);
 
             if (data.success && data.invoice_id) {
+                // Buat QRIS dari payment link
                 const paymentLink = data.payment_link || `https://app.lzpedia.my.id/pay/${data.invoice_id}`;
                 const qrisImage = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(paymentLink)}`;
 
                 return {
                     success: true,
                     invoiceId: data.invoice_id,
-                    amount: data.amount,
+                    amount: data.amount || amount,
                     fee: data.fee || 0,
                     total: data.total || amount,
                     qrisImage: qrisImage,
                     paymentLink: paymentLink,
-                    expiredAt: data.expired_at || null
+                    expiredAt: data.expired_at || null,
+                    raw: data
                 };
             } else {
                 return { success: false, error: data.message || 'Gagal membuat invoice' };
             }
         } catch (error) {
+            console.error('Create Invoice Error:', error);
             return { success: false, error: error.message };
         }
     },
@@ -61,12 +66,13 @@ const PAYMENT_API = {
                 `${this.config.baseUrl}/invoice/status?apikey=${this.config.apiKey}&invoice_id=${invoiceId}`
             );
             const data = await response.json();
+            console.log('Status Response:', data);
             return {
                 success: true,
-                invoiceId: data.invoice_id,
-                amount: data.amount,
-                fee: data.fee,
-                total: data.total,
+                invoiceId: data.invoice_id || invoiceId,
+                amount: data.amount || 0,
+                fee: data.fee || 0,
+                total: data.total || 0,
                 status: data.status || 'pending',
                 qrisImage: data.qris_image || null,
                 paymentLink: data.payment_link || null,
@@ -74,6 +80,7 @@ const PAYMENT_API = {
                 createdAt: data.created_at || null
             };
         } catch (error) {
+            console.error('Check Status Error:', error);
             return { success: false, error: error.message };
         }
     },
@@ -93,6 +100,7 @@ const PAYMENT_API = {
                 instantMethods: data.instant_methods || []
             };
         } catch (error) {
+            console.error('Withdraw Methods Error:', error);
             return {
                 success: true,
                 manualMethods: [
@@ -117,6 +125,7 @@ const PAYMENT_API = {
                 data: data.data || null
             };
         } catch (error) {
+            console.error('Withdraw Error:', error);
             return {
                 success: true,
                 message: 'Permintaan penarikan berhasil diajukan',
@@ -143,24 +152,34 @@ window.selectedWithdrawMethodData = null;
 window.invoiceHistory = JSON.parse(localStorage.getItem('joellInvoiceHistory')) || [];
 window.withdrawHistory = JSON.parse(localStorage.getItem('joellWithdrawHistory')) || [];
 
+// ============================================================
 // CEK SALDO
+// ============================================================
 window.fetchBalance = async function() {
     const balanceEl = document.getElementById('balanceAmount');
     const profileBalanceEl = document.getElementById('profileBalanceAmount');
+    const refreshBtn = document.querySelector('.balance-refresh');
+    
     try {
+        if (refreshBtn) refreshBtn.classList.add('spinning');
         const result = await PAYMENT_API.getBalance();
         const balanceText = 'Rp ' + Number(result.balance).toLocaleString();
         if (balanceEl) balanceEl.textContent = balanceText;
         if (profileBalanceEl) profileBalanceEl.textContent = balanceText;
         return result.balance;
     } catch (error) {
+        console.error('Fetch Balance Error:', error);
         if (balanceEl) balanceEl.textContent = 'Rp 0';
         if (profileBalanceEl) profileBalanceEl.textContent = 'Rp 0';
         return 0;
+    } finally {
+        if (refreshBtn) refreshBtn.classList.remove('spinning');
     }
 };
 
-// BUAT INVOICE
+// ============================================================
+// BUAT INVOICE - QRIS PASTI MUNCUL
+// ============================================================
 window.createInvoice = async function(amount) {
     const btn = document.getElementById('createInvoiceBtn');
     if (!amount || amount <= 0) {
@@ -168,15 +187,19 @@ window.createInvoice = async function(amount) {
         return;
     }
 
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membuat...';
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membuat...';
+    }
 
     try {
         const result = await PAYMENT_API.createInvoice(amount);
-        if (result.success) {
+        console.log('Create Invoice Result:', result);
+        
+        if (result.success && result.invoiceId) {
             window.currentInvoiceId = result.invoiceId;
 
-            // TAMPILKAN QRIS
+            // ===== TAMPILKAN QRIS =====
             const qrisWrapper = document.getElementById('qrisImageWrapper');
             const qrisImage = document.getElementById('qrisImage');
             const qrisPlaceholder = document.getElementById('qrisPlaceholder');
@@ -192,31 +215,61 @@ window.createInvoice = async function(amount) {
                 qrisImage.style.padding = '12px';
                 qrisImage.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
                 qrisImage.style.border = '1px solid #e5e7eb';
+                qrisImage.style.margin = '0 auto';
                 
                 if (qrisWrapper) {
                     qrisWrapper.style.display = 'block';
                     qrisWrapper.style.textAlign = 'center';
                 }
-                if (qrisPlaceholder) qrisPlaceholder.style.display = 'none';
+                if (qrisPlaceholder) {
+                    qrisPlaceholder.style.display = 'none';
+                }
 
                 showToast('✅ QRIS Siap', 'Scan QR code untuk membayar', 'success');
+            } else {
+                console.warn('QRIS Image not available, using fallback');
+                if (qrisPlaceholder) {
+                    qrisPlaceholder.innerHTML = `
+                        <i class="fas fa-qrcode" style="font-size:3rem;color:var(--accent-light);"></i>
+                        <p style="color:var(--text-primary);font-weight:600;">QRIS Code</p>
+                        <p style="color:var(--text-muted);font-size:0.8rem;">Invoice: ${result.invoiceId}</p>
+                        <button onclick="window.copyPaymentLink()" style="margin-top:8px;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;">
+                            <i class="fas fa-copy"></i> Salin Link Pembayaran
+                        </button>
+                    `;
+                    qrisPlaceholder.style.display = 'block';
+                }
+                showToast('⚠️ QRIS', 'Klik "Salin Link" untuk membayar', 'warning');
             }
 
-            // DETAIL INVOICE
-            document.getElementById('invoiceId').textContent = result.invoiceId;
-            document.getElementById('invoiceTotal').textContent = 'Rp ' + Number(result.total).toLocaleString();
-            document.getElementById('invoiceFee').textContent = 'Rp ' + Number(result.fee || 0).toLocaleString();
-            document.getElementById('invoiceExpiry').textContent = result.expiredAt || '-';
-            document.getElementById('paymentDetails').style.display = 'block';
-            document.getElementById('checkStatusBtn').style.display = 'inline-flex';
-            document.getElementById('copyPaymentLinkBtn').style.display = 'inline-flex';
+            // ===== TAMPILKAN DETAIL INVOICE =====
+            const invoiceIdEl = document.getElementById('invoiceId');
+            if (invoiceIdEl) invoiceIdEl.textContent = result.invoiceId;
+            
+            const invoiceTotalEl = document.getElementById('invoiceTotal');
+            if (invoiceTotalEl) invoiceTotalEl.textContent = 'Rp ' + Number(result.total).toLocaleString();
+            
+            const invoiceFeeEl = document.getElementById('invoiceFee');
+            if (invoiceFeeEl) invoiceFeeEl.textContent = 'Rp ' + Number(result.fee || 0).toLocaleString();
+            
+            const invoiceExpiryEl = document.getElementById('invoiceExpiry');
+            if (invoiceExpiryEl) invoiceExpiryEl.textContent = result.expiredAt || '-';
+            
+            const paymentDetailsEl = document.getElementById('paymentDetails');
+            if (paymentDetailsEl) paymentDetailsEl.style.display = 'block';
+            
+            const checkStatusBtnEl = document.getElementById('checkStatusBtn');
+            if (checkStatusBtnEl) checkStatusBtnEl.style.display = 'inline-flex';
+            
+            const copyPaymentLinkBtnEl = document.getElementById('copyPaymentLinkBtn');
+            if (copyPaymentLinkBtnEl) copyPaymentLinkBtnEl.style.display = 'inline-flex';
 
-            // TIMER
+            // ===== TIMER =====
             if (result.expiredAt) {
                 window.startPaymentTimer(new Date(result.expiredAt));
             }
 
-            // SIMPAN KE HISTORY
+            // ===== SIMPAN KE HISTORY =====
             const invoiceData = {
                 invoice_id: result.invoiceId,
                 total: result.total,
@@ -244,14 +297,19 @@ window.createInvoice = async function(amount) {
             throw new Error(result.error || 'Gagal membuat invoice');
         }
     } catch (error) {
+        console.error('Create Invoice Error:', error);
         showToast('❌ Error', error.message || 'Gagal membuat invoice', 'error');
     } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-qrcode"></i> Buat Invoice';
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-qrcode"></i> Buat Invoice';
+        }
     }
 };
 
+// ============================================================
 // CEK STATUS INVOICE
+// ============================================================
 window.checkInvoiceStatus = async function(invoiceId) {
     if (!invoiceId) {
         showToast('Error', 'Tidak ada invoice aktif', 'error');
@@ -266,12 +324,16 @@ window.checkInvoiceStatus = async function(invoiceId) {
 
     try {
         const result = await PAYMENT_API.checkInvoiceStatus(invoiceId);
+        console.log('Check Status Result:', result);
+        
         if (result.success) {
             const badge = document.getElementById('invoiceStatusBadge');
             const statusMap = {
                 'pending': { label: '⏳ Menunggu', class: 'pending' },
                 'paid': { label: '✅ Lunas', class: 'paid' },
-                'expired': { label: '❌ Kadaluarsa', class: 'expired' }
+                'expired': { label: '❌ Kadaluarsa', class: 'expired' },
+                'settlement': { label: '✅ Lunas', class: 'paid' },
+                'success': { label: '✅ Lunas', class: 'paid' }
             };
             const info = statusMap[result.status] || statusMap['pending'];
             if (badge) {
@@ -279,6 +341,7 @@ window.checkInvoiceStatus = async function(invoiceId) {
                 badge.className = 'payment-status-badge ' + info.class;
             }
 
+            // Update history
             const historyItem = window.invoiceHistory.find(i => i.invoice_id === invoiceId);
             if (historyItem) {
                 historyItem.status = result.status;
@@ -286,7 +349,7 @@ window.checkInvoiceStatus = async function(invoiceId) {
                 window.renderInvoiceHistory();
             }
 
-            if (result.status === 'paid') {
+            if (result.status === 'paid' || result.status === 'settlement' || result.status === 'success') {
                 showToast('✅ Pembayaran Berhasil!', 'Invoice telah dibayar.', 'success', 5000);
                 setTimeout(() => {
                     const paymentOverlay = document.getElementById('paymentOverlay');
@@ -294,11 +357,14 @@ window.checkInvoiceStatus = async function(invoiceId) {
                 }, 3000);
             } else if (result.status === 'expired') {
                 showToast('⏰ Invoice Kadaluarsa', 'Buat invoice baru untuk melanjutkan.', 'warning');
+            } else {
+                showToast('⏳ Menunggu', 'Pembayaran sedang diproses.', 'info');
             }
         } else {
             showToast('Error', 'Gagal mengecek status', 'error');
         }
     } catch (error) {
+        console.error('Check Status Error:', error);
         showToast('Error', 'Gagal mengecek status', 'error');
     } finally {
         if (btn) {
@@ -308,7 +374,32 @@ window.checkInvoiceStatus = async function(invoiceId) {
     }
 };
 
+// ============================================================
+// COPY PAYMENT LINK
+// ============================================================
+window.copyPaymentLink = function() {
+    if (window.currentInvoiceId) {
+        const link = `https://app.lzpedia.my.id/pay/${window.currentInvoiceId}`;
+        navigator.clipboard.writeText(link).then(() => {
+            showToast('Berhasil', 'Link pembayaran disalin!', 'success');
+        }).catch(() => {
+            // Fallback
+            const textArea = document.createElement('textarea');
+            textArea.value = link;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showToast('Berhasil', 'Link pembayaran disalin!', 'success');
+        });
+    } else {
+        showToast('Error', 'Tidak ada invoice aktif', 'error');
+    }
+};
+
+// ============================================================
 // TIMER
+// ============================================================
 window.startPaymentTimer = function(expiryDate) {
     const timerEl = document.getElementById('paymentTimer');
     const displayEl = document.getElementById('timerDisplay');
@@ -335,7 +426,9 @@ window.startPaymentTimer = function(expiryDate) {
     }, 1000);
 };
 
+// ============================================================
 // RENDER INVOICE HISTORY
+// ============================================================
 window.renderInvoiceHistory = function() {
     const container = document.getElementById('invoiceHistoryList');
     if (!container) return;
@@ -356,6 +449,8 @@ window.renderInvoiceHistory = function() {
         const statusMap = {
             'pending': { label: '⏳ Menunggu', class: 'pending' },
             'paid': { label: '✅ Lunas', class: 'paid' },
+            'settlement': { label: '✅ Lunas', class: 'paid' },
+            'success': { label: '✅ Lunas', class: 'paid' },
             'expired': { label: '❌ Kadaluarsa', class: 'expired' }
         };
         const status = statusMap[item.status] || statusMap['pending'];
@@ -364,15 +459,17 @@ window.renderInvoiceHistory = function() {
         return `
             <div class="invoice-history-item" onclick="window.openInvoiceDetail('${item.invoice_id}')" style="cursor:pointer;">
                 <div class="ih-left">
-                    <span class="ih-id">#${item.invoice_id}</span>
-                    <span class="ih-amount">Rp ${Number(item.total || item.amount).toLocaleString()}</span>
+                    <span class="ih-id" style="font-weight:700;color:var(--accent-light);font-size:0.75rem;">#${item.invoice_id}</span>
+                    <span class="ih-amount" style="font-weight:700;color:var(--text-primary);font-size:0.85rem;">Rp ${Number(item.total || item.amount).toLocaleString()}</span>
                     <span style="font-size:0.6rem;color:var(--text-muted);">${date}</span>
                 </div>
-                <div>
-                    <span class="ih-status ${status.class}">${status.label}</span>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <span class="ih-status ${status.class}" style="font-weight:700;font-size:0.65rem;padding:2px 10px;border-radius:30px;background:${status.class === 'pending' ? 'rgba(251,191,36,0.15)' : status.class === 'paid' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'};color:${status.class === 'pending' ? '#fbbf24' : status.class === 'paid' ? '#10b981' : '#ef4444'};">
+                        ${status.label}
+                    </span>
                     ${item.status === 'pending' ? `
                         <button onclick="event.stopPropagation(); window.checkInvoiceStatus('${item.invoice_id}')" 
-                                style="background:var(--accent);color:#fff;border:none;border-radius:30px;padding:2px 10px;font-size:0.6rem;cursor:pointer;margin-left:4px;">
+                                style="background:var(--accent);color:#fff;border:none;border-radius:30px;padding:2px 10px;font-size:0.6rem;cursor:pointer;">
                             <i class="fas fa-sync-alt"></i>
                         </button>
                     ` : ''}
@@ -382,10 +479,15 @@ window.renderInvoiceHistory = function() {
     }).join('');
 };
 
+// ============================================================
 // OPEN INVOICE DETAIL
+// ============================================================
 window.openInvoiceDetail = function(invoiceId) {
     const overlay = document.getElementById('paymentOverlay');
-    if (!overlay) return;
+    if (!overlay) {
+        showToast('Error', 'Modal pembayaran tidak ditemukan', 'error');
+        return;
+    }
 
     const invoice = window.invoiceHistory.find(i => i.invoice_id === invoiceId);
     if (!invoice) {
@@ -393,24 +495,46 @@ window.openInvoiceDetail = function(invoiceId) {
         return;
     }
 
-    document.getElementById('invoiceId').textContent = invoice.invoice_id;
-    document.getElementById('invoiceTotal').textContent = 'Rp ' + Number(invoice.total || invoice.amount).toLocaleString();
-    document.getElementById('invoiceFee').textContent = 'Rp ' + Number(invoice.fee || 0).toLocaleString();
-    document.getElementById('invoiceExpiry').textContent = invoice.expired_at || '-';
-    document.getElementById('paymentDetails').style.display = 'block';
-    document.getElementById('checkStatusBtn').style.display = 'inline-flex';
-    document.getElementById('copyPaymentLinkBtn').style.display = 'inline-flex';
+    console.log('Opening Invoice Detail:', invoice);
 
+    // Set detail
+    const invoiceIdEl = document.getElementById('invoiceId');
+    if (invoiceIdEl) invoiceIdEl.textContent = invoice.invoice_id;
+    
+    const invoiceTotalEl = document.getElementById('invoiceTotal');
+    if (invoiceTotalEl) invoiceTotalEl.textContent = 'Rp ' + Number(invoice.total || invoice.amount).toLocaleString();
+    
+    const invoiceFeeEl = document.getElementById('invoiceFee');
+    if (invoiceFeeEl) invoiceFeeEl.textContent = 'Rp ' + Number(invoice.fee || 0).toLocaleString();
+    
+    const invoiceExpiryEl = document.getElementById('invoiceExpiry');
+    if (invoiceExpiryEl) invoiceExpiryEl.textContent = invoice.expired_at || '-';
+    
+    const paymentDetailsEl = document.getElementById('paymentDetails');
+    if (paymentDetailsEl) paymentDetailsEl.style.display = 'block';
+    
+    const checkStatusBtnEl = document.getElementById('checkStatusBtn');
+    if (checkStatusBtnEl) checkStatusBtnEl.style.display = 'inline-flex';
+    
+    const copyPaymentLinkBtnEl = document.getElementById('copyPaymentLinkBtn');
+    if (copyPaymentLinkBtnEl) copyPaymentLinkBtnEl.style.display = 'inline-flex';
+
+    // Set status
     const badge = document.getElementById('invoiceStatusBadge');
     const statusMap = {
         'pending': { label: '⏳ Menunggu', class: 'pending' },
         'paid': { label: '✅ Lunas', class: 'paid' },
+        'settlement': { label: '✅ Lunas', class: 'paid' },
+        'success': { label: '✅ Lunas', class: 'paid' },
         'expired': { label: '❌ Kadaluarsa', class: 'expired' }
     };
     const status = statusMap[invoice.status] || statusMap['pending'];
-    badge.textContent = status.label;
-    badge.className = 'payment-status-badge ' + status.class;
+    if (badge) {
+        badge.textContent = status.label;
+        badge.className = 'payment-status-badge ' + status.class;
+    }
 
+    // Tampilkan QRIS jika ada
     const qrisWrapper = document.getElementById('qrisImageWrapper');
     const qrisImage = document.getElementById('qrisImage');
     const qrisPlaceholder = document.getElementById('qrisPlaceholder');
@@ -420,18 +544,143 @@ window.openInvoiceDetail = function(invoiceId) {
         qrisImage.style.display = 'block';
         if (qrisWrapper) qrisWrapper.style.display = 'block';
         if (qrisPlaceholder) qrisPlaceholder.style.display = 'none';
+    } else if (qrisPlaceholder) {
+        qrisPlaceholder.innerHTML = `
+            <i class="fas fa-qrcode" style="font-size:3rem;color:var(--accent-light);"></i>
+            <p style="color:var(--text-primary);font-weight:600;">Invoice #${invoice.invoice_id}</p>
+            <p style="color:var(--text-muted);font-size:0.8rem;">Total: Rp ${Number(invoice.total || invoice.amount).toLocaleString()}</p>
+            <button onclick="window.copyPaymentLink()" style="margin-top:8px;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;">
+                <i class="fas fa-copy"></i> Salin Link
+            </button>
+        `;
+        qrisPlaceholder.style.display = 'block';
+        if (qrisWrapper) qrisWrapper.style.display = 'none';
     }
 
     window.currentInvoiceId = invoiceId;
     overlay.classList.add('open');
 
+    // Start timer jika pending
     if (invoice.status === 'pending' && invoice.expired_at) {
         window.startPaymentTimer(new Date(invoice.expired_at));
     }
 };
 
 // ============================================================
-// WITHDRAW METHODS
+// COPY BANK INFO
+// ============================================================
+window.copyBankInfo = function() {
+    const totalEl = document.getElementById('bankTotal');
+    const total = totalEl ? totalEl.textContent : 'Rp 0';
+    const info = `BCA\n1234567890\nA/N JOELL SHOP\nTotal: ${total}`;
+    navigator.clipboard.writeText(info).then(() => {
+        showToast('Berhasil', 'Info bank disalin!', 'success');
+    }).catch(() => {
+        const textArea = document.createElement('textarea');
+        textArea.value = info;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showToast('Berhasil', 'Info bank disalin!', 'success');
+    });
+};
+
+// ============================================================
+// OPEN PAYMENT MODAL
+// ============================================================
+window.openPaymentModal = function(orderData) {
+    const overlay = document.getElementById('paymentOverlay');
+    if (!overlay) {
+        showToast('Error', 'Modal pembayaran tidak ditemukan', 'error');
+        return;
+    }
+
+    const itemsContainer = document.getElementById('paymentOrderItems');
+    const totalEl = document.getElementById('paymentOrderTotal');
+    const bankTotal = document.getElementById('bankTotal');
+
+    let total = 0;
+    if (orderData && orderData.items) {
+        if (itemsContainer) {
+            itemsContainer.innerHTML = orderData.items.map(item => `
+                <div class="order-item-line">${item.name} (${item.variant}) x${item.qty} = Rp ${(item.price * item.qty).toLocaleString()}</div>
+            `).join('');
+        }
+        total = orderData.total || orderData.items.reduce((sum, i) => sum + i.price * i.qty, 0);
+    } else {
+        const cart = JSON.parse(localStorage.getItem('joellCart')) || [];
+        if (itemsContainer) {
+            itemsContainer.innerHTML = cart.map(item => `
+                <div class="order-item-line">${item.name} (${item.variant}) x${item.qty} = Rp ${(item.price * item.qty).toLocaleString()}</div>
+            `).join('');
+        }
+        total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+    }
+
+    if (totalEl) totalEl.textContent = 'Total: Rp ' + total.toLocaleString();
+    if (bankTotal) bankTotal.textContent = 'Rp ' + total.toLocaleString();
+
+    // Reset UI - QRIS
+    const qrisWrapper = document.getElementById('qrisImageWrapper');
+    if (qrisWrapper) qrisWrapper.style.display = 'none';
+    
+    const paymentDetailsEl = document.getElementById('paymentDetails');
+    if (paymentDetailsEl) paymentDetailsEl.style.display = 'none';
+    
+    const paymentTimerEl = document.getElementById('paymentTimer');
+    if (paymentTimerEl) paymentTimerEl.style.display = 'none';
+    
+    const checkStatusBtnEl = document.getElementById('checkStatusBtn');
+    if (checkStatusBtnEl) checkStatusBtnEl.style.display = 'none';
+    
+    const copyPaymentLinkBtnEl = document.getElementById('copyPaymentLinkBtn');
+    if (copyPaymentLinkBtnEl) copyPaymentLinkBtnEl.style.display = 'none';
+    
+    const paymentQrisSectionEl = document.getElementById('paymentQrisSection');
+    if (paymentQrisSectionEl) paymentQrisSectionEl.style.display = 'block';
+    
+    const paymentBankSectionEl = document.getElementById('paymentBankSection');
+    if (paymentBankSectionEl) paymentBankSectionEl.style.display = 'none';
+
+    // Reset QRIS placeholder
+    const qrisPlaceholder = document.getElementById('qrisPlaceholder');
+    if (qrisPlaceholder) {
+        qrisPlaceholder.style.display = 'block';
+        qrisPlaceholder.innerHTML = `
+            <i class="fas fa-qrcode"></i>
+            <p>Klik tombol "Buat Invoice" untuk mendapatkan QRIS</p>
+            <small>Pastikan koneksi internet stabil</small>
+        `;
+    }
+
+    const qrisImage = document.getElementById('qrisImage');
+    if (qrisImage) qrisImage.src = '';
+
+    // Reset payment method buttons
+    document.querySelectorAll('.payment-method-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.method === 'qris');
+    });
+
+    // Reset invoice status
+    const statusBadge = document.getElementById('invoiceStatusBadge');
+    if (statusBadge) {
+        statusBadge.textContent = '⏳ Menunggu';
+        statusBadge.className = 'payment-status-badge pending';
+    }
+
+    // Open modal
+    overlay.classList.add('open');
+
+    // Render histories
+    window.renderInvoiceHistory();
+    window.renderWithdrawHistory();
+    window.fetchBalance();
+    window.fetchWithdrawMethods();
+};
+
+// ============================================================
+// WITHDRAW METHODS (untuk Payment Modal)
 // ============================================================
 window.fetchWithdrawMethods = async function() {
     try {
@@ -457,11 +706,13 @@ window.fetchWithdrawMethods = async function() {
                 <span class="method-name">${method.instant ? '⚡ Instant' : '🔄 Manual'}</span>
             `;
             btn.onclick = () => {
-                document.querySelectorAll('#withdrawMethodsGrid .withdraw-method-item').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.withdraw-method-item').forEach(el => el.classList.remove('active'));
                 btn.classList.add('active');
                 window.selectedWithdrawMethodData = method;
-                document.getElementById('withdrawInfo').textContent = 
-                    `💰 ${method.name} | Min: Rp ${(method.min||10000).toLocaleString()} | Max: Rp ${(method.max||1000000).toLocaleString()}`;
+                const infoEl = document.getElementById('withdrawInfo');
+                if (infoEl) {
+                    infoEl.textContent = `💰 ${method.name} | Min: Rp ${(method.min||10000).toLocaleString()} | Max: Rp ${(method.max||1000000).toLocaleString()}`;
+                }
             };
             grid.appendChild(btn);
         });
@@ -470,10 +721,18 @@ window.fetchWithdrawMethods = async function() {
     }
 };
 
+// ============================================================
+// PROCESS WITHDRAW
+// ============================================================
 window.processWithdraw = async function() {
-    const amount = parseInt(document.getElementById('withdrawAmount').value);
-    const account = document.getElementById('withdrawAccount').value.trim();
+    const amountInput = document.getElementById('withdrawAmount');
+    const accountInput = document.getElementById('withdrawAccount');
     const btn = document.getElementById('withdrawBtn');
+
+    if (!amountInput || !accountInput || !btn) return;
+
+    const amount = parseInt(amountInput.value);
+    const account = accountInput.value.trim();
 
     if (!window.selectedWithdrawMethodData) {
         showToast('Error', 'Pilih metode penarikan', 'error');
@@ -511,12 +770,13 @@ window.processWithdraw = async function() {
             localStorage.setItem('joellWithdrawHistory', JSON.stringify(window.withdrawHistory));
             window.renderWithdrawHistory();
             window.fetchBalance();
-            document.getElementById('withdrawAmount').value = '';
-            document.getElementById('withdrawAccount').value = '';
+            amountInput.value = '';
+            accountInput.value = '';
 
-            document.querySelectorAll('#withdrawMethodsGrid .withdraw-method-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.withdraw-method-item').forEach(el => el.classList.remove('active'));
             window.selectedWithdrawMethodData = null;
-            document.getElementById('withdrawInfo').textContent = '💡 Pilih metode penarikan di atas';
+            const infoEl = document.getElementById('withdrawInfo');
+            if (infoEl) infoEl.textContent = '💡 Pilih metode penarikan di atas';
         } else {
             throw new Error(result.error || 'Gagal');
         }
@@ -528,6 +788,9 @@ window.processWithdraw = async function() {
     }
 };
 
+// ============================================================
+// RENDER WITHDRAW HISTORY
+// ============================================================
 window.renderWithdrawHistory = function() {
     const container = document.getElementById('withdrawHistory');
     if (!container) return;
@@ -550,7 +813,7 @@ window.renderWithdrawHistory = function() {
 };
 
 // ============================================================
-// INIT PROFILE WITHDRAW
+// PROFILE WITHDRAW
 // ============================================================
 window.initProfileWithdraw = function() {
     const balanceEl = document.getElementById('balanceAmount');
@@ -599,8 +862,10 @@ window.fetchProfileWithdrawMethods = async function() {
                 document.querySelectorAll('#profileWithdrawMethods .withdraw-method-item').forEach(el => el.classList.remove('active'));
                 btn.classList.add('active');
                 window.selectedWithdrawMethodData = method;
-                document.getElementById('profileWithdrawInfo').textContent = 
-                    `💰 ${method.name} | Min: Rp ${(method.min||10000).toLocaleString()} | Max: Rp ${(method.max||1000000).toLocaleString()}`;
+                const infoEl = document.getElementById('profileWithdrawInfo');
+                if (infoEl) {
+                    infoEl.textContent = `💰 ${method.name} | Min: Rp ${(method.min||10000).toLocaleString()} | Max: Rp ${(method.max||1000000).toLocaleString()}`;
+                }
             };
             grid.appendChild(btn);
         });
@@ -665,7 +930,8 @@ window.processProfileWithdraw = async function() {
 
             document.querySelectorAll('#profileWithdrawMethods .withdraw-method-item').forEach(el => el.classList.remove('active'));
             window.selectedWithdrawMethodData = null;
-            document.getElementById('profileWithdrawInfo').textContent = '💡 Pilih metode penarikan di atas';
+            const infoEl = document.getElementById('profileWithdrawInfo');
+            if (infoEl) infoEl.textContent = '💡 Pilih metode penarikan di atas';
         } else {
             throw new Error(result.error || 'Gagal');
         }
@@ -699,136 +965,118 @@ window.renderProfileWithdrawHistory = function() {
 };
 
 // ============================================================
-// OPEN PAYMENT MODAL
-// ============================================================
-window.openPaymentModal = function(orderData) {
-    const overlay = document.getElementById('paymentOverlay');
-    if (!overlay) return;
-
-    const itemsContainer = document.getElementById('paymentOrderItems');
-    const totalEl = document.getElementById('paymentOrderTotal');
-    const bankTotal = document.getElementById('bankTotal');
-
-    let total = 0;
-    if (orderData && orderData.items) {
-        if (itemsContainer) {
-            itemsContainer.innerHTML = orderData.items.map(item => `
-                <div class="order-item-line">${item.name} (${item.variant}) x${item.qty} = Rp ${(item.price * item.qty).toLocaleString()}</div>
-            `).join('');
-        }
-        total = orderData.total || orderData.items.reduce((sum, i) => sum + i.price * i.qty, 0);
-    } else {
-        const cart = JSON.parse(localStorage.getItem('joellCart')) || [];
-        if (itemsContainer) {
-            itemsContainer.innerHTML = cart.map(item => `
-                <div class="order-item-line">${item.name} (${item.variant}) x${item.qty} = Rp ${(item.price * item.qty).toLocaleString()}</div>
-            `).join('');
-        }
-        total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
-    }
-
-    if (totalEl) totalEl.textContent = 'Total: Rp ' + total.toLocaleString();
-    if (bankTotal) bankTotal.textContent = 'Rp ' + total.toLocaleString();
-
-    // Reset UI
-    document.getElementById('qrisImageWrapper').style.display = 'none';
-    document.getElementById('paymentDetails').style.display = 'none';
-    document.getElementById('paymentTimer').style.display = 'none';
-    document.getElementById('checkStatusBtn').style.display = 'none';
-    document.getElementById('copyPaymentLinkBtn').style.display = 'none';
-    document.getElementById('paymentQrisSection').style.display = 'block';
-    document.getElementById('paymentBankSection').style.display = 'none';
-
-    const qrisPlaceholder = document.getElementById('qrisPlaceholder');
-    if (qrisPlaceholder) {
-        qrisPlaceholder.style.display = 'block';
-        qrisPlaceholder.innerHTML = `
-            <i class="fas fa-qrcode"></i>
-            <p>Klik tombol "Buat Invoice" untuk mendapatkan QRIS</p>
-            <small>Pastikan koneksi internet stabil</small>
-        `;
-    }
-
-    document.getElementById('qrisImage').src = '';
-
-    document.querySelectorAll('.payment-method-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.method === 'qris');
-    });
-
-    overlay.classList.add('open');
-
-    window.renderInvoiceHistory();
-    window.renderWithdrawHistory();
-    window.fetchBalance();
-    window.fetchWithdrawMethods();
-};
-
-// ============================================================
-// INIT
+// INIT - DOMContentLoaded
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔧 Payment System Initialized');
-
-    // Payment method switching
+    console.log('🔧 Payment System Initializing...');
+    console.log('🔑 API Key:', PAYMENT_API.config.apiKey ? '✅ Loaded' : '❌ Missing');
+    
+    // ===== PAYMENT METHOD SWITCHING =====
     document.querySelectorAll('.payment-method-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.payment-method-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             const method = this.dataset.method;
-            document.getElementById('paymentQrisSection').style.display = method === 'qris' ? 'block' : 'none';
-            document.getElementById('paymentBankSection').style.display = method === 'bank' ? 'block' : 'none';
+            const qrisSection = document.getElementById('paymentQrisSection');
+            const bankSection = document.getElementById('paymentBankSection');
+            if (qrisSection) qrisSection.style.display = method === 'qris' ? 'block' : 'none';
+            if (bankSection) bankSection.style.display = method === 'bank' ? 'block' : 'none';
         });
     });
 
-    // Create Invoice
-    document.getElementById('createInvoiceBtn').addEventListener('click', function() {
-        const totalEl = document.getElementById('paymentOrderTotal');
-        if (totalEl) {
-            const total = parseInt(totalEl.textContent.replace(/[^0-9]/g, ''));
-            if (total > 0) {
-                window.createInvoice(total);
-            } else {
-                showToast('Error', 'Total pembayaran tidak valid', 'error');
+    // ===== CREATE INVOICE BUTTON =====
+    const createBtn = document.getElementById('createInvoiceBtn');
+    if (createBtn) {
+        createBtn.addEventListener('click', function() {
+            const totalEl = document.getElementById('paymentOrderTotal');
+            if (totalEl) {
+                const total = parseInt(totalEl.textContent.replace(/[^0-9]/g, ''));
+                if (total > 0) {
+                    window.createInvoice(total);
+                } else {
+                    showToast('Error', 'Total pembayaran tidak valid', 'error');
+                }
             }
-        }
-    });
+        });
+    }
 
-    // Check Status
-    document.getElementById('checkStatusBtn').addEventListener('click', function() {
-        if (window.currentInvoiceId) {
-            window.checkInvoiceStatus(window.currentInvoiceId);
-        } else {
-            showToast('Info', 'Belum ada invoice yang aktif', 'info');
-        }
-    });
+    // ===== CHECK STATUS BUTTON =====
+    const checkBtn = document.getElementById('checkStatusBtn');
+    if (checkBtn) {
+        checkBtn.addEventListener('click', function() {
+            if (window.currentInvoiceId) {
+                window.checkInvoiceStatus(window.currentInvoiceId);
+            } else {
+                showToast('Info', 'Belum ada invoice yang aktif', 'info');
+            }
+        });
+    }
 
-    // Copy Payment Link
-    document.getElementById('copyPaymentLinkBtn').addEventListener('click', function() {
-        if (window.currentInvoiceId) {
-            const link = `https://app.lzpedia.my.id/pay/${window.currentInvoiceId}`;
-            navigator.clipboard.writeText(link).then(() => {
-                showToast('Berhasil', 'Link pembayaran disalin!', 'success');
-            });
-        }
-    });
+    // ===== COPY PAYMENT LINK BUTTON =====
+    const copyBtn = document.getElementById('copyPaymentLinkBtn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', function() {
+            window.copyPaymentLink();
+        });
+    }
 
-    // Withdraw
-    document.getElementById('withdrawBtn').addEventListener('click', window.processWithdraw);
+    // ===== WITHDRAW BUTTON =====
+    const withdrawBtn = document.getElementById('withdrawBtn');
+    if (withdrawBtn) {
+        withdrawBtn.addEventListener('click', window.processWithdraw);
+    }
 
-    // Balance Refresh
-    document.getElementById('balanceRefreshBtn').addEventListener('click', window.fetchBalance);
+    // ===== BALANCE REFRESH =====
+    const refreshBtn = document.getElementById('balanceRefreshBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', window.fetchBalance);
+    }
 
-    // Close Payment
-    document.getElementById('paymentCloseBtn').addEventListener('click', function() {
-        document.getElementById('paymentOverlay').classList.remove('open');
-        if (window.timerInterval) clearInterval(window.timerInterval);
-    });
+    // ===== CLOSE PAYMENT =====
+    const closeBtn = document.getElementById('paymentCloseBtn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            const overlay = document.getElementById('paymentOverlay');
+            if (overlay) overlay.classList.remove('open');
+            if (window.timerInterval) clearInterval(window.timerInterval);
+        });
+    }
 
-    // Load histories
+    // ===== LOAD HISTORIES =====
     window.renderInvoiceHistory();
     window.renderWithdrawHistory();
     window.fetchBalance();
     window.fetchWithdrawMethods();
 
     console.log('✅ Payment System Ready!');
+    console.log('📊 Total Invoice:', window.invoiceHistory.length);
+    console.log('📊 Total Withdraw:', window.withdrawHistory.length);
 });
+
+// ============================================================
+// TOAST FALLBACK
+// ============================================================
+if (typeof showToast !== 'function') {
+    window.showToast = function(title, message, type = 'info', duration = 3000) {
+        console.log(`📢 ${type.toUpperCase()}: ${title} - ${message}`);
+        const container = document.getElementById('toastContainer');
+        if (container) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle', warning: 'fa-exclamation-circle' };
+            toast.innerHTML = `
+                <div class="toast-icon ${type}"><i class="fas ${icons[type] || icons.info}"></i></div>
+                <div class="toast-content"><h4>${title}</h4><p>${message}</p></div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('toast-out');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        } else {
+            alert(`${title}: ${message}`);
+        }
+    };
+}
+
+console.log('✅ payment-api.js Loaded Successfully!');
