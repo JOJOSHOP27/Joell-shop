@@ -807,37 +807,47 @@
 
 <script>
     // ============================================================
-    // AUTO INVOICE - QRIS LANGSUNG TAMPIL TANPA KLIK
+    // AUTO INVOICE - QRIS LANGSUNG TAMPIL TANPA KLIK (FIXED v2.5)
     // ============================================================
     document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ JOELL SHOP Initialized');
-        
+
         if (typeof renderMenus === 'function') renderMenus();
         if (typeof renderTopupGames === 'function') renderTopupGames();
         if (typeof updateCartUI === 'function') updateCartUI();
         if (typeof updateUserUI === 'function') updateUserUI();
         if (typeof renderOrdersList === 'function') renderOrdersList();
         if (typeof renderProfilePage === 'function') renderProfilePage();
-        
-        // Override openPaymentModal untuk auto buat invoice
-        if (typeof window.openPaymentModal === 'function') {
-            const originalOpenPayment = window.openPaymentModal;
-            window.openPaymentModal = function(orderData) {
-                originalOpenPayment(orderData);
-                
-                // Auto buat invoice setelah modal terbuka
-                setTimeout(function() {
-                    const totalEl = document.getElementById('paymentOrderTotal');
-                    if (totalEl) {
-                        const total = parseInt(totalEl.textContent.replace(/[^0-9]/g, ''));
-                        if (total > 0 && typeof window.createInvoice === 'function') {
-                            window.createInvoice(total);
+
+        // FIXED: Gunakan MutationObserver agar tidak bentrok dengan payment-api.js
+        const paymentOverlay = document.getElementById('paymentOverlay');
+        if (paymentOverlay) {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        if (paymentOverlay.classList.contains('open')) {
+                            if (!window._autoInvoiceTriggered) {
+                                window._autoInvoiceTriggered = true;
+                                setTimeout(function() {
+                                    const totalEl = document.getElementById('paymentOrderTotal');
+                                    const createBtn = document.getElementById('createInvoiceBtn');
+                                    if (totalEl && createBtn && createBtn.style.display !== 'none') {
+                                        const total = parseInt(totalEl.textContent.replace(/[^0-9]/g, ''));
+                                        if (total > 0 && typeof window.createInvoice === 'function') {
+                                            window.createInvoice(total);
+                                        }
+                                    }
+                                }, 600);
+                            }
+                        } else {
+                            window._autoInvoiceTriggered = false;
                         }
                     }
-                }, 800);
-            };
+                });
+            });
+            observer.observe(paymentOverlay, { attributes: true });
         }
-        
+
         console.log('✅ All systems ready! QRIS auto-show enabled!');
     });
 </script>
