@@ -911,21 +911,16 @@ document.addEventListener('DOMContentLoaded', function() {
             
             document.getElementById('checkoutOverlay').classList.remove('open');
             
-            // ===== BUKA PAYMENT & AUTO BUAT INVOICE =====
+                        // ===== BUKA PAYMENT MODAL (Auto-invoice via MutationObserver di index.html) =====
             showToast('⏳ Membuat Invoice...', 'Silakan tunggu sebentar', 'info', 2000);
-            
-            setTimeout(async function() {
+
+            setTimeout(function() {
                 if (typeof window.openPaymentModal === 'function') {
                     window.openPaymentModal(order);
                 }
-                
-                setTimeout(async function() {
-                    if (total > 0 && typeof window.createInvoice === 'function') {
-                        await window.createInvoice(total);
-                    }
-                }, 800);
-            }, 500);
-            
+                // createInvoice() akan dipicu otomatis oleh MutationObserver 
+                // saat modal paymentOverlay mendapat class 'open'
+            }, 300);
             renderOrdersList();
         });
     }
