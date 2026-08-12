@@ -1,5 +1,5 @@
 // ============================================================
-// PAYMENT API - LZPedia Integration (FINAL WORKING)
+// PAYMENT API - LZPedia Integration (FINAL FIXED)
 // ============================================================
 
 const PAYMENT_API = {
@@ -176,14 +176,30 @@ window.fetchBalance = async function() {
 };
 
 // ============================================================
-// BUAT INVOICE - QRIS LANGSUNG DARI API
+// BUAT INVOICE - QRIS LANGSUNG TAMPIL
 // ============================================================
 window.createInvoice = async function(amount) {
     const btn = document.getElementById('createInvoiceBtn');
+    const qrisPlaceholder = document.getElementById('qrisPlaceholder');
+    const qrisWrapper = document.getElementById('qrisImageWrapper');
+    const qrisImage = document.getElementById('qrisImage');
+    
     if (!amount || amount <= 0) {
         showToast('Error', 'Jumlah tidak valid', 'error');
         return;
     }
+
+    // TAMPILKAN LOADING
+    if (qrisPlaceholder) {
+        qrisPlaceholder.style.display = 'block';
+        qrisPlaceholder.innerHTML = `
+            <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:var(--accent-light);"></i>
+            <p style="margin-top:12px;font-weight:600;">Membuat invoice...</p>
+            <small style="color:var(--text-muted);">Mohon tunggu sebentar</small>
+        `;
+    }
+    
+    if (qrisWrapper) qrisWrapper.style.display = 'none';
 
     if (btn) {
         btn.disabled = true;
@@ -197,49 +213,68 @@ window.createInvoice = async function(amount) {
         if (result.success && result.invoiceId) {
             window.currentInvoiceId = result.invoiceId;
 
-            // ===== TAMPILKAN QRIS DARI API =====
-            const qrisWrapper = document.getElementById('qrisImageWrapper');
-            const qrisImage = document.getElementById('qrisImage');
-            const qrisPlaceholder = document.getElementById('qrisPlaceholder');
-
+            // ===== QRIS DARI API =====
             if (result.qrisImage && qrisImage) {
                 // QRIS RESMI DARI API
                 qrisImage.src = result.qrisImage;
                 qrisImage.style.display = 'block';
-                qrisImage.style.maxWidth = '300px';
+                qrisImage.style.maxWidth = '280px';
                 qrisImage.style.width = '100%';
                 qrisImage.style.height = 'auto';
                 qrisImage.style.borderRadius = '16px';
-                qrisImage.style.background = '#fff';
+                qrisImage.style.background = '#ffffff';
                 qrisImage.style.padding = '16px';
-                qrisImage.style.boxShadow = '0 8px 32px rgba(0,0,0,0.2)';
+                qrisImage.style.boxShadow = '0 8px 32px rgba(0,0,0,0.15)';
                 qrisImage.style.border = '2px solid #e5e7eb';
                 qrisImage.style.margin = '0 auto';
                 
                 if (qrisWrapper) {
                     qrisWrapper.style.display = 'block';
                     qrisWrapper.style.textAlign = 'center';
-                    qrisWrapper.style.animation = 'fadeIn 0.5s ease';
+                    
+                    // Tambahkan teks sukses
+                    const successText = document.querySelector('.qris-success-text');
+                    if (successText) {
+                        successText.style.display = 'block';
+                        successText.innerHTML = '<i class="fas fa-check-circle"></i> Scan QRIS untuk membayar';
+                    }
                 }
                 if (qrisPlaceholder) {
                     qrisPlaceholder.style.display = 'none';
                 }
 
                 showToast('✅ QRIS Siap', 'Scan QR code untuk membayar', 'success');
-            } else {
+            } else if (result.paymentLink && qrisImage) {
                 // FALLBACK: QRIS dari payment_link
-                if (result.paymentLink && qrisImage) {
-                    const fallbackQris = `https://chart.googleapis.com/chart?chs=350x350&cht=qr&chl=${encodeURIComponent(result.paymentLink)}`;
-                    qrisImage.src = fallbackQris;
-                    qrisImage.style.display = 'block';
-                    if (qrisWrapper) qrisWrapper.style.display = 'block';
-                    if (qrisPlaceholder) qrisPlaceholder.style.display = 'none';
-                    showToast('⚠️ QRIS', 'Menggunakan QRIS alternatif', 'warning');
-                } else if (qrisPlaceholder) {
+                const fallbackQris = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(result.paymentLink)}`;
+                qrisImage.src = fallbackQris;
+                qrisImage.style.display = 'block';
+                qrisImage.style.maxWidth = '280px';
+                qrisImage.style.width = '100%';
+                qrisImage.style.height = 'auto';
+                qrisImage.style.borderRadius = '16px';
+                qrisImage.style.background = '#ffffff';
+                qrisImage.style.padding = '16px';
+                qrisImage.style.boxShadow = '0 8px 32px rgba(0,0,0,0.15)';
+                qrisImage.style.border = '2px solid #e5e7eb';
+                qrisImage.style.margin = '0 auto';
+                
+                if (qrisWrapper) {
+                    qrisWrapper.style.display = 'block';
+                    qrisWrapper.style.textAlign = 'center';
+                }
+                if (qrisPlaceholder) {
+                    qrisPlaceholder.style.display = 'none';
+                }
+                showToast('⚠️ QRIS', 'Menggunakan QRIS alternatif', 'warning');
+            } else {
+                // TIDAK ADA QRIS
+                if (qrisPlaceholder) {
+                    qrisPlaceholder.style.display = 'block';
                     qrisPlaceholder.innerHTML = `
                         <i class="fas fa-qrcode" style="font-size:3rem;color:var(--accent-light);"></i>
                         <p style="color:var(--text-primary);font-weight:600;margin-top:8px;">Invoice #${result.invoiceId}</p>
-                        <p style="color:var(--text-muted);font-size:0.8rem;">Total: Rp ${Number(result.total).toLocaleString()}</p>
+                        <p style="color:var(--text-muted);font-size:0.9rem;">Total: Rp ${Number(result.total).toLocaleString()}</p>
                         <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
                             <button onclick="window.copyPaymentLink()" style="padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
                                 <i class="fas fa-copy"></i> Salin Link
@@ -249,8 +284,8 @@ window.createInvoice = async function(amount) {
                             </button>
                         </div>
                     `;
-                    qrisPlaceholder.style.display = 'block';
                 }
+                if (qrisWrapper) qrisWrapper.style.display = 'none';
                 showToast('⚠️ QRIS', 'Gunakan link pembayaran', 'warning');
             }
 
@@ -322,6 +357,17 @@ window.createInvoice = async function(amount) {
         if (btn) {
             btn.style.display = 'inline-flex';
         }
+        if (qrisPlaceholder) {
+            qrisPlaceholder.style.display = 'block';
+            qrisPlaceholder.innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="font-size:3rem;color:var(--red);"></i>
+                <p style="color:var(--red);font-weight:600;margin-top:8px;">Gagal membuat invoice</p>
+                <p style="color:var(--text-muted);font-size:0.9rem;">${error.message || 'Coba lagi nanti'}</p>
+                <button onclick="window.createInvoice(${amount})" style="margin-top:12px;padding:10px 24px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
+                    <i class="fas fa-redo"></i> Coba Lagi
+                </button>
+            `;
+        }
     } finally {
         if (btn) {
             btn.disabled = false;
@@ -380,7 +426,7 @@ window.checkInvoiceStatus = async function(invoiceId) {
                 badge.className = 'payment-status-badge ' + info.class;
             }
 
-            // Update history
+            // UPDATE HISTORY
             const historyItem = window.invoiceHistory.find(i => i.invoice_id === invoiceId);
             if (historyItem) {
                 historyItem.status = result.status;
@@ -404,6 +450,9 @@ window.checkInvoiceStatus = async function(invoiceId) {
                     clearInterval(window.autoCheckInterval);
                     window.autoCheckInterval = null;
                 }
+                // Tampilkan tombol Buat Invoice lagi
+                const btnCreate = document.getElementById('createInvoiceBtn');
+                if (btnCreate) btnCreate.style.display = 'inline-flex';
             }
         } else {
             showToast('Error', 'Gagal mengecek status', 'error');
@@ -466,6 +515,9 @@ window.startPaymentTimer = function(expiryDate) {
                 clearInterval(window.autoCheckInterval);
                 window.autoCheckInterval = null;
             }
+            // Tampilkan tombol Buat Invoice lagi
+            const btnCreate = document.getElementById('createInvoiceBtn');
+            if (btnCreate) btnCreate.style.display = 'inline-flex';
             return;
         }
         const m = Math.floor(diff / 60000);
@@ -476,7 +528,7 @@ window.startPaymentTimer = function(expiryDate) {
 };
 
 // ============================================================
-// RENDER INVOICE HISTORY
+// RENDER INVOICE HISTORY - BISA DI KLIK
 // ============================================================
 window.renderInvoiceHistory = function() {
     const container = document.getElementById('invoiceHistoryList');
@@ -506,30 +558,45 @@ window.renderInvoiceHistory = function() {
         const date = item.created_at ? new Date(item.created_at).toLocaleString('id-ID') : '-';
 
         return `
-            <div class="invoice-history-item" onclick="window.openInvoiceDetail('${item.invoice_id}')" style="cursor:pointer;">
-                <div class="ih-left">
-                    <span class="ih-id" style="font-weight:700;color:var(--accent-light);font-size:0.75rem;">#${item.invoice_id}</span>
-                    <span class="ih-amount" style="font-weight:700;color:var(--text-primary);font-size:0.85rem;">Rp ${Number(item.total || item.amount).toLocaleString()}</span>
-                    <span style="font-size:0.6rem;color:var(--text-muted);">${date}</span>
+            <div class="invoice-history-item" onclick="window.openInvoiceDetail('${item.invoice_id}')" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg-primary);border-radius:8px;border:1px solid var(--border-subtle);margin-bottom:6px;transition:all 0.3s ease;">
+                <div style="display:flex;flex-direction:column;gap:2px;flex:1;cursor:pointer;">
+                    <span style="font-weight:700;color:var(--accent-light);font-size:0.8rem;">#${item.invoice_id}</span>
+                    <span style="font-weight:700;color:var(--text-primary);font-size:0.9rem;">Rp ${Number(item.total || item.amount).toLocaleString()}</span>
+                    <span style="font-size:0.65rem;color:var(--text-muted);">${date}</span>
                 </div>
-                <div style="display:flex;align-items:center;gap:6px;">
-                    <span class="ih-status ${status.class}" style="font-weight:700;font-size:0.65rem;padding:2px 10px;border-radius:30px;background:${status.class === 'pending' ? 'rgba(251,191,36,0.15)' : status.class === 'paid' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'};color:${status.class === 'pending' ? '#fbbf24' : status.class === 'paid' ? '#10b981' : '#ef4444'};">
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                    <span style="font-weight:700;font-size:0.65rem;padding:3px 12px;border-radius:30px;background:${status.class === 'pending' ? 'rgba(251,191,36,0.15)' : status.class === 'paid' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'};color:${status.class === 'pending' ? '#fbbf24' : status.class === 'paid' ? '#10b981' : '#ef4444'};">
                         ${status.label}
                     </span>
                     ${item.status === 'pending' ? `
                         <button onclick="event.stopPropagation(); window.checkInvoiceStatus('${item.invoice_id}')" 
-                                style="background:var(--accent);color:#fff;border:none;border-radius:30px;padding:2px 10px;font-size:0.6rem;cursor:pointer;">
+                                style="background:var(--accent);color:#fff;border:none;border-radius:30px;padding:4px 10px;font-size:0.6rem;cursor:pointer;">
                             <i class="fas fa-sync-alt"></i>
                         </button>
                     ` : ''}
+                    <i class="fas fa-chevron-right" style="color:var(--text-muted);font-size:0.7rem;"></i>
                 </div>
             </div>
         `;
     }).join('');
+
+    // Tambahkan event listener untuk hover
+    container.querySelectorAll('.invoice-history-item').forEach(el => {
+        el.addEventListener('mouseenter', function() {
+            this.style.borderColor = 'var(--accent)';
+            this.style.background = 'rgba(99,102,241,0.05)';
+            this.style.transform = 'translateX(4px)';
+        });
+        el.addEventListener('mouseleave', function() {
+            this.style.borderColor = 'var(--border-subtle)';
+            this.style.background = 'var(--bg-primary)';
+            this.style.transform = 'translateX(0)';
+        });
+    });
 };
 
 // ============================================================
-// OPEN INVOICE DETAIL
+// OPEN INVOICE DETAIL - QRIS & DETAIL LENGKAP
 // ============================================================
 window.openInvoiceDetail = function(invoiceId) {
     const overlay = document.getElementById('paymentOverlay');
@@ -557,7 +624,7 @@ window.openInvoiceDetail = function(invoiceId) {
     if (invoiceFeeEl) invoiceFeeEl.textContent = 'Rp ' + Number(invoice.fee || 0).toLocaleString();
     
     const invoiceExpiryEl = document.getElementById('invoiceExpiry');
-    if (invoiceExpiryEl) invoiceExpiryEl.textContent = invoice.expired_at || '-';
+    if (invoiceExpiryEl) invoiceExpiryEl.textContent = invoice.expired_at ? new Date(invoice.expired_at).toLocaleString('id-ID') : '-';
     
     const paymentDetailsEl = document.getElementById('paymentDetails');
     if (paymentDetailsEl) paymentDetailsEl.style.display = 'block';
@@ -592,13 +659,13 @@ window.openInvoiceDetail = function(invoiceId) {
         // QRIS RESMI DARI API
         qrisImage.src = invoice.qris_image;
         qrisImage.style.display = 'block';
-        qrisImage.style.maxWidth = '300px';
+        qrisImage.style.maxWidth = '280px';
         qrisImage.style.width = '100%';
         qrisImage.style.height = 'auto';
         qrisImage.style.borderRadius = '16px';
-        qrisImage.style.background = '#fff';
+        qrisImage.style.background = '#ffffff';
         qrisImage.style.padding = '16px';
-        qrisImage.style.boxShadow = '0 8px 32px rgba(0,0,0,0.2)';
+        qrisImage.style.boxShadow = '0 8px 32px rgba(0,0,0,0.15)';
         qrisImage.style.border = '2px solid #e5e7eb';
         qrisImage.style.margin = '0 auto';
         
@@ -611,21 +678,43 @@ window.openInvoiceDetail = function(invoiceId) {
         }
     } else if (invoice.payment_link && qrisImage) {
         // FALLBACK: QRIS dari payment_link
-        const fallbackQris = `https://chart.googleapis.com/chart?chs=350x350&cht=qr&chl=${encodeURIComponent(invoice.payment_link)}`;
+        const fallbackQris = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(invoice.payment_link)}`;
         qrisImage.src = fallbackQris;
         qrisImage.style.display = 'block';
-        if (qrisWrapper) qrisWrapper.style.display = 'block';
-        if (qrisPlaceholder) qrisPlaceholder.style.display = 'none';
+        qrisImage.style.maxWidth = '280px';
+        qrisImage.style.width = '100%';
+        qrisImage.style.height = 'auto';
+        qrisImage.style.borderRadius = '16px';
+        qrisImage.style.background = '#ffffff';
+        qrisImage.style.padding = '16px';
+        qrisImage.style.boxShadow = '0 8px 32px rgba(0,0,0,0.15)';
+        qrisImage.style.border = '2px solid #e5e7eb';
+        qrisImage.style.margin = '0 auto';
+        
+        if (qrisWrapper) {
+            qrisWrapper.style.display = 'block';
+            qrisWrapper.style.textAlign = 'center';
+        }
+        if (qrisPlaceholder) {
+            qrisPlaceholder.style.display = 'none';
+        }
     } else if (qrisPlaceholder) {
+        qrisPlaceholder.style.display = 'block';
         qrisPlaceholder.innerHTML = `
             <i class="fas fa-qrcode" style="font-size:3rem;color:var(--accent-light);"></i>
-            <p style="color:var(--text-primary);font-weight:600;">Invoice #${invoice.invoice_id}</p>
-            <p style="color:var(--text-muted);font-size:0.8rem;">Total: Rp ${Number(invoice.total || invoice.amount).toLocaleString()}</p>
-            <button onclick="window.copyPaymentLink()" style="margin-top:8px;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;">
-                <i class="fas fa-copy"></i> Salin Link
-            </button>
+            <p style="color:var(--text-primary);font-weight:600;margin-top:8px;">Invoice #${invoice.invoice_id}</p>
+            <p style="color:var(--text-muted);font-size:0.9rem;">Total: Rp ${Number(invoice.total || invoice.amount).toLocaleString()}</p>
+            <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                <button onclick="window.copyPaymentLink()" style="padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
+                    <i class="fas fa-copy"></i> Salin Link
+                </button>
+                ${invoice.payment_link ? `
+                    <button onclick="window.open('${invoice.payment_link}', '_blank')" style="padding:10px 20px;background:var(--green);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
+                        <i class="fas fa-external-link-alt"></i> Buka Link
+                    </button>
+                ` : ''}
+            </div>
         `;
-        qrisPlaceholder.style.display = 'block';
         if (qrisWrapper) qrisWrapper.style.display = 'none';
     }
 
@@ -637,6 +726,10 @@ window.openInvoiceDetail = function(invoiceId) {
         window.startPaymentTimer(new Date(invoice.expired_at));
         window.startAutoCheckStatus(invoiceId);
     }
+    
+    // Sembunyikan tombol Buat Invoice
+    const btnCreate = document.getElementById('createInvoiceBtn');
+    if (btnCreate) btnCreate.style.display = 'none';
 };
 
 // ============================================================
@@ -722,8 +815,8 @@ window.openPaymentModal = function(orderData) {
         qrisPlaceholder.style.display = 'block';
         qrisPlaceholder.innerHTML = `
             <i class="fas fa-qrcode"></i>
-            <p>Membuat invoice...</p>
-            <small>Silakan tunggu sebentar</small>
+            <p style="margin-top:8px;font-weight:600;">Klik tombol "Buat Invoice"</p>
+            <small style="color:var(--text-muted);">Untuk mendapatkan QRIS pembayaran</small>
         `;
     }
 
@@ -741,6 +834,10 @@ window.openPaymentModal = function(orderData) {
         statusBadge.textContent = '⏳ Menunggu';
         statusBadge.className = 'payment-status-badge pending';
     }
+
+    // ===== TAMPILKAN TOMBOL BUAT INVOICE =====
+    const btnCreate = document.getElementById('createInvoiceBtn');
+    if (btnCreate) btnCreate.style.display = 'inline-flex';
 
     // ===== OPEN MODAL =====
     overlay.classList.add('open');
@@ -1057,7 +1154,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ===== CREATE INVOICE BUTTON (hidden by default) =====
+    // ===== CREATE INVOICE BUTTON =====
     const createBtn = document.getElementById('createInvoiceBtn');
     if (createBtn) {
         createBtn.addEventListener('click', function() {
