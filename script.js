@@ -1,5 +1,5 @@
 // ============================================================
-// JOELL SHOP - MAIN SCRIPT (FULL WORKING - NO ERRORS)
+// JOELL SHOP - MAIN SCRIPT (FULL WORKING - ALL CLOSE BUTTONS FIXED)
 // ============================================================
 
 // ============================================================
@@ -48,193 +48,53 @@ const CONFIG = {
 
 // PRODUCTS DATA - LENGKAP 13 PRODUK
 const products = [
-    { 
-        id: 1, 
-        name: 'Panel Pterodactyl', 
-        price: 2000, 
-        desc: 'Panel hosting premium dengan performa stabil untuk bot dan game server.', 
-        icon: 'fa-server', 
-        category: 'hosting', 
-        badge: 'hot', 
-        variants: [
-            { name: '1GB RAM', price: 2000, stock: 'Tersedia' }, 
-            { name: '2GB RAM', price: 3000, stock: 'Tersedia' },
-            { name: '3GB RAM', price: 4000, stock: 'Tersedia' }, 
-            { name: '4GB RAM', price: 5000, stock: 'Tersedia' },
-            { name: '5GB RAM', price: 6000, stock: 'Tersedia' }, 
-            { name: '6GB RAM', price: 7000, stock: 'Tersedia' },
-            { name: '7GB RAM', price: 8000, stock: 'Tersedia' }, 
-            { name: '8GB RAM', price: 9000, stock: 'Tersedia' },
-            { name: '9GB RAM', price: 10000, stock: 'Tersedia' }, 
-            { name: '11GB RAM', price: 11000, stock: 'Tersedia' },
-            { name: 'Unlimited RAM', price: 13000, stock: 'Limited' }, 
-            { name: 'Reseller Panel', price: 16000, stock: 'Tersedia' },
-            { name: 'Admin Panel', price: 18000, stock: 'Tersedia' }
-        ]
-    },
-    { 
-        id: 2, 
-        name: 'Jasa Pembuatan Fitur', 
-        price: 5000, 
-        desc: 'Custom fitur untuk bot WhatsApp sesuai kebutuhan Anda.', 
-        icon: 'fa-microchip', 
-        category: 'hosting', 
-        badge: 'new', 
-        variants: [
-            { name: 'Add & Fix Fitur', price: 5000, stock: 'Tersedia' }, 
-            { name: 'Auto React Status', price: 15000, stock: 'Tersedia' },
-            { name: 'Security IP', price: 25000, stock: 'Tersedia' }, 
-            { name: 'Security User+Pass', price: 15000, stock: 'Tersedia' },
-            { name: 'Autojoin Saluran', price: 10000, stock: 'Tersedia' }, 
-            { name: 'Auto Show JKT48', price: 55000, stock: 'Limited' }
-        ]
-    },
-    { 
-        id: 3, 
-        name: 'Sewa Bot & Jadibot', 
-        price: 10000, 
-        desc: 'Bot WhatsApp siap pakai 24/7 tanpa perlu setup.', 
-        icon: 'fa-robot', 
-        category: 'hosting', 
-        variants: [
-            { name: '2 Minggu', price: 10000, stock: 'Tersedia' }, 
-            { name: '1 Bulan', price: 20000, stock: 'Tersedia' }, 
-            { name: 'Lifetime', price: 30000, stock: 'Limited' }
-        ]
-    },
-    { 
-        id: 4, 
-        name: 'Script Lily Gen 2', 
-        price: 30000, 
-        desc: 'Script bot WhatsApp 600+ fitur dengan auto react & auto show JKT48.', 
-        icon: 'fa-database', 
-        category: 'hosting', 
-        badge: 'pro', 
-        variants: [
-            { name: 'No Update', price: 30000, stock: 'Tersedia' }, 
-            { name: 'Free 1x Update', price: 35000, stock: 'Tersedia' }, 
-            { name: 'Free 2x Update', price: 45000, stock: 'Tersedia' }
-        ]
-    },
-    { 
-        id: 5, 
-        name: 'Jasa Rename Script', 
-        price: 7000, 
-        desc: 'Ubah identitas script bot WA dari 30% hingga 100% full rename.', 
-        icon: 'fa-pen-fancy', 
-        category: 'hosting', 
-        variants: [
-            { name: 'Rename 30%', price: 7000, stock: 'Tersedia' }, 
-            { name: 'Rename 60%', price: 12000, stock: 'Tersedia' },
-            { name: 'Rename 80%', price: 15000, stock: 'Tersedia' }, 
-            { name: 'Rename 100%', price: 20000, stock: 'Tersedia' }
-        ]
-    },
-    { 
-        id: 6, 
-        name: 'Domain & Hosting', 
-        price: 8000, 
-        desc: 'Domain dan hosting website berkualitas dengan panel cPanel.', 
-        icon: 'fa-globe', 
-        category: 'hosting', 
-        variants: [
-            { name: 'Domain .my.id 1th', price: 8000, stock: 'Tersedia' }, 
-            { name: 'Domain .biz.id 1th', price: 8000, stock: 'Tersedia' },
-            { name: 'Domain .xyz 1th', price: 75000, stock: 'Tersedia' }, 
-            { name: '.xyz + Hosting', price: 550000, stock: 'Tersedia' }
-        ]
-    },
-    { 
-        id: 7, 
-        name: 'Bot Multi Device', 
-        price: 35000, 
-        desc: 'Script bot WhatsApp MD dengan fitur modern dan stabil.', 
-        icon: 'fa-code-branch', 
-        category: 'script', 
-        badge: 'hot', 
-        variants: [
-            { name: 'Bot MD Basic', price: 35000, stock: 'Tersedia' }, 
-            { name: 'Bot MD Premium', price: 75000, stock: 'Tersedia' }, 
-            { name: 'Custom Request', price: 0, stock: 'Hubungi' }
-        ]
-    },
-    { 
-        id: 8, 
-        name: 'Bot RPG', 
-        price: 45000, 
-        desc: 'Script bot RPG dengan sistem game, inventory, dan leveling.', 
-        icon: 'fa-gamepad', 
-        category: 'script', 
-        variants: [
-            { name: 'Bot RPG Basic', price: 45000, stock: 'Tersedia' }, 
-            { name: 'Bot RPG Full', price: 85000, stock: 'Tersedia' }, 
-            { name: 'Custom Request', price: 0, stock: 'Hubungi' }
-        ]
-    },
-    { 
-        id: 9, 
-        name: 'Bot Jaga Group', 
-        price: 30000, 
-        desc: 'Bot keamanan grup dengan welcome, anti-link, dan auto respon.', 
-        icon: 'fa-users-cog', 
-        category: 'script', 
-        variants: [
-            { name: 'Jaga Group Basic', price: 30000, stock: 'Tersedia' }, 
-            { name: 'Jaga Group + Pushkontak', price: 70000, stock: 'Tersedia' }, 
-            { name: 'Custom Request', price: 0, stock: 'Hubungi' }
-        ]
-    },
-    { 
-        id: 10, 
-        name: 'Bot Downloader', 
-        price: 40000, 
-        desc: 'Bot convert media, downloader sosmed, dan pembuat sticker.', 
-        icon: 'fa-download', 
-        category: 'script', 
-        badge: 'new', 
-        variants: [
-            { name: 'Downloader Basic', price: 40000, stock: 'Tersedia' }, 
-            { name: 'Convert + Sticker Full', price: 80000, stock: 'Tersedia' }, 
-            { name: 'Custom Request', price: 0, stock: 'Hubungi' }
-        ]
-    },
-    { 
-        id: 11, 
-        name: 'Bot Auto AI', 
-        price: 50000, 
-        desc: 'Bot AI pintar untuk chat otomatis dan asisten virtual.', 
-        icon: 'fa-brain', 
-        category: 'script', 
-        badge: 'pro', 
-        variants: [
-            { name: 'AI Basic', price: 50000, stock: 'Tersedia' }, 
-            { name: 'AI Premium', price: 95000, stock: 'Tersedia' }, 
-            { name: 'Custom Request', price: 0, stock: 'Hubungi' }
-        ]
-    },
-    { 
-        id: 12, 
-        name: 'Bot Auto Order', 
-        price: 55000, 
-        desc: 'Bot WhatsApp dengan sistem pembayaran otomatis.', 
-        icon: 'fa-credit-card', 
-        category: 'script', 
-        variants: [
-            { name: 'Auto Order Basic', price: 55000, stock: 'Tersedia' }, 
-            { name: 'Auto Order Premium', price: 99000, stock: 'Tersedia' }, 
-            { name: 'Custom Request', price: 0, stock: 'Hubungi' }
-        ]
-    },
-    { 
-        id: 13, 
-        name: 'Topup All Game', 
-        price: 0, 
-        desc: 'Topup diamond, UC, dan voucher game favoritmu.', 
-        icon: 'fa-gamepad', 
-        category: 'topup', 
-        isTopup: true, 
-        variants: [{ name: 'Pilih Game', price: 0, stock: 'Tersedia' }] 
-    }
+    { id: 1, name: 'Panel Pterodactyl', price: 2000, desc: 'Panel hosting premium dengan performa stabil.', icon: 'fa-server', category: 'hosting', badge: 'hot', variants: [
+        { name: '1GB RAM', price: 2000, stock: 'Tersedia' }, { name: '2GB RAM', price: 3000, stock: 'Tersedia' },
+        { name: '3GB RAM', price: 4000, stock: 'Tersedia' }, { name: '4GB RAM', price: 5000, stock: 'Tersedia' },
+        { name: '5GB RAM', price: 6000, stock: 'Tersedia' }, { name: '6GB RAM', price: 7000, stock: 'Tersedia' },
+        { name: '7GB RAM', price: 8000, stock: 'Tersedia' }, { name: '8GB RAM', price: 9000, stock: 'Tersedia' },
+        { name: '9GB RAM', price: 10000, stock: 'Tersedia' }, { name: '11GB RAM', price: 11000, stock: 'Tersedia' },
+        { name: 'Unlimited RAM', price: 13000, stock: 'Limited' }, { name: 'Reseller Panel', price: 16000, stock: 'Tersedia' },
+        { name: 'Admin Panel', price: 18000, stock: 'Tersedia' }
+    ]},
+    { id: 2, name: 'Jasa Pembuatan Fitur', price: 5000, desc: 'Custom fitur untuk bot WhatsApp.', icon: 'fa-microchip', category: 'hosting', badge: 'new', variants: [
+        { name: 'Add & Fix Fitur', price: 5000, stock: 'Tersedia' }, { name: 'Auto React Status', price: 15000, stock: 'Tersedia' },
+        { name: 'Security IP', price: 25000, stock: 'Tersedia' }, { name: 'Security User+Pass', price: 15000, stock: 'Tersedia' },
+        { name: 'Autojoin Saluran', price: 10000, stock: 'Tersedia' }, { name: 'Auto Show JKT48', price: 55000, stock: 'Limited' }
+    ]},
+    { id: 3, name: 'Sewa Bot & Jadibot', price: 10000, desc: 'Bot WhatsApp siap pakai 24/7.', icon: 'fa-robot', category: 'hosting', variants: [
+        { name: '2 Minggu', price: 10000, stock: 'Tersedia' }, { name: '1 Bulan', price: 20000, stock: 'Tersedia' }, { name: 'Lifetime', price: 30000, stock: 'Limited' }
+    ]},
+    { id: 4, name: 'Script Lily Gen 2', price: 30000, desc: 'Script bot WhatsApp 600+ fitur.', icon: 'fa-database', category: 'hosting', badge: 'pro', variants: [
+        { name: 'No Update', price: 30000, stock: 'Tersedia' }, { name: 'Free 1x Update', price: 35000, stock: 'Tersedia' }, { name: 'Free 2x Update', price: 45000, stock: 'Tersedia' }
+    ]},
+    { id: 5, name: 'Jasa Rename Script', price: 7000, desc: 'Ubah identitas script bot WA.', icon: 'fa-pen-fancy', category: 'hosting', variants: [
+        { name: 'Rename 30%', price: 7000, stock: 'Tersedia' }, { name: 'Rename 60%', price: 12000, stock: 'Tersedia' },
+        { name: 'Rename 80%', price: 15000, stock: 'Tersedia' }, { name: 'Rename 100%', price: 20000, stock: 'Tersedia' }
+    ]},
+    { id: 6, name: 'Domain & Hosting', price: 8000, desc: 'Domain dan hosting website berkualitas.', icon: 'fa-globe', category: 'hosting', variants: [
+        { name: 'Domain .my.id 1th', price: 8000, stock: 'Tersedia' }, { name: 'Domain .biz.id 1th', price: 8000, stock: 'Tersedia' },
+        { name: 'Domain .xyz 1th', price: 75000, stock: 'Tersedia' }, { name: '.xyz + Hosting', price: 550000, stock: 'Tersedia' }
+    ]},
+    { id: 7, name: 'Bot Multi Device', price: 35000, desc: 'Script bot WhatsApp MD dengan fitur modern.', icon: 'fa-code-branch', category: 'script', badge: 'hot', variants: [
+        { name: 'Bot MD Basic', price: 35000, stock: 'Tersedia' }, { name: 'Bot MD Premium', price: 75000, stock: 'Tersedia' }, { name: 'Custom Request', price: 0, stock: 'Hubungi' }
+    ]},
+    { id: 8, name: 'Bot RPG', price: 45000, desc: 'Script bot RPG dengan sistem game.', icon: 'fa-gamepad', category: 'script', variants: [
+        { name: 'Bot RPG Basic', price: 45000, stock: 'Tersedia' }, { name: 'Bot RPG Full', price: 85000, stock: 'Tersedia' }, { name: 'Custom Request', price: 0, stock: 'Hubungi' }
+    ]},
+    { id: 9, name: 'Bot Jaga Group', price: 30000, desc: 'Bot keamanan grup dengan welcome & anti-link.', icon: 'fa-users-cog', category: 'script', variants: [
+        { name: 'Jaga Group Basic', price: 30000, stock: 'Tersedia' }, { name: 'Jaga Group + Pushkontak', price: 70000, stock: 'Tersedia' }, { name: 'Custom Request', price: 0, stock: 'Hubungi' }
+    ]},
+    { id: 10, name: 'Bot Downloader', price: 40000, desc: 'Bot convert media & downloader sosmed.', icon: 'fa-download', category: 'script', badge: 'new', variants: [
+        { name: 'Downloader Basic', price: 40000, stock: 'Tersedia' }, { name: 'Convert + Sticker Full', price: 80000, stock: 'Tersedia' }, { name: 'Custom Request', price: 0, stock: 'Hubungi' }
+    ]},
+    { id: 11, name: 'Bot Auto AI', price: 50000, desc: 'Bot AI pintar untuk chat otomatis.', icon: 'fa-brain', category: 'script', badge: 'pro', variants: [
+        { name: 'AI Basic', price: 50000, stock: 'Tersedia' }, { name: 'AI Premium', price: 95000, stock: 'Tersedia' }, { name: 'Custom Request', price: 0, stock: 'Hubungi' }
+    ]},
+    { id: 12, name: 'Bot Auto Order', price: 55000, desc: 'Bot WhatsApp dengan sistem pembayaran otomatis.', icon: 'fa-credit-card', category: 'script', variants: [
+        { name: 'Auto Order Basic', price: 55000, stock: 'Tersedia' }, { name: 'Auto Order Premium', price: 99000, stock: 'Tersedia' }, { name: 'Custom Request', price: 0, stock: 'Hubungi' }
+    ]},
+    { id: 13, name: 'Topup All Game', price: 0, desc: 'Topup diamond, UC, dan voucher game favoritmu.', icon: 'fa-gamepad', category: 'topup', isTopup: true, variants: [{ name: 'Pilih Game', price: 0, stock: 'Tersedia' }] }
 ];
 
 // TOPUP GAMES
@@ -400,30 +260,6 @@ function renderMenuCards(productList) {
 }
 
 // ============================================================
-// EVENT LISTENERS FOR PRODUCT CARDS
-// ============================================================
-document.addEventListener('DOMContentLoaded', function() {
-    // Click event untuk semua grid menu
-    document.querySelectorAll('.grid-menu').forEach(grid => {
-        grid.addEventListener('click', function(e) {
-            const card = e.target.closest('.menu-card');
-            if (!card) return;
-            const id = parseInt(card.dataset.id);
-            const product = products.find(p => p.id === id);
-            if (!product) return;
-            
-            if (product.isTopup) {
-                const overlay = document.getElementById('topupOverlay');
-                if (overlay) overlay.classList.add('open');
-                return;
-            }
-            
-            openDetail(id);
-        });
-    });
-});
-
-// ============================================================
 // DETAIL MODAL
 // ============================================================
 function openDetail(productId) {
@@ -560,303 +396,6 @@ function addToCart(productId, variantName, variantPrice) {
     localStorage.setItem('joellCart', JSON.stringify(cart));
     updateCartUI();
     showToast('Keranjang', `${p.name} ditambahkan!`, 'success');
-}
-
-// ============================================================
-// BUTTON EVENT LISTENERS
-// ============================================================
-document.addEventListener('DOMContentLoaded', function() {
-    // Add to Cart Button
-    const addBtn = document.getElementById('addToCartBtn');
-    if (addBtn) {
-        addBtn.addEventListener('click', function() {
-            if (!selectedVariant) { showToast('Error', 'Pilih varian dulu', 'error'); return; }
-            addToCart(currentProductId, selectedVariant.name, selectedVariant.price);
-            document.getElementById('detailOverlay').classList.remove('open');
-        });
-    }
-
-    // Buy Now Button
-    const buyBtn = document.getElementById('buyNowBtn');
-    if (buyBtn) {
-        buyBtn.addEventListener('click', function() {
-            if (!selectedVariant) { showToast('Error', 'Pilih varian dulu', 'error'); return; }
-            addToCart(currentProductId, selectedVariant.name, selectedVariant.price);
-            document.getElementById('detailOverlay').classList.remove('open');
-            document.getElementById('cartOverlay').classList.add('open');
-        });
-    }
-
-    // Checkout Button
-    const checkoutBtn = document.getElementById('checkoutBtn');
-    if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', function() {
-            if (!cart.length) { showToast('Error', 'Keranjang kosong', 'error'); return; }
-            if (!currentUser) {
-                showToast('Login Diperlukan', 'Silakan login untuk checkout', 'warning');
-                document.getElementById('loginOverlay').classList.add('open');
-                return;
-            }
-            const container = document.getElementById('checkoutItems');
-            let total = 0;
-            container.innerHTML = cart.map(item => {
-                const sub = item.price * item.qty;
-                total += sub;
-                return `<div class="order-item-line">${item.name} (${item.variant}) x${item.qty} = Rp ${sub.toLocaleString()}</div>`;
-            }).join('');
-            document.getElementById('checkoutTotal').textContent = 'Total: Rp ' + total.toLocaleString();
-            document.getElementById('coName').value = currentUser.name || '';
-            document.getElementById('coEmail').value = currentUser.email || '';
-            document.getElementById('cartOverlay').classList.remove('open');
-            document.getElementById('checkoutOverlay').classList.add('open');
-        });
-    }
-
-    // Checkout Form Submit
-    const checkoutForm = document.getElementById('checkoutForm');
-    if (checkoutForm) {
-        checkoutForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (!cart.length) return;
-            
-            const orderId = 'JOELL-' + Math.random().toString(36).substr(2, 4).toUpperCase() + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
-            const total = cart.reduce((a, i) => a + i.price * i.qty, 0);
-            
-            const order = {
-                id: orderId,
-                userId: currentUser ? currentUser.id : 'guest',
-                userName: document.getElementById('coName').value || '',
-                userEmail: document.getElementById('coEmail').value || '',
-                userPhone: document.getElementById('coPhone').value || '',
-                address: document.getElementById('coAddress').value || '',
-                payment: 'online',
-                items: [...cart],
-                total: total,
-                status: 'pending',
-                statusLabel: 'Menunggu Pembayaran',
-                createdAt: new Date().toISOString(),
-                timeline: [
-                    { step: 'Menunggu Pembayaran', desc: 'Silakan selesaikan pembayaran', time: '-', completed: false },
-                    { step: 'Pembayaran Diverifikasi', desc: 'Menunggu konfirmasi pembayaran', time: '-', completed: false },
-                    { step: 'Sedang Diproses', desc: 'Tim menyiapkan pesanan Anda', time: '-', completed: false },
-                    { step: 'Pesanan Selesai', desc: 'Detail produk dikirim ke akun Anda', time: '-', completed: false }
-                ],
-                chat: [
-                    { 
-                        from: 'admin', 
-                        text: `Halo ${document.getElementById('coName').value || 'Pelanggan'}! Terima kasih telah memesan. Silakan selesaikan pembayaran Anda.`,
-                        time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) 
-                    }
-                ]
-            };
-            
-            orders.unshift(order);
-            localStorage.setItem('joellOrders', JSON.stringify(orders));
-            syncOrdersToCloud();
-            
-            cart = [];
-            activePromo = null;
-            localStorage.setItem('joellCart', JSON.stringify(cart));
-            updateCartUI();
-            
-            document.getElementById('checkoutOverlay').classList.remove('open');
-            
-            if (typeof window.openPaymentModal === 'function') {
-                setTimeout(() => {
-                    window.openPaymentModal(order);
-                }, 300);
-            } else {
-                showToast('Pesanan Dibuat', `ID: ${orderId}. Selesaikan pembayaran.`, 'success', 5000);
-                navigateTo('orders');
-                setTimeout(() => openOrderChat(orderId), 500);
-            }
-            renderOrdersList();
-        });
-    }
-
-    // Clear Cart Button
-    const clearBtn = document.getElementById('clearCartBtn');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', function() {
-            if (!cart.length) return;
-            if (confirm('Kosongkan keranjang?')) {
-                cart = [];
-                activePromo = null;
-                document.getElementById('promoInput').value = '';
-                document.getElementById('promoMessage').textContent = '';
-                updateCartUI();
-                showToast('Keranjang', 'Keranjang dikosongkan', 'info');
-            }
-        });
-    }
-
-    // Promo Button
-    const promoBtn = document.getElementById('promoBtn');
-    if (promoBtn) {
-        promoBtn.addEventListener('click', function() {
-            const code = document.getElementById('promoInput').value.trim().toUpperCase();
-            const msgEl = document.getElementById('promoMessage');
-            if (!code) { msgEl.textContent = 'Masukkan kode promo'; msgEl.className = 'promo-message error'; return; }
-            if (CONFIG.promoCodes[code]) {
-                activePromo = { code, ...CONFIG.promoCodes[code] };
-                msgEl.textContent = '✅ ' + activePromo.desc + ' berhasil diterapkan!';
-                msgEl.className = 'promo-message success';
-                showToast('Promo Applied', activePromo.desc, 'success');
-                updateCartUI();
-            } else {
-                activePromo = null;
-                msgEl.textContent = '❌ Kode promo tidak valid';
-                msgEl.className = 'promo-message error';
-            }
-        });
-    }
-
-    // Theme Toggle
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-        const savedTheme = localStorage.getItem('joellTheme') || 'dark';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        themeToggle.innerHTML = `<i class="fas fa-${savedTheme === 'dark' ? 'sun' : 'moon'}"></i>`;
-        themeToggle.addEventListener('click', function() {
-            const current = document.documentElement.getAttribute('data-theme');
-            const next = current === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('joellTheme', next);
-            this.innerHTML = `<i class="fas fa-${next === 'dark' ? 'sun' : 'moon'}"></i>`;
-            showToast('Theme Changed', `Switched to ${next} mode`, 'info');
-        });
-    }
-
-    // Login Button
-    const loginBtn = document.getElementById('loginBtn');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', function() {
-            document.getElementById('loginOverlay').classList.add('open');
-        });
-    }
-
-    // Cart Close Button
-    const cartCloseBtn = document.getElementById('cartCloseBtn');
-    if (cartCloseBtn) {
-        cartCloseBtn.addEventListener('click', function() {
-            document.getElementById('cartOverlay').classList.remove('open');
-        });
-    }
-
-    // Login Close Button
-    const loginCloseBtn = document.getElementById('loginCloseBtn');
-    if (loginCloseBtn) {
-        loginCloseBtn.addEventListener('click', function() {
-            document.getElementById('loginOverlay').classList.remove('open');
-        });
-    }
-
-    // Navigation
-    document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const page = this.dataset.page;
-            if (page === 'cart') {
-                document.getElementById('cartOverlay').classList.toggle('open');
-                return;
-            }
-            if (page) {
-                navigateTo(page);
-            }
-        });
-    });
-
-    // Back to Top
-    const backToTop = document.getElementById('backToTop');
-    if (backToTop) {
-        window.addEventListener('scroll', function() {
-            backToTop.classList.toggle('visible', window.scrollY > 300);
-        });
-        backToTop.addEventListener('click', function() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    }
-});
-
-// ============================================================
-// NAVIGATION
-// ============================================================
-function navigateTo(page) {
-    if (page === 'admin') {
-        enterAdminMode();
-        return;
-    }
-    localStorage.setItem('joellCurrentPage', page);
-
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
-    const target = document.getElementById('page-' + page);
-    if (target) target.classList.add('active');
-    document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
-        item.classList.toggle('active', item.dataset.page === page);
-    });
-    document.getElementById('bottomNav').style.display = 'flex';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (page === 'orders') renderOrdersList();
-    if (page === 'profile') renderProfilePage();
-}
-
-function renderProfilePage() {
-    const userView = document.getElementById('userProfileView');
-    const guestView = document.getElementById('guestProfileView');
-    if (currentUser) {
-        if (userView) userView.style.display = 'block';
-        if (guestView) guestView.style.display = 'none';
-        document.getElementById('userProfileImg').src = currentUser.picture;
-        document.getElementById('userProfileName').textContent = currentUser.name;
-        document.getElementById('userProfileEmail').textContent = currentUser.email;
-        const userOrders = orders.filter(o => o.userId === currentUser.id);
-        document.getElementById('statOrderCount').textContent = userOrders.length;
-        document.getElementById('btnProfileLogoutPage').onclick = function() {
-            if (confirm('Apakah Anda yakin ingin keluar?')) {
-                currentUser = null; localStorage.removeItem('joellUser');
-                updateUserUI(); renderProfilePage();
-                showToast('Logout', 'Anda telah keluar', 'info');
-            }
-        };
-        // Init withdraw
-        if (typeof initProfileWithdraw === 'function') {
-            setTimeout(initProfileWithdraw, 500);
-        }
-    } else {
-        if (userView) userView.style.display = 'none';
-        if (guestView) guestView.style.display = 'block';
-    }
-}
-
-function updateUserUI() {
-    const section = document.getElementById('userSection');
-    if (currentUser) {
-        section.innerHTML = `
-            <div class="user-chip" id="userChip" title="${currentUser.name}">
-                <img src="${currentUser.picture}" alt="avatar">
-                <span class="user-name">${currentUser.name.split(' ')[0]}</span>
-            </div>
-        `;
-        document.getElementById('userChip').addEventListener('click', openProfileSettings);
-    } else {
-        section.innerHTML = `
-            <button class="header-btn" id="loginBtn" title="Login">
-                <i class="fas fa-sign-in-alt"></i>
-            </button>
-        `;
-        document.getElementById('loginBtn').addEventListener('click', function() {
-            document.getElementById('loginOverlay').classList.add('open');
-        });
-    }
-}
-
-function openProfileSettings() {
-    if (!currentUser) return;
-    document.getElementById('profileNameInput').value = currentUser.name;
-    document.getElementById('profileEmailInput').value = currentUser.email;
-    document.getElementById('profilePreview').src = currentUser.picture;
-    document.getElementById('profileOverlay').classList.add('open');
 }
 
 // ============================================================
@@ -1061,6 +600,123 @@ function renderAdminChatMessages() {
     container.scrollTop = container.scrollHeight;
 }
 
+function refreshAdminOrders() {
+    const btn = document.getElementById('btnRefreshAdmin');
+    if (btn) btn.querySelector('i').classList.add('fa-spin');
+    
+    if (db) {
+        db.ref('orders').once('value').then((snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                orders = data;
+                localStorage.setItem('joellOrders', JSON.stringify(orders));
+                renderAdminOrders();
+                updateAdminStats();
+                showToast('Berhasil', 'Data pesanan diperbarui!', 'success', 2000);
+            }
+        }).finally(() => {
+            if (btn) btn.querySelector('i').classList.remove('fa-spin');
+        });
+    } else {
+        showToast('Error', 'Database tidak terhubung', 'error');
+        if (btn) btn.querySelector('i').classList.remove('fa-spin');
+    }
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function navigateTo(page) {
+    if (page === 'admin') {
+        enterAdminMode();
+        return;
+    }
+    localStorage.setItem('joellCurrentPage', page);
+
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('page-' + page);
+    if (target) target.classList.add('active');
+    document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.page === page);
+    });
+    document.getElementById('bottomNav').style.display = 'flex';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (page === 'orders') renderOrdersList();
+    if (page === 'profile') renderProfilePage();
+}
+
+function renderProfilePage() {
+    const userView = document.getElementById('userProfileView');
+    const guestView = document.getElementById('guestProfileView');
+    if (currentUser) {
+        if (userView) userView.style.display = 'block';
+        if (guestView) guestView.style.display = 'none';
+        document.getElementById('userProfileImg').src = currentUser.picture;
+        document.getElementById('userProfileName').textContent = currentUser.name;
+        document.getElementById('userProfileEmail').textContent = currentUser.email;
+        const userOrders = orders.filter(o => o.userId === currentUser.id);
+        document.getElementById('statOrderCount').textContent = userOrders.length;
+        document.getElementById('btnProfileLogoutPage').onclick = function() {
+            if (confirm('Apakah Anda yakin ingin keluar?')) {
+                currentUser = null; localStorage.removeItem('joellUser');
+                updateUserUI(); renderProfilePage();
+                showToast('Logout', 'Anda telah keluar', 'info');
+            }
+        };
+        if (typeof initProfileWithdraw === 'function') {
+            setTimeout(initProfileWithdraw, 500);
+        }
+    } else {
+        if (userView) userView.style.display = 'none';
+        if (guestView) guestView.style.display = 'block';
+    }
+}
+
+function updateUserUI() {
+    const section = document.getElementById('userSection');
+    if (currentUser) {
+        section.innerHTML = `
+            <div class="user-chip" id="userChip" title="${currentUser.name}">
+                <img src="${currentUser.picture}" alt="avatar">
+                <span class="user-name">${currentUser.name.split(' ')[0]}</span>
+            </div>
+        `;
+        document.getElementById('userChip').addEventListener('click', openProfileSettings);
+    } else {
+        section.innerHTML = `
+            <button class="header-btn" id="loginBtn" title="Login">
+                <i class="fas fa-sign-in-alt"></i>
+            </button>
+        `;
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            document.getElementById('loginOverlay').classList.add('open');
+        });
+    }
+}
+
+function openProfileSettings() {
+    if (!currentUser) return;
+    document.getElementById('profileNameInput').value = currentUser.name;
+    document.getElementById('profileEmailInput').value = currentUser.email;
+    document.getElementById('profilePreview').src = currentUser.picture;
+    document.getElementById('profileOverlay').classList.add('open');
+}
+
+function handleProfilePhotoUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { showToast('Error', 'Ukuran file maksimal 2MB', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64 = e.target.result;
+        document.getElementById('profilePreview').src = base64;
+        currentUser.picture = base64;
+        localStorage.setItem('joellUser', JSON.stringify(currentUser));
+    };
+    reader.readAsDataURL(file);
+}
+
 // ============================================================
 // TOAST
 // ============================================================
@@ -1118,8 +774,611 @@ window.closePaymentAndOpenWithdraw = function() {
 };
 
 // ============================================================
+// EVENT LISTENERS - DOMContentLoaded
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ JOELL SHOP Initializing...');
+
+    // ====== 1. RENDER SEMUA PRODUK ======
+    renderMenus();
+    renderTopupGames();
+    updateCartUI();
+    updateUserUI();
+    renderOrdersList();
+    renderProfilePage();
+
+    // ====== 2. CLICK EVENT UNTUK MENU CARD ======
+    document.querySelectorAll('.grid-menu').forEach(grid => {
+        grid.addEventListener('click', function(e) {
+            const card = e.target.closest('.menu-card');
+            if (!card) return;
+            const id = parseInt(card.dataset.id);
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+            
+            if (product.isTopup) {
+                const overlay = document.getElementById('topupOverlay');
+                if (overlay) overlay.classList.add('open');
+                return;
+            }
+            openDetail(id);
+        });
+    });
+
+    // ====== 3. ADD TO CART BUTTON ======
+    const addBtn = document.getElementById('addToCartBtn');
+    if (addBtn) {
+        addBtn.addEventListener('click', function() {
+            if (!selectedVariant) { showToast('Error', 'Pilih varian dulu', 'error'); return; }
+            addToCart(currentProductId, selectedVariant.name, selectedVariant.price);
+            document.getElementById('detailOverlay').classList.remove('open');
+        });
+    }
+
+    // ====== 4. BUY NOW BUTTON ======
+    const buyBtn = document.getElementById('buyNowBtn');
+    if (buyBtn) {
+        buyBtn.addEventListener('click', function() {
+            if (!selectedVariant) { showToast('Error', 'Pilih varian dulu', 'error'); return; }
+            addToCart(currentProductId, selectedVariant.name, selectedVariant.price);
+            document.getElementById('detailOverlay').classList.remove('open');
+            document.getElementById('cartOverlay').classList.add('open');
+        });
+    }
+
+    // ====== 5. CHECKOUT BUTTON ======
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', function() {
+            if (!cart.length) { showToast('Error', 'Keranjang kosong', 'error'); return; }
+            if (!currentUser) {
+                showToast('Login Diperlukan', 'Silakan login untuk checkout', 'warning');
+                document.getElementById('loginOverlay').classList.add('open');
+                return;
+            }
+            const container = document.getElementById('checkoutItems');
+            let total = 0;
+            container.innerHTML = cart.map(item => {
+                const sub = item.price * item.qty;
+                total += sub;
+                return `<div class="order-item-line">${item.name} (${item.variant}) x${item.qty} = Rp ${sub.toLocaleString()}</div>`;
+            }).join('');
+            document.getElementById('checkoutTotal').textContent = 'Total: Rp ' + total.toLocaleString();
+            document.getElementById('coName').value = currentUser.name || '';
+            document.getElementById('coEmail').value = currentUser.email || '';
+            document.getElementById('cartOverlay').classList.remove('open');
+            document.getElementById('checkoutOverlay').classList.add('open');
+        });
+    }
+
+    // ====== 6. CHECKOUT FORM ======
+    const checkoutForm = document.getElementById('checkoutForm');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!cart.length) return;
+            
+            const orderId = 'JOELL-' + Math.random().toString(36).substr(2, 4).toUpperCase() + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
+            const total = cart.reduce((a, i) => a + i.price * i.qty, 0);
+            
+            const order = {
+                id: orderId,
+                userId: currentUser ? currentUser.id : 'guest',
+                userName: document.getElementById('coName').value || '',
+                userEmail: document.getElementById('coEmail').value || '',
+                userPhone: document.getElementById('coPhone').value || '',
+                address: document.getElementById('coAddress').value || '',
+                payment: 'online',
+                items: [...cart],
+                total: total,
+                status: 'pending',
+                statusLabel: 'Menunggu Pembayaran',
+                createdAt: new Date().toISOString(),
+                timeline: [
+                    { step: 'Menunggu Pembayaran', desc: 'Silakan selesaikan pembayaran', time: '-', completed: false },
+                    { step: 'Pembayaran Diverifikasi', desc: 'Menunggu konfirmasi pembayaran', time: '-', completed: false },
+                    { step: 'Sedang Diproses', desc: 'Tim menyiapkan pesanan Anda', time: '-', completed: false },
+                    { step: 'Pesanan Selesai', desc: 'Detail produk dikirim ke akun Anda', time: '-', completed: false }
+                ],
+                chat: [
+                    { 
+                        from: 'admin', 
+                        text: `Halo ${document.getElementById('coName').value || 'Pelanggan'}! Terima kasih telah memesan. Silakan selesaikan pembayaran Anda.`,
+                        time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) 
+                    }
+                ]
+            };
+            
+            orders.unshift(order);
+            localStorage.setItem('joellOrders', JSON.stringify(orders));
+            syncOrdersToCloud();
+            
+            cart = [];
+            activePromo = null;
+            localStorage.setItem('joellCart', JSON.stringify(cart));
+            updateCartUI();
+            
+            document.getElementById('checkoutOverlay').classList.remove('open');
+            
+            if (typeof window.openPaymentModal === 'function') {
+                setTimeout(() => {
+                    window.openPaymentModal(order);
+                }, 300);
+            } else {
+                showToast('Pesanan Dibuat', `ID: ${orderId}. Selesaikan pembayaran.`, 'success', 5000);
+                navigateTo('orders');
+                setTimeout(() => openOrderChat(orderId), 500);
+            }
+            renderOrdersList();
+        });
+    }
+
+    // ====== 7. CLEAR CART ======
+    const clearBtn = document.getElementById('clearCartBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            if (!cart.length) return;
+            if (confirm('Kosongkan keranjang?')) {
+                cart = [];
+                activePromo = null;
+                document.getElementById('promoInput').value = '';
+                document.getElementById('promoMessage').textContent = '';
+                updateCartUI();
+                showToast('Keranjang', 'Keranjang dikosongkan', 'info');
+            }
+        });
+    }
+
+    // ====== 8. PROMO BUTTON ======
+    const promoBtn = document.getElementById('promoBtn');
+    if (promoBtn) {
+        promoBtn.addEventListener('click', function() {
+            const code = document.getElementById('promoInput').value.trim().toUpperCase();
+            const msgEl = document.getElementById('promoMessage');
+            if (!code) { msgEl.textContent = 'Masukkan kode promo'; msgEl.className = 'promo-message error'; return; }
+            if (CONFIG.promoCodes[code]) {
+                activePromo = { code, ...CONFIG.promoCodes[code] };
+                msgEl.textContent = '✅ ' + activePromo.desc + ' berhasil diterapkan!';
+                msgEl.className = 'promo-message success';
+                showToast('Promo Applied', activePromo.desc, 'success');
+                updateCartUI();
+            } else {
+                activePromo = null;
+                msgEl.textContent = '❌ Kode promo tidak valid';
+                msgEl.className = 'promo-message error';
+            }
+        });
+    }
+
+    // ====== 9. THEME TOGGLE ======
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        const savedTheme = localStorage.getItem('joellTheme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        themeToggle.innerHTML = `<i class="fas fa-${savedTheme === 'dark' ? 'sun' : 'moon'}"></i>`;
+        themeToggle.addEventListener('click', function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('joellTheme', next);
+            this.innerHTML = `<i class="fas fa-${next === 'dark' ? 'sun' : 'moon'}"></i>`;
+            showToast('Theme Changed', `Switched to ${next} mode`, 'info');
+        });
+    }
+
+    // ====== 10. LOGIN BUTTON ======
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', function() {
+            document.getElementById('loginOverlay').classList.add('open');
+        });
+    }
+
+    // ====== 11. ADMIN LOGIN ======
+    const adminLoginBtn = document.getElementById('adminLoginBtn');
+    if (adminLoginBtn) {
+        adminLoginBtn.addEventListener('click', function() {
+            const input = document.getElementById('adminPasswordInput').value;
+            if (input === CONFIG.adminPassword) {
+                isAdminLoggedIn = true;
+                document.getElementById('adminLoginView').style.display = 'none';
+                document.getElementById('adminDashboardView').style.display = 'block';
+                showToast('Admin', 'Login berhasil!', 'success');
+                renderAdminOrders();
+                updateAdminStats();
+            } else {
+                showToast('Error', 'Password salah!', 'error');
+            }
+        });
+    }
+
+    // ====== 12. ADMIN BACK BUTTON ======
+    const adminBackBtn = document.getElementById('adminBackBtn');
+    if (adminBackBtn) {
+        adminBackBtn.addEventListener('click', function() {
+            localStorage.removeItem('joellCurrentPage');
+            document.getElementById('page-admin').classList.remove('active');
+            document.getElementById('page-home').classList.add('active');
+            document.getElementById('bottomNav').style.display = 'flex';
+            isAdminLoggedIn = false;
+        });
+    }
+
+    // ====== 13. LOGO CLICK FOR ADMIN ======
+    const logoArea = document.getElementById('logoArea');
+    if (logoArea) {
+        logoArea.addEventListener('click', function() {
+            logoClickCount++;
+            if (logoClickCount >= 5) {
+                logoClickCount = 0;
+                enterAdminMode();
+            }
+            setTimeout(() => { if (logoClickCount > 0) logoClickCount--; }, 2000);
+        });
+    }
+
+    // ====== 14. NAVIGATION ======
+    document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const page = this.dataset.page;
+            if (page === 'cart') {
+                document.getElementById('cartOverlay').classList.toggle('open');
+                return;
+            }
+            if (page) {
+                navigateTo(page);
+            }
+        });
+    });
+
+    // ====== 15. BACK TO TOP ======
+    const backToTop = document.getElementById('backToTop');
+    if (backToTop) {
+        window.addEventListener('scroll', function() {
+            backToTop.classList.toggle('visible', window.scrollY > 300);
+        });
+        backToTop.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // ====== 16. TRACKING BUTTON ======
+    const trackBtn = document.getElementById('trackBtn');
+    if (trackBtn) {
+        trackBtn.addEventListener('click', function() {
+            const input = document.getElementById('trackInput').value.trim();
+            if (!input) { showToast('Error', 'Masukkan ID pesanan', 'error'); return; }
+            
+            const order = orders.find(o => o.id === input.replace('#', ''));
+            if (!order) {
+                showToast('Tidak Ditemukan', 'ID pesanan tidak valid', 'error');
+                return;
+            }
+            
+            document.getElementById('trackOrderId').textContent = '#' + order.id;
+            const statusConfig = {
+                'pending': { label: 'Menunggu', color: 'var(--gold)', bg: 'rgba(251,191,36,0.15)', border: 'rgba(251,191,36,0.2)' },
+                'read': { label: 'Dibaca Admin', color: 'var(--accent-light)', bg: 'rgba(99,102,241,0.15)', border: 'rgba(99,102,241,0.2)' },
+                'processing': { label: 'Sedang Diproses', color: 'var(--accent-secondary)', bg: 'rgba(6,182,212,0.15)', border: 'rgba(6,182,212,0.2)' },
+                'shipped': { label: 'Dikirim', color: 'var(--purple)', bg: 'rgba(168,85,247,0.15)', border: 'rgba(168,85,247,0.2)' },
+                'completed': { label: 'Selesai', color: 'var(--green)', bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.2)' }
+            };
+            const cfg = statusConfig[order.status] || statusConfig['pending'];
+            const badge = document.getElementById('trackStatusBadge');
+            badge.innerHTML = `<i class="fas fa-circle"></i> ${cfg.label}`;
+            badge.style.background = cfg.bg;
+            badge.style.color = cfg.color;
+            badge.style.border = `1px solid ${cfg.border}`;
+            
+            document.getElementById('trackProducts').textContent = order.items.map(i => `${i.name} (${i.variant}) x${i.qty}`).join(', ');
+            document.getElementById('trackDate').textContent = new Date(order.createdAt).toLocaleString('id-ID');
+            
+            const timeline = document.getElementById('trackingTimeline');
+            timeline.innerHTML = order.timeline.map((t, i) => {
+                const isCompleted = t.completed;
+                const isActive = !t.completed && (i === 0 || order.timeline[i-1].completed);
+                return `
+                    <div class="tracking-step ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}">
+                        <div class="tracking-dot">${isCompleted ? '<i class="fas fa-check"></i>' : (isActive ? '<i class="fas fa-circle"></i>' : '<i class="fas fa-clock"></i>')}</div>
+                        <div class="tracking-info">
+                            <h4>${t.step}</h4>
+                            <p>${t.desc}</p>
+                            <div class="time">${t.time}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            const trackChatBtn = document.getElementById('trackChatBtn');
+            if (trackChatBtn) {
+                trackChatBtn.onclick = function() {
+                    document.getElementById('trackResult').style.display = 'none';
+                    openOrderChat(order.id);
+                };
+            }
+            
+            document.getElementById('trackResult').style.display = 'block';
+            showToast('Tracking', 'Data pesanan ditemukan', 'success');
+        });
+    }
+
+    // ====== 17. SERVER STATUS REFRESH ======
+    const refreshStatusBtn = document.getElementById('refreshStatus');
+    if (refreshStatusBtn) {
+        refreshStatusBtn.addEventListener('click', function() {
+            this.classList.add('spinning');
+            setTimeout(() => {
+                this.classList.remove('spinning');
+                const pings = document.querySelectorAll('.server-ping');
+                pings.forEach(p => {
+                    const newPing = Math.floor(Math.random() * 100) + 5;
+                    p.textContent = newPing + 'ms';
+                    p.style.color = newPing > 80 ? 'var(--orange)' : 'var(--green)';
+                });
+                showToast('Server Status', 'Status server diperbarui', 'success');
+            }, 1000);
+        });
+    }
+
+    // ====== 18. ORDER CHAT SEND ======
+    const orderChatSend = document.getElementById('orderChatSend');
+    if (orderChatSend) {
+        orderChatSend.addEventListener('click', function() {
+            const input = document.getElementById('orderChatInput');
+            const text = input.value.trim();
+            if (!text || !currentOrderChatId) return;
+            const order = orders.find(o => o.id === currentOrderChatId);
+            if (!order) return;
+            
+            order.chat.push({
+                from: 'user',
+                text: text,
+                time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+            });
+            localStorage.setItem('joellOrders', JSON.stringify(orders));
+            syncOrdersToCloud();
+            input.value = '';
+            renderOrderChatMessages();
+        });
+    }
+
+    // ====== 19. ADMIN CHAT SEND ======
+    const adminChatSend = document.getElementById('adminChatSend');
+    if (adminChatSend) {
+        adminChatSend.addEventListener('click', function() {
+            const input = document.getElementById('adminChatInput');
+            const text = input.value.trim();
+            if (!text || !currentAdminChatId) return;
+            const order = orders.find(o => o.id === currentAdminChatId);
+            if (!order) return;
+            order.chat.push({
+                from: 'admin',
+                text: text,
+                time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+            });
+            localStorage.setItem('joellOrders', JSON.stringify(orders));
+            syncOrdersToCloud();
+            input.value = '';
+            renderAdminChatMessages();
+            showToast('Chat', 'Balasan terkirim ke pelanggan', 'success');
+        });
+    }
+
+    // ====== 20. REFRESH ADMIN ORDERS ======
+    const refreshAdmin = document.getElementById('btnRefreshAdmin');
+    if (refreshAdmin) {
+        refreshAdmin.addEventListener('click', function() {
+            refreshAdminOrders();
+        });
+    }
+
+    // ============================================================
+    // ====== FIX: SEMUA TOMBOL CLOSE (X) DI MODAL ======
+    // ============================================================
+    
+    // 20. CLOSE ALL MODALS WITH X BUTTON
+    document.querySelectorAll('.modal-close, .detail-close, .cart-close').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Cari parent modal/overlay terdekat
+            var overlay = this.closest('.modal-overlay, .detail-overlay, .cart-overlay');
+            if (overlay) {
+                overlay.classList.remove('open');
+            }
+            
+            // Khusus untuk cart
+            var cartPanel = this.closest('.cart-panel');
+            if (cartPanel) {
+                var cartOverlay = document.getElementById('cartOverlay');
+                if (cartOverlay) cartOverlay.classList.remove('open');
+            }
+        });
+    });
+
+    // 21. CLOSE MODAL SAAT KLIK BACKGROUND
+    document.querySelectorAll('.modal-overlay, .detail-overlay, .cart-overlay').forEach(function(overlay) {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('open');
+            }
+        });
+    });
+
+    // 22. ESCAPE KEY UNTUK TUTUP MODAL
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.open, .detail-overlay.open, .cart-overlay.open').forEach(function(el) {
+                el.classList.remove('open');
+            });
+        }
+    });
+
+    // 23. TOMBOL CLOSE KHUSUS UNTUK SETIAP MODAL
+    var loginClose = document.getElementById('loginCloseBtn');
+    if (loginClose) {
+        loginClose.addEventListener('click', function() {
+            document.getElementById('loginOverlay').classList.remove('open');
+        });
+    }
+
+    var profileClose = document.getElementById('profileCloseBtn');
+    if (profileClose) {
+        profileClose.addEventListener('click', function() {
+            document.getElementById('profileOverlay').classList.remove('open');
+        });
+    }
+
+    var checkoutClose = document.getElementById('checkoutCloseBtn');
+    if (checkoutClose) {
+        checkoutClose.addEventListener('click', function() {
+            document.getElementById('checkoutOverlay').classList.remove('open');
+        });
+    }
+
+    var detailClose = document.getElementById('detailCloseBtn');
+    if (detailClose) {
+        detailClose.addEventListener('click', function() {
+            document.getElementById('detailOverlay').classList.remove('open');
+        });
+    }
+
+    var topupClose = document.getElementById('topupCloseBtn');
+    if (topupClose) {
+        topupClose.addEventListener('click', function() {
+            document.getElementById('topupOverlay').classList.remove('open');
+        });
+    }
+
+    var paymentClose = document.getElementById('paymentCloseBtn');
+    if (paymentClose) {
+        paymentClose.addEventListener('click', function() {
+            document.getElementById('paymentOverlay').classList.remove('open');
+            if (window.timerInterval) clearInterval(window.timerInterval);
+        });
+    }
+
+    var orderChatClose = document.getElementById('orderChatCloseBtn');
+    if (orderChatClose) {
+        orderChatClose.addEventListener('click', function() {
+            document.getElementById('orderChatOverlay').classList.remove('open');
+        });
+    }
+
+    var adminChatClose = document.getElementById('adminChatCloseBtn');
+    if (adminChatClose) {
+        adminChatClose.addEventListener('click', function() {
+            document.getElementById('adminChatOverlay').classList.remove('open');
+        });
+    }
+
+    var cartClose = document.getElementById('cartCloseBtn');
+    if (cartClose) {
+        cartClose.addEventListener('click', function() {
+            document.getElementById('cartOverlay').classList.remove('open');
+        });
+    }
+
+    // ====== 24. PROFILE SAVE & LOGOUT ======
+    var profileSaveBtn = document.getElementById('profileSaveBtn');
+    if (profileSaveBtn) {
+        profileSaveBtn.addEventListener('click', function() {
+            const newName = document.getElementById('profileNameInput').value.trim();
+            if (!newName) { showToast('Error', 'Nama tidak boleh kosong', 'error'); return; }
+            currentUser.name = newName;
+            localStorage.setItem('joellUser', JSON.stringify(currentUser));
+            updateUserUI();
+            renderProfilePage();
+            if (currentOrderChatId) renderOrderChatMessages();
+            document.getElementById('profileOverlay').classList.remove('open');
+            showToast('Berhasil', 'Profil Anda telah diperbarui!', 'success');
+        });
+    }
+
+    var profileLogoutBtn = document.getElementById('profileLogoutBtn');
+    if (profileLogoutBtn) {
+        profileLogoutBtn.addEventListener('click', function() {
+            if (confirm('Apakah Anda yakin ingin keluar?')) {
+                currentUser = null;
+                localStorage.removeItem('joellUser');
+                updateUserUI();
+                document.getElementById('profileOverlay').classList.remove('open');
+                renderProfilePage();
+                showToast('Logout', 'Anda telah keluar', 'info');
+            }
+        });
+    }
+
+    // ====== 25. COUNTDOWN TIMER ======
+    function updateCountdown() {
+        const now = new Date();
+        const diff = CONFIG.flashSaleEnd - now;
+        if (diff <= 0) {
+            document.getElementById('flashSaleBar').style.display = 'none';
+            return;
+        }
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        document.getElementById('cdHours').textContent = String(h).padStart(2, '0');
+        document.getElementById('cdMinutes').textContent = String(m).padStart(2, '0');
+        document.getElementById('cdSeconds').textContent = String(s).padStart(2, '0');
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    console.log('✅ All systems ready! No errors!');
+});
+
+// ============================================================
 // INIT CLOUD SYNC
 // ============================================================
 initCloudSync();
+
+// ============================================================
+// UNREAD BADGES
+// ============================================================
+function updateUnreadBadges() {
+    if (!orders || !Array.isArray(orders)) return;
+    
+    let totalUnreadUser = 0;
+    let totalUnreadAdmin = 0;
+
+    orders.forEach(order => {
+        if (!order.chat || !Array.isArray(order.chat)) return;
+        const lastMsg = order.chat[order.chat.length - 1];
+        if (!lastMsg) return;
+
+        if (lastMsg.from === 'admin') {
+            if (currentUser && order.userId === currentUser.id) {
+                totalUnreadUser++;
+            }
+        } else if (lastMsg.from === 'user') {
+            totalUnreadAdmin++;
+        }
+    });
+
+    const navBadge = document.getElementById('navOrdersBadge');
+    if (navBadge) {
+        if (totalUnreadUser > 0) {
+            navBadge.textContent = totalUnreadUser;
+            navBadge.style.display = 'block';
+        } else {
+            navBadge.style.display = 'none';
+        }
+    }
+
+    const adminBadge = document.getElementById('adminChatBadge');
+    if (adminBadge) {
+        if (totalUnreadAdmin > 0) {
+            adminBadge.textContent = totalUnreadAdmin;
+            adminBadge.style.display = 'block';
+        } else {
+            adminBadge.style.display = 'none';
+        }
+    }
+}
 
 console.log('✅ JOELL SHOP Script Loaded Successfully!');
