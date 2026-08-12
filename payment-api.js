@@ -1,5 +1,5 @@
 // ============================================================
-// PAYMENT API - LZPedia Integration (FIXED v2.5)
+// PAYMENT API - LZPedia Integration (FIXED v3.0 - Privacy Focused)
 // API Key: LXZ_6d2cebe4c33643b0
 // ============================================================
 
@@ -9,25 +9,7 @@ const PAYMENT_API = {
         baseUrl: 'https://app.lzpedia.my.id/api'
     },
 
-    // 1. CEK SALDO
-    async getBalance() {
-        try {
-            const response = await fetch(`${this.config.baseUrl}/balance?apikey=${this.config.apiKey}`);
-            const data = await response.json();
-            console.log('💰 Balance Response:', data);
-            return {
-                success: true,
-                balance: data.balance || 0,
-                username: data.username || '',
-                email: data.email || ''
-            };
-        } catch (error) {
-            console.error('Balance Error:', error);
-            return { success: false, error: error.message, balance: 0 };
-        }
-    },
-
-    // 2. BUAT INVOICE
+    // 1. BUAT INVOICE
     async createInvoice(amount) {
         try {
             const response = await fetch(
@@ -57,7 +39,7 @@ const PAYMENT_API = {
         }
     },
 
-    // 3. CEK STATUS INVOICE
+    // 2. CEK STATUS INVOICE
     async checkInvoiceStatus(invoiceId) {
         try {
             const response = await fetch(
@@ -81,62 +63,6 @@ const PAYMENT_API = {
             console.error('Check Status Error:', error);
             return { success: false, error: error.message };
         }
-    },
-
-    // 4. METODE WITHDRAW
-    async getWithdrawMethods() {
-        try {
-            const response = await fetch(`${this.config.baseUrl}/withdraw/methods?apikey=${this.config.apiKey}`);
-            const data = await response.json();
-            return {
-                success: true,
-                manualMethods: data.manual_methods || [
-                    { name: 'Dana', method: 'dana', fee: 1000, min: 10000, max: 1000000 },
-                    { name: 'OVO', method: 'ovo', fee: 1000, min: 10000, max: 1000000 },
-                    { name: 'Gopay', method: 'gopay', fee: 1000, min: 10000, max: 1000000 }
-                ],
-                instantMethods: data.instant_methods || []
-            };
-        } catch (error) {
-            console.error('Withdraw Methods Error:', error);
-            return {
-                success: true,
-                manualMethods: [
-                    { name: 'Dana', method: 'dana', fee: 1000, min: 10000, max: 1000000 },
-                    { name: 'OVO', method: 'ovo', fee: 1000, min: 10000, max: 1000000 },
-                    { name: 'Gopay', method: 'gopay', fee: 1000, min: 10000, max: 1000000 }
-                ],
-                instantMethods: []
-            };
-        }
-    },
-
-    // 5. PROSES WITHDRAW
-    async processWithdraw(amount, method, accountNumber, instant = false) {
-        try {
-            const url = `${this.config.baseUrl}/withdraw?apikey=${this.config.apiKey}&amount=${amount}&method=${method}&account_number=${encodeURIComponent(accountNumber)}&instant=${instant}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return {
-                success: true,
-                message: data.message || 'Penarikan berhasil',
-                data: data.data || null
-            };
-        } catch (error) {
-            console.error('Withdraw Error:', error);
-            return {
-                success: true,
-                message: 'Permintaan penarikan berhasil diajukan',
-                data: {
-                    id: 'WD' + Math.random().toString(36).substr(2, 8),
-                    amount: amount,
-                    method: method,
-                    account_number: accountNumber,
-                    status: 'pending',
-                    created_at: new Date().toISOString()
-                }
-            };
-        }
     }
 };
 
@@ -147,50 +73,47 @@ const PAYMENT_API = {
 window.currentInvoiceId = null;
 window.timerInterval = null;
 window.autoCheckInterval = null;
-window.selectedWithdrawMethodData = null;
-window.invoiceHistory = JSON.parse(localStorage.getItem('joellInvoiceHistory')) || [];
-window.withdrawHistory = JSON.parse(localStorage.getItem('joellWithdrawHistory')) || [];
+
+// Get current user for privacy
+function getCurrentUserId() {
+    const user = JSON.parse(localStorage.getItem('joellUser') || '{}');
+    return user.id || 'guest_' + (localStorage.getItem('joellGuestId') || generateGuestId());
+}
+
+function generateGuestId() {
+    const id = 'guest_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('joellGuestId', id);
+    return id;
+}
+
+// Invoice history key per user
+function getInvoiceHistoryKey() {
+    return 'joellInvoiceHistory_' + getCurrentUserId();
+}
+
+function getInvoiceHistory() {
+    return JSON.parse(localStorage.getItem(getInvoiceHistoryKey()) || '[]');
+}
+
+function setInvoiceHistory(history) {
+    localStorage.setItem(getInvoiceHistoryKey(), JSON.stringify(history));
+}
 
 // ============================================================
-// CEK SALDO
-// ============================================================
-window.fetchBalance = async function() {
-    const balanceEl = document.getElementById('balanceAmount');
-    const profileBalanceEl = document.getElementById('profileBalanceAmount');
-    const refreshBtn = document.querySelector('.balance-refresh');
-
-    try {
-        if (refreshBtn) refreshBtn.classList.add('spinning');
-        const result = await PAYMENT_API.getBalance();
-        const balanceText = 'Rp ' + Number(result.balance).toLocaleString();
-        if (balanceEl) balanceEl.textContent = balanceText;
-        if (profileBalanceEl) profileBalanceEl.textContent = balanceText;
-        return result.balance;
-    } catch (error) {
-        console.error('Fetch Balance Error:', error);
-        if (balanceEl) balanceEl.textContent = 'Rp 0';
-        if (profileBalanceEl) profileBalanceEl.textContent = 'Rp 0';
-        return 0;
-    } finally {
-        if (refreshBtn) refreshBtn.classList.remove('spinning');
-    }
-};
-
-// ============================================================
-// GENERATE FALLBACK QRIS (QRServer API - Free & Reliable)
+// GENERATE FALLBACK QRIS
 // ============================================================
 window.generateFallbackQris = function(text) {
     return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=${encodeURIComponent(text)}`;
 };
 
 // ============================================================
-// BUAT INVOICE - QRIS LANGSUNG TAMPIL (FIXED)
+// BUAT INVOICE - QRIS LANGSUNG TAMPIL (FIXED v3.0)
 // ============================================================
 window.createInvoice = async function(amount) {
-    const btn = document.getElementById('createInvoiceBtn');
     const qrisPlaceholder = document.getElementById('qrisPlaceholder');
     const qrisWrapper = document.getElementById('qrisImageWrapper');
     const qrisImage = document.getElementById('qrisImage');
+    const createBtn = document.getElementById('createInvoiceBtn');
 
     if (!amount || amount <= 0) {
         showToast('Error', 'Jumlah tidak valid', 'error');
@@ -199,19 +122,17 @@ window.createInvoice = async function(amount) {
 
     // TAMPILKAN LOADING
     if (qrisPlaceholder) {
-        qrisPlaceholder.style.display = 'block';
+        qrisPlaceholder.style.display = 'flex';
         qrisPlaceholder.innerHTML = `
-            <i class="fas fa-spinner fa-spin" style="font-size:2.5rem;color:var(--accent-light);"></i>
-            <p style="margin-top:16px;font-weight:700;font-size:1rem;">Membuat invoice...</p>
-            <small style="color:var(--text-muted);">Mohon tunggu sebentar</small>
+            <div style="text-align:center;">
+                <i class="fas fa-spinner fa-spin" style="font-size:2.5rem;color:var(--accent-light);display:block;margin-bottom:12px;"></i>
+                <p style="font-weight:700;font-size:1rem;margin-bottom:4px;">Membuat invoice...</p>
+                <small style="color:var(--text-muted);">Mohon tunggu sebentar</small>
+            </div>
         `;
     }
     if (qrisWrapper) qrisWrapper.style.display = 'none';
-
-    if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membuat...';
-    }
+    if (createBtn) createBtn.style.display = 'none';
 
     try {
         const result = await PAYMENT_API.createInvoice(amount);
@@ -220,24 +141,13 @@ window.createInvoice = async function(amount) {
         if (result.success && result.invoiceId) {
             window.currentInvoiceId = result.invoiceId;
 
-            // ===== SIAPKAN PAYMENT LINK =====
+            // PAYMENT LINK
             const paymentLink = result.paymentLink || `https://app.lzpedia.my.id/pay/${result.invoiceId}`;
 
-            // ===== PILIH QRIS SOURCE =====
-            let qrisSrc = null;
-            let qrisSourceLabel = '';
+            // PILIH QRIS SOURCE
+            let qrisSrc = result.qrisImage || window.generateFallbackQris(paymentLink);
 
-            if (result.qrisImage) {
-                // QRIS RESMI DARI API
-                qrisSrc = result.qrisImage;
-                qrisSourceLabel = 'QRIS Resmi';
-            } else {
-                // FALLBACK: Generate QRIS dari payment link
-                qrisSrc = window.generateFallbackQris(paymentLink);
-                qrisSourceLabel = 'QRIS Alternatif';
-            }
-
-            // ===== TAMPILKAN QRIS =====
+            // TAMPILKAN QRIS
             if (qrisImage) {
                 qrisImage.src = qrisSrc;
                 qrisImage.style.display = 'block';
@@ -251,18 +161,19 @@ window.createInvoice = async function(amount) {
                 qrisImage.style.border = '2px solid #e5e7eb';
                 qrisImage.style.margin = '0 auto';
 
-                // Error handler jika gambar gagal load
                 qrisImage.onerror = function() {
                     this.style.display = 'none';
                     if (qrisPlaceholder) {
-                        qrisPlaceholder.style.display = 'block';
+                        qrisPlaceholder.style.display = 'flex';
                         qrisPlaceholder.innerHTML = `
-                            <i class="fas fa-exclamation-triangle" style="font-size:2.5rem;color:var(--orange);"></i>
-                            <p style="margin-top:12px;font-weight:600;">Gagal memuat QRIS</p>
-                            <p style="color:var(--text-muted);font-size:0.85rem;">Gunakan link pembayaran di bawah</p>
-                            <button onclick="window.regenerateQris()" style="margin-top:12px;padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
-                                <i class="fas fa-redo"></i> Muat Ulang QRIS
-                            </button>
+                            <div style="text-align:center;">
+                                <i class="fas fa-exclamation-triangle" style="font-size:2.5rem;color:var(--orange);display:block;margin-bottom:12px;"></i>
+                                <p style="font-weight:600;margin-bottom:8px;">Gagal memuat QRIS</p>
+                                <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:12px;">Gunakan link pembayaran di bawah</p>
+                                <button onclick="window.regenerateQris()" style="padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
+                                    <i class="fas fa-redo"></i> Muat Ulang QRIS
+                                </button>
+                            </div>
                         `;
                     }
                 };
@@ -272,20 +183,16 @@ window.createInvoice = async function(amount) {
                 qrisWrapper.style.display = 'block';
                 qrisWrapper.style.textAlign = 'center';
             }
-            if (qrisPlaceholder) {
-                qrisPlaceholder.style.display = 'none';
-            }
+            if (qrisPlaceholder) qrisPlaceholder.style.display = 'none';
 
-            // ===== TAMPILKAN TEKS SUKSES =====
+            // TEKS SUKSES
             const successText = document.querySelector('.qris-success-text');
             if (successText) {
                 successText.style.display = 'block';
-                successText.innerHTML = `<i class="fas fa-check-circle"></i> ${qrisSourceLabel} — Scan untuk membayar`;
+                successText.innerHTML = `<i class="fas fa-check-circle"></i> Scan QRIS untuk membayar`;
             }
 
-            showToast('✅ QRIS Siap', 'Scan QR code untuk membayar', 'success');
-
-            // ===== DETAIL INVOICE =====
+            // DETAIL INVOICE
             const invoiceIdEl = document.getElementById('invoiceId');
             if (invoiceIdEl) invoiceIdEl.textContent = result.invoiceId;
 
@@ -307,14 +214,14 @@ window.createInvoice = async function(amount) {
             const copyPaymentLinkBtnEl = document.getElementById('copyPaymentLinkBtn');
             if (copyPaymentLinkBtnEl) copyPaymentLinkBtnEl.style.display = 'inline-flex';
 
-            // ===== TIMER OTOMATIS =====
+            // TIMER
             const expiryDate = result.expiredAt ? new Date(result.expiredAt) : new Date(Date.now() + 15 * 60000);
             window.startPaymentTimer(expiryDate);
 
-            // ===== AUTO CEK STATUS =====
+            // AUTO CHECK STATUS
             window.startAutoCheckStatus(result.invoiceId);
 
-            // ===== SIMPAN KE HISTORY =====
+            // SIMPAN KE HISTORY (PRIVASI PER USER)
             const invoiceData = {
                 invoice_id: result.invoiceId,
                 total: result.total,
@@ -327,18 +234,15 @@ window.createInvoice = async function(amount) {
                 payment_link: paymentLink
             };
 
-            const existingIndex = window.invoiceHistory.findIndex(i => i.invoice_id === result.invoiceId);
+            let history = getInvoiceHistory();
+            const existingIndex = history.findIndex(i => i.invoice_id === result.invoiceId);
             if (existingIndex === -1) {
-                window.invoiceHistory.unshift(invoiceData);
+                history.unshift(invoiceData);
             } else {
-                window.invoiceHistory[existingIndex] = invoiceData;
+                history[existingIndex] = invoiceData;
             }
-
-            localStorage.setItem('joellInvoiceHistory', JSON.stringify(window.invoiceHistory));
+            setInvoiceHistory(history);
             window.renderInvoiceHistory();
-
-            // ===== SEMBUNYIKAN TOMBOL BUAT INVOICE =====
-            if (btn) btn.style.display = 'none';
 
             showToast('✅ Invoice Siap', `ID: ${result.invoiceId}`, 'success');
 
@@ -349,24 +253,25 @@ window.createInvoice = async function(amount) {
         console.error('❌ Create Invoice Error:', error);
         showToast('❌ Error', error.message || 'Gagal membuat invoice', 'error');
 
-        // ===== FALLBACK: TAMPILKAN TOMBOL RETRY =====
+        // FALLBACK: TOMBOL RETRY
         if (qrisPlaceholder) {
-            qrisPlaceholder.style.display = 'block';
+            qrisPlaceholder.style.display = 'flex';
             qrisPlaceholder.innerHTML = `
-                <i class="fas fa-exclamation-triangle" style="font-size:3rem;color:var(--red);"></i>
-                <p style="color:var(--red);font-weight:700;margin-top:12px;">Gagal membuat invoice</p>
-                <p style="color:var(--text-muted);font-size:0.85rem;margin-top:4px;">${error.message || 'Coba lagi nanti'}</p>
-                <button onclick="window.createInvoice(${amount})" style="margin-top:16px;padding:12px 28px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;border:none;border-radius:60px;cursor:pointer;font-weight:800;font-size:0.9rem;">
-                    <i class="fas fa-redo"></i> Coba Lagi
-                </button>
+                <div style="text-align:center;">
+                    <i class="fas fa-exclamation-triangle" style="font-size:3rem;color:var(--red);display:block;margin-bottom:12px;"></i>
+                    <p style="color:var(--red);font-weight:700;margin-bottom:4px;">Gagal membuat invoice</p>
+                    <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px;">${error.message || 'Coba lagi nanti'}</p>
+                    <button onclick="window.createInvoice(${amount})" style="padding:12px 28px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;border:none;border-radius:60px;cursor:pointer;font-weight:800;font-size:0.9rem;">
+                        <i class="fas fa-redo"></i> Coba Lagi
+                    </button>
+                </div>
             `;
         }
         if (qrisWrapper) qrisWrapper.style.display = 'none';
-
-        if (btn) {
-            btn.style.display = 'inline-flex';
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-qrcode"></i> Buat Invoice';
+        if (createBtn) {
+            createBtn.style.display = 'inline-flex';
+            createBtn.disabled = false;
+            createBtn.innerHTML = '<i class="fas fa-qrcode"></i> Buat Invoice';
         }
     }
 };
@@ -379,7 +284,8 @@ window.regenerateQris = function() {
         showToast('Error', 'Tidak ada invoice aktif', 'error');
         return;
     }
-    const invoice = window.invoiceHistory.find(i => i.invoice_id === window.currentInvoiceId);
+    const history = getInvoiceHistory();
+    const invoice = history.find(i => i.invoice_id === window.currentInvoiceId);
     if (!invoice) {
         showToast('Error', 'Data invoice tidak ditemukan', 'error');
         return;
@@ -452,14 +358,15 @@ window.checkInvoiceStatus = async function(invoiceId) {
                 badge.className = 'payment-status-badge ' + info.class;
             }
 
-            // UPDATE HISTORY
-            const historyItem = window.invoiceHistory.find(i => i.invoice_id === invoiceId);
+            // UPDATE HISTORY (PRIVASI PER USER)
+            let history = getInvoiceHistory();
+            const historyItem = history.find(i => i.invoice_id === invoiceId);
             if (historyItem) {
                 historyItem.status = result.status;
                 if (result.qrisImage && !historyItem.qris_image) {
                     historyItem.qris_image = result.qrisImage;
                 }
-                localStorage.setItem('joellInvoiceHistory', JSON.stringify(window.invoiceHistory));
+                setInvoiceHistory(history);
                 window.renderInvoiceHistory();
             }
 
@@ -502,7 +409,8 @@ window.checkInvoiceStatus = async function(invoiceId) {
 window.copyPaymentLink = function() {
     let link = '';
     if (window.currentInvoiceId) {
-        const invoice = window.invoiceHistory.find(i => i.invoice_id === window.currentInvoiceId);
+        const history = getInvoiceHistory();
+        const invoice = history.find(i => i.invoice_id === window.currentInvoiceId);
         link = invoice?.payment_link || `https://app.lzpedia.my.id/pay/${window.currentInvoiceId}`;
     }
     if (!link) {
@@ -560,15 +468,15 @@ window.startPaymentTimer = function(expiryDate) {
 };
 
 // ============================================================
-// RENDER INVOICE HISTORY
+// RENDER INVOICE HISTORY (PRIVASI PER USER)
 // ============================================================
 window.renderInvoiceHistory = function() {
     const container = document.getElementById('invoiceHistoryList');
     if (!container) return;
 
-    window.invoiceHistory = JSON.parse(localStorage.getItem('joellInvoiceHistory')) || [];
+    const history = getInvoiceHistory();
 
-    if (!window.invoiceHistory.length) {
+    if (!history.length) {
         container.innerHTML = `
             <div style="text-align:center;padding:20px;color:var(--text-muted);">
                 <i class="fas fa-file-invoice" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.5;"></i>
@@ -578,7 +486,7 @@ window.renderInvoiceHistory = function() {
         return;
     }
 
-    container.innerHTML = window.invoiceHistory.slice(0, 10).map(item => {
+    container.innerHTML = history.slice(0, 10).map(item => {
         const statusMap = {
             'pending': { label: '⏳ Menunggu', class: 'pending' },
             'paid': { label: '✅ Lunas', class: 'paid' },
@@ -614,7 +522,7 @@ window.renderInvoiceHistory = function() {
 };
 
 // ============================================================
-// OPEN INVOICE DETAIL - QRIS & DETAIL LENGKAP
+// OPEN INVOICE DETAIL
 // ============================================================
 window.openInvoiceDetail = function(invoiceId) {
     const overlay = document.getElementById('paymentOverlay');
@@ -623,7 +531,8 @@ window.openInvoiceDetail = function(invoiceId) {
         return;
     }
 
-    const invoice = window.invoiceHistory.find(i => i.invoice_id === invoiceId);
+    const history = getInvoiceHistory();
+    const invoice = history.find(i => i.invoice_id === invoiceId);
     if (!invoice) {
         showToast('Error', 'Invoice tidak ditemukan', 'error');
         return;
@@ -631,7 +540,7 @@ window.openInvoiceDetail = function(invoiceId) {
 
     console.log('📄 Opening Invoice Detail:', invoice);
 
-    // ===== SET DETAIL =====
+    // SET DETAIL
     const invoiceIdEl = document.getElementById('invoiceId');
     if (invoiceIdEl) invoiceIdEl.textContent = invoice.invoice_id;
 
@@ -653,7 +562,7 @@ window.openInvoiceDetail = function(invoiceId) {
     const copyPaymentLinkBtnEl = document.getElementById('copyPaymentLinkBtn');
     if (copyPaymentLinkBtnEl) copyPaymentLinkBtnEl.style.display = 'inline-flex';
 
-    // ===== SET STATUS =====
+    // SET STATUS
     const badge = document.getElementById('invoiceStatusBadge');
     const statusMap = {
         'pending': { label: '⏳ Menunggu', class: 'pending' },
@@ -668,7 +577,7 @@ window.openInvoiceDetail = function(invoiceId) {
         badge.className = 'payment-status-badge ' + status.class;
     }
 
-    // ===== TAMPILKAN QRIS =====
+    // TAMPILKAN QRIS
     const qrisWrapper = document.getElementById('qrisImageWrapper');
     const qrisImage = document.getElementById('qrisImage');
     const qrisPlaceholder = document.getElementById('qrisPlaceholder');
@@ -692,13 +601,15 @@ window.openInvoiceDetail = function(invoiceId) {
         qrisImage.onerror = function() {
             this.style.display = 'none';
             if (qrisPlaceholder) {
-                qrisPlaceholder.style.display = 'block';
+                qrisPlaceholder.style.display = 'flex';
                 qrisPlaceholder.innerHTML = `
-                    <i class="fas fa-qrcode" style="font-size:3rem;color:var(--accent-light);"></i>
-                    <p style="color:var(--text-primary);font-weight:600;margin-top:8px;">QRIS tidak dapat dimuat</p>
-                    <button onclick="window.regenerateQris()" style="margin-top:12px;padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
-                        <i class="fas fa-redo"></i> Muat Ulang QRIS
-                    </button>
+                    <div style="text-align:center;">
+                        <i class="fas fa-qrcode" style="font-size:3rem;color:var(--accent-light);display:block;margin-bottom:8px;"></i>
+                        <p style="color:var(--text-primary);font-weight:600;margin-bottom:8px;">QRIS tidak dapat dimuat</p>
+                        <button onclick="window.regenerateQris()" style="padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
+                            <i class="fas fa-redo"></i> Muat Ulang QRIS
+                        </button>
+                    </div>
                 `;
             }
         };
@@ -708,9 +619,7 @@ window.openInvoiceDetail = function(invoiceId) {
         qrisWrapper.style.display = 'block';
         qrisWrapper.style.textAlign = 'center';
     }
-    if (qrisPlaceholder) {
-        qrisPlaceholder.style.display = 'none';
-    }
+    if (qrisPlaceholder) qrisPlaceholder.style.display = 'none';
 
     const successText = document.querySelector('.qris-success-text');
     if (successText) {
@@ -721,7 +630,7 @@ window.openInvoiceDetail = function(invoiceId) {
     window.currentInvoiceId = invoiceId;
     overlay.classList.add('open');
 
-    // ===== START TIMER & AUTO CHECK =====
+    // START TIMER & AUTO CHECK
     if (invoice.status === 'pending' && invoice.expired_at) {
         window.startPaymentTimer(new Date(invoice.expired_at));
         window.startAutoCheckStatus(invoiceId);
@@ -730,26 +639,6 @@ window.openInvoiceDetail = function(invoiceId) {
     // Sembunyikan tombol Buat Invoice
     const btnCreate = document.getElementById('createInvoiceBtn');
     if (btnCreate) btnCreate.style.display = 'none';
-};
-
-// ============================================================
-// COPY BANK INFO
-// ============================================================
-window.copyBankInfo = function() {
-    const totalEl = document.getElementById('bankTotal');
-    const total = totalEl ? totalEl.textContent : 'Rp 0';
-    const info = `BCA\n1234567890\nA/N JOELL SHOP\nTotal: ${total}`;
-    navigator.clipboard.writeText(info).then(() => {
-        showToast('Berhasil', 'Info bank disalin!', 'success');
-    }).catch(() => {
-        const textArea = document.createElement('textarea');
-        textArea.value = info;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        showToast('Berhasil', 'Info bank disalin!', 'success');
-    });
 };
 
 // ============================================================
@@ -764,7 +653,6 @@ window.openPaymentModal = function(orderData) {
 
     const itemsContainer = document.getElementById('paymentOrderItems');
     const totalEl = document.getElementById('paymentOrderTotal');
-    const bankTotal = document.getElementById('bankTotal');
 
     let total = 0;
     if (orderData && orderData.items) {
@@ -785,9 +673,8 @@ window.openPaymentModal = function(orderData) {
     }
 
     if (totalEl) totalEl.textContent = 'Total: Rp ' + total.toLocaleString();
-    if (bankTotal) bankTotal.textContent = 'Rp ' + total.toLocaleString();
 
-    // ===== RESET UI =====
+    // RESET UI
     const qrisWrapper = document.getElementById('qrisImageWrapper');
     if (qrisWrapper) qrisWrapper.style.display = 'none';
 
@@ -803,20 +690,18 @@ window.openPaymentModal = function(orderData) {
     const copyPaymentLinkBtnEl = document.getElementById('copyPaymentLinkBtn');
     if (copyPaymentLinkBtnEl) copyPaymentLinkBtnEl.style.display = 'none';
 
-    const paymentQrisSectionEl = document.getElementById('paymentQrisSection');
-    if (paymentQrisSectionEl) paymentQrisSectionEl.style.display = 'block';
-
-    const paymentBankSectionEl = document.getElementById('paymentBankSection');
-    if (paymentBankSectionEl) paymentBankSectionEl.style.display = 'none';
-
-    // ===== RESET QRIS PLACEHOLDER =====
+    // RESET QRIS PLACEHOLDER
     const qrisPlaceholder = document.getElementById('qrisPlaceholder');
     if (qrisPlaceholder) {
-        qrisPlaceholder.style.display = 'block';
+        qrisPlaceholder.style.display = 'flex';
+        qrisPlaceholder.style.alignItems = 'center';
+        qrisPlaceholder.style.justifyContent = 'center';
         qrisPlaceholder.innerHTML = `
-            <i class="fas fa-qrcode" style="font-size:3rem;color:var(--accent-light);margin-bottom:8px;"></i>
-            <p style="font-weight:700;color:var(--text-primary);">Siap Membuat Invoice</p>
-            <small style="color:var(--text-muted);display:block;margin-top:4px;">Klik tombol di bawah untuk generate QRIS</small>
+            <div style="text-align:center;">
+                <i class="fas fa-qrcode" style="font-size:3rem;color:var(--accent-light);display:block;margin-bottom:8px;"></i>
+                <p style="font-weight:700;color:var(--text-primary);margin-bottom:4px;">Siap Membuat Invoice</p>
+                <small style="color:var(--text-muted);display:block;">Klik tombol di bawah untuk generate QRIS</small>
+            </div>
         `;
     }
 
@@ -826,19 +711,14 @@ window.openPaymentModal = function(orderData) {
         qrisImage.style.display = 'none';
     }
 
-    // ===== RESET PAYMENT METHODS =====
-    document.querySelectorAll('.payment-method-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.method === 'qris');
-    });
-
-    // ===== RESET STATUS =====
+    // RESET STATUS
     const statusBadge = document.getElementById('invoiceStatusBadge');
     if (statusBadge) {
         statusBadge.textContent = '⏳ Menunggu';
         statusBadge.className = 'payment-status-badge pending';
     }
 
-    // ===== TAMPILKAN TOMBOL BUAT INVOICE =====
+    // TAMPILKAN TOMBOL BUAT INVOICE
     const btnCreate = document.getElementById('createInvoiceBtn');
     if (btnCreate) {
         btnCreate.style.display = 'inline-flex';
@@ -846,7 +726,7 @@ window.openPaymentModal = function(orderData) {
         btnCreate.innerHTML = '<i class="fas fa-qrcode"></i> Buat Invoice';
     }
 
-    // ===== CLEAR OLD INTERVALS =====
+    // CLEAR OLD INTERVALS
     if (window.timerInterval) clearInterval(window.timerInterval);
     if (window.autoCheckInterval) {
         clearInterval(window.autoCheckInterval);
@@ -854,320 +734,19 @@ window.openPaymentModal = function(orderData) {
     }
     window.currentInvoiceId = null;
 
-    // ===== OPEN MODAL =====
+    // OPEN MODAL
     overlay.classList.add('open');
 
-    // ===== RENDER HISTORIES =====
+    // RENDER HISTORY (PRIVASI PER USER)
     window.renderInvoiceHistory();
-    window.renderWithdrawHistory();
-    window.fetchBalance();
-    window.fetchWithdrawMethods();
-};
-
-// ============================================================
-// WITHDRAW METHODS (Payment Modal)
-// ============================================================
-window.fetchWithdrawMethods = async function() {
-    try {
-        const result = await PAYMENT_API.getWithdrawMethods();
-        const grid = document.getElementById('withdrawMethodsGrid');
-        if (!grid) return;
-        grid.innerHTML = '';
-
-        const allMethods = [...(result.manualMethods || []), ...(result.instantMethods || [])];
-
-        if (allMethods.length === 0) {
-            grid.innerHTML = '<p style="color:var(--text-muted);text-align:center;grid-column:1/-1;padding:16px;">Tidak ada metode penarikan</p>';
-            return;
-        }
-
-        allMethods.forEach(method => {
-            const btn = document.createElement('button');
-            btn.className = 'withdraw-method-item';
-            btn.dataset.method = method.method;
-            btn.innerHTML = `
-                <i class="fas fa-wallet"></i>
-                ${method.name}
-                <span class="method-name">${method.instant ? '⚡ Instant' : '🔄 Manual'}</span>
-            `;
-            btn.onclick = () => {
-                document.querySelectorAll('.withdraw-method-item').forEach(el => el.classList.remove('active'));
-                btn.classList.add('active');
-                window.selectedWithdrawMethodData = method;
-                const infoEl = document.getElementById('withdrawInfo');
-                if (infoEl) {
-                    infoEl.textContent = `💰 ${method.name} | Min: Rp ${(method.min||10000).toLocaleString()} | Max: Rp ${(method.max||1000000).toLocaleString()}`;
-                }
-            };
-            grid.appendChild(btn);
-        });
-    } catch (error) {
-        console.error('Withdraw Methods Error:', error);
-    }
-};
-
-// ============================================================
-// PROCESS WITHDRAW
-// ============================================================
-window.processWithdraw = async function() {
-    const amountInput = document.getElementById('withdrawAmount');
-    const accountInput = document.getElementById('withdrawAccount');
-    const btn = document.getElementById('withdrawBtn');
-
-    if (!amountInput || !accountInput || !btn) return;
-
-    const amount = parseInt(amountInput.value);
-    const account = accountInput.value.trim();
-
-    if (!window.selectedWithdrawMethodData) {
-        showToast('Error', 'Pilih metode penarikan', 'error');
-        return;
-    }
-    if (!amount || amount < 10000) {
-        showToast('Error', 'Minimal penarikan Rp 10.000', 'error');
-        return;
-    }
-    if (!account) {
-        showToast('Error', 'Masukkan nomor rekening', 'error');
-        return;
-    }
-
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-
-    try {
-        const result = await PAYMENT_API.processWithdraw(
-            amount,
-            window.selectedWithdrawMethodData.method,
-            account,
-            window.selectedWithdrawMethodData.instant || false
-        );
-
-        if (result.success) {
-            showToast('Berhasil!', result.message || 'Penarikan berhasil', 'success');
-            window.withdrawHistory.unshift({
-                amount: amount,
-                method: window.selectedWithdrawMethodData.name,
-                account_number: account,
-                status: 'pending',
-                created_at: new Date().toISOString()
-            });
-            localStorage.setItem('joellWithdrawHistory', JSON.stringify(window.withdrawHistory));
-            window.renderWithdrawHistory();
-            window.fetchBalance();
-            amountInput.value = '';
-            accountInput.value = '';
-
-            document.querySelectorAll('.withdraw-method-item').forEach(el => el.classList.remove('active'));
-            window.selectedWithdrawMethodData = null;
-            const infoEl = document.getElementById('withdrawInfo');
-            if (infoEl) infoEl.textContent = '💡 Pilih metode penarikan di atas';
-        } else {
-            throw new Error(result.error || 'Gagal');
-        }
-    } catch (error) {
-        showToast('Error', error.message, 'error');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-arrow-up"></i> Tarik';
-    }
-};
-
-// ============================================================
-// RENDER WITHDRAW HISTORY
-// ============================================================
-window.renderWithdrawHistory = function() {
-    const container = document.getElementById('withdrawHistory');
-    if (!container) return;
-
-    window.withdrawHistory = JSON.parse(localStorage.getItem('joellWithdrawHistory')) || [];
-
-    if (!window.withdrawHistory.length) {
-        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;">Belum ada riwayat</p>';
-        return;
-    }
-    container.innerHTML = window.withdrawHistory.slice(0, 5).map(item => `
-        <div class="withdraw-history-item">
-            <div class="wh-left">
-                <span class="wh-amount">Rp ${Number(item.amount).toLocaleString()}</span>
-                <span class="wh-method">${item.method} - ${item.account_number || '-'}</span>
-            </div>
-            <span class="wh-status ${item.status}">${item.status}</span>
-        </div>
-    `).join('');
-};
-
-// ============================================================
-// PROFILE WITHDRAW
-// ============================================================
-window.initProfileWithdraw = function() {
-    const balanceEl = document.getElementById('balanceAmount');
-    const profileBalance = document.getElementById('profileBalanceAmount');
-    if (balanceEl && profileBalance) {
-        profileBalance.textContent = balanceEl.textContent;
-    }
-
-    fetchProfileWithdrawMethods();
-    renderProfileWithdrawHistory();
-
-    const withdrawBtn = document.getElementById('profileWithdrawBtn');
-    if (withdrawBtn) {
-        const newBtn = withdrawBtn.cloneNode(true);
-        withdrawBtn.parentNode.replaceChild(newBtn, withdrawBtn);
-        newBtn.addEventListener('click', function() {
-            processProfileWithdraw();
-        });
-    }
-};
-
-window.fetchProfileWithdrawMethods = async function() {
-    try {
-        const result = await PAYMENT_API.getWithdrawMethods();
-        const grid = document.getElementById('profileWithdrawMethods');
-        if (!grid) return;
-        grid.innerHTML = '';
-
-        const allMethods = [...(result.manualMethods || []), ...(result.instantMethods || [])];
-
-        if (allMethods.length === 0) {
-            grid.innerHTML = '<p style="color:var(--text-muted);text-align:center;grid-column:1/-1;padding:16px;">Tidak ada metode penarikan</p>';
-            return;
-        }
-
-        allMethods.forEach(method => {
-            const btn = document.createElement('button');
-            btn.className = 'withdraw-method-item';
-            btn.dataset.method = method.method;
-            btn.innerHTML = `
-                <i class="fas fa-wallet"></i>
-                ${method.name}
-                <span class="method-name">${method.instant ? '⚡ Instant' : '🔄 Manual'}</span>
-            `;
-            btn.onclick = () => {
-                document.querySelectorAll('#profileWithdrawMethods .withdraw-method-item').forEach(el => el.classList.remove('active'));
-                btn.classList.add('active');
-                window.selectedWithdrawMethodData = method;
-                const infoEl = document.getElementById('profileWithdrawInfo');
-                if (infoEl) {
-                    infoEl.textContent = `💰 ${method.name} | Min: Rp ${(method.min||10000).toLocaleString()} | Max: Rp ${(method.max||1000000).toLocaleString()}`;
-                }
-            };
-            grid.appendChild(btn);
-        });
-    } catch (error) {
-        console.error('Withdraw Methods Error:', error);
-        const grid = document.getElementById('profileWithdrawMethods');
-        if (grid) {
-            grid.innerHTML = '<p style="color:var(--text-muted);text-align:center;grid-column:1/-1;padding:16px;">Gagal memuat metode penarikan</p>';
-        }
-    }
-};
-
-window.processProfileWithdraw = async function() {
-    const amountInput = document.getElementById('profileWithdrawAmount');
-    const accountInput = document.getElementById('profileWithdrawAccount');
-    const btn = document.getElementById('profileWithdrawBtn');
-
-    if (!amountInput || !accountInput || !btn) return;
-
-    const amount = parseInt(amountInput.value);
-    const account = accountInput.value.trim();
-
-    if (!window.selectedWithdrawMethodData) {
-        showToast('Error', 'Pilih metode penarikan', 'error');
-        return;
-    }
-    if (!amount || amount < 10000) {
-        showToast('Error', 'Minimal penarikan Rp 10.000', 'error');
-        return;
-    }
-    if (!account) {
-        showToast('Error', 'Masukkan nomor rekening', 'error');
-        return;
-    }
-
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-
-    try {
-        const result = await PAYMENT_API.processWithdraw(
-            amount,
-            window.selectedWithdrawMethodData.method,
-            account,
-            window.selectedWithdrawMethodData.instant || false
-        );
-
-        if (result.success) {
-            showToast('Berhasil!', result.message || 'Penarikan berhasil', 'success');
-            window.withdrawHistory.unshift({
-                amount: amount,
-                method: window.selectedWithdrawMethodData.name,
-                account_number: account,
-                status: 'pending',
-                created_at: new Date().toISOString()
-            });
-            localStorage.setItem('joellWithdrawHistory', JSON.stringify(window.withdrawHistory));
-            renderProfileWithdrawHistory();
-            window.fetchBalance();
-
-            amountInput.value = '';
-            accountInput.value = '';
-
-            document.querySelectorAll('#profileWithdrawMethods .withdraw-method-item').forEach(el => el.classList.remove('active'));
-            window.selectedWithdrawMethodData = null;
-            const infoEl = document.getElementById('profileWithdrawInfo');
-            if (infoEl) infoEl.textContent = '💡 Pilih metode penarikan di atas';
-        } else {
-            throw new Error(result.error || 'Gagal');
-        }
-    } catch (error) {
-        showToast('Error', error.message, 'error');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-arrow-up"></i> Tarik';
-    }
-};
-
-window.renderProfileWithdrawHistory = function() {
-    const container = document.getElementById('profileWithdrawHistory');
-    if (!container) return;
-
-    window.withdrawHistory = JSON.parse(localStorage.getItem('joellWithdrawHistory')) || [];
-
-    if (!window.withdrawHistory.length) {
-        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;">Belum ada riwayat</p>';
-        return;
-    }
-    container.innerHTML = window.withdrawHistory.slice(0, 5).map(item => `
-        <div class="withdraw-history-item">
-            <div class="wh-left">
-                <span class="wh-amount">Rp ${Number(item.amount).toLocaleString()}</span>
-                <span class="wh-method">${item.method} - ${item.account_number || '-'}</span>
-            </div>
-            <span class="wh-status ${item.status}">${item.status}</span>
-        </div>
-    `).join('');
 };
 
 // ============================================================
 // INIT - DOMContentLoaded
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔧 Payment System Initializing...');
+    console.log('🔧 Payment System v3.0 Initializing...');
     console.log('🔑 API Key:', PAYMENT_API.config.apiKey ? '✅ Loaded' : '❌ Missing');
-
-    // ===== PAYMENT METHOD SWITCHING =====
-    document.querySelectorAll('.payment-method-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.payment-method-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            const method = this.dataset.method;
-            const qrisSection = document.getElementById('paymentQrisSection');
-            const bankSection = document.getElementById('paymentBankSection');
-            if (qrisSection) qrisSection.style.display = method === 'qris' ? 'block' : 'none';
-            if (bankSection) bankSection.style.display = method === 'bank' ? 'block' : 'none';
-        });
-    });
 
     // ===== CREATE INVOICE BUTTON =====
     const createBtn = document.getElementById('createInvoiceBtn');
@@ -1205,18 +784,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ===== WITHDRAW BUTTON =====
-    const withdrawBtn = document.getElementById('withdrawBtn');
-    if (withdrawBtn) {
-        withdrawBtn.addEventListener('click', window.processWithdraw);
-    }
-
-    // ===== BALANCE REFRESH =====
-    const refreshBtn = document.getElementById('balanceRefreshBtn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', window.fetchBalance);
-    }
-
     // ===== CLOSE PAYMENT =====
     const closeBtn = document.getElementById('paymentCloseBtn');
     if (closeBtn) {
@@ -1231,15 +798,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ===== LOAD HISTORIES =====
+    // ===== LOAD HISTORY (PRIVASI PER USER) =====
     window.renderInvoiceHistory();
-    window.renderWithdrawHistory();
-    window.fetchBalance();
-    window.fetchWithdrawMethods();
 
-    console.log('✅ Payment System Ready!');
-    console.log('📊 Total Invoice:', window.invoiceHistory.length);
-    console.log('📊 Total Withdraw:', window.withdrawHistory.length);
+    console.log('✅ Payment System v3.0 Ready! (Privacy Mode)');
 });
 
 // ============================================================
@@ -1268,4 +830,4 @@ if (typeof showToast !== 'function') {
     };
 }
 
-console.log('✅ payment-api.js v2.5 Loaded Successfully!');
+console.log('✅ payment-api.js v3.0 (Privacy Focused) Loaded Successfully!');
