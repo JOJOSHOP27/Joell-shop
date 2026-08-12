@@ -1,7 +1,3 @@
-/* ============================================================
-   PAYMENT SYSTEM STYLES
-   ============================================================ */
-
 .payment-modal .modal-box {
     max-width: 520px;
 }
@@ -58,6 +54,11 @@
 .payment-qris-container .qris-placeholder {
     color: var(--text-muted);
     font-size: 0.9rem;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .payment-qris-container .qris-placeholder i {
@@ -243,176 +244,6 @@
     color: var(--accent-light);
 }
 
-/* Balance Display */
-.payment-balance-display {
-    background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.1));
-    border: 1px solid rgba(99,102,241,0.2);
-    border-radius: 12px;
-    padding: 16px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
-.payment-balance-display .balance-amount {
-    font-size: 1.4rem;
-    font-weight: 900;
-    color: var(--accent-light);
-}
-
-.payment-balance-display .balance-refresh {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    font-size: 1rem;
-}
-
-.payment-balance-display .balance-refresh.spinning {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* Withdraw Section */
-.withdraw-section {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border-subtle);
-}
-
-.withdraw-methods-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
-    margin-bottom: 14px;
-}
-
-.withdraw-method-item {
-    padding: 12px;
-    border-radius: 8px;
-    border: 2px solid var(--border-subtle);
-    background: var(--bg-primary);
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.8rem;
-    font-weight: 700;
-}
-
-.withdraw-method-item:hover {
-    border-color: var(--accent);
-}
-
-.withdraw-method-item.active {
-    border-color: var(--accent);
-    background: rgba(99,102,241,0.1);
-}
-
-.withdraw-method-item .method-name {
-    display: block;
-    font-size: 0.65rem;
-    color: var(--text-muted);
-    font-weight: 400;
-}
-
-.withdraw-input-group {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-}
-
-.withdraw-input-group input {
-    flex: 1;
-    padding: 12px 16px;
-    border-radius: 8px;
-    border: 1px solid var(--border-subtle);
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    outline: none;
-    min-width: 120px;
-}
-
-.withdraw-input-group input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-glow);
-}
-
-.withdraw-input-group .withdraw-btn {
-    padding: 12px 24px;
-    background: linear-gradient(135deg, var(--accent), var(--purple));
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.withdraw-input-group .withdraw-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.withdraw-info {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    padding: 8px 12px;
-    background: rgba(99,102,241,0.05);
-    border-radius: 8px;
-}
-
-/* History */
-.withdraw-history,
-.invoice-history-list {
-    margin-top: 14px;
-    max-height: 220px;
-    overflow-y: auto;
-}
-
-.withdraw-history-item,
-.invoice-history-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 14px;
-    background: var(--bg-primary);
-    border-radius: 8px;
-    border: 1px solid var(--border-subtle);
-    margin-bottom: 6px;
-    font-size: 0.8rem;
-}
-
-.withdraw-history-item .wh-status,
-.invoice-history-item .ih-status {
-    font-weight: 700;
-    font-size: 0.7rem;
-    padding: 2px 12px;
-    border-radius: 30px;
-}
-
-.withdraw-history-item .wh-status.pending,
-.invoice-history-item .ih-status.pending {
-    background: rgba(251,191,36,0.15);
-    color: #fbbf24;
-}
-
-.withdraw-history-item .wh-status.success,
-.invoice-history-item .ih-status.paid {
-    background: rgba(16,185,129,0.15);
-    color: #10b981;
-}
-
-.withdraw-history-item .wh-status.failed,
-.invoice-history-item .ih-status.expired {
-    background: rgba(239,68,68,0.15);
-    color: #ef4444;
-}
-
 /* Section Label */
 .payment-section {
     margin-bottom: 20px;
@@ -434,114 +265,14 @@
     color: var(--accent-light);
 }
 
-.withdraw-section {
-    background: rgba(99,102,241,0.03);
-    border-radius: var(--radius-sm);
-    padding: 16px;
-    border: 1px solid var(--border-subtle);
-    margin-top: 8px;
-}
-
-.withdraw-section .section-label {
-    border-left-color: var(--orange);
-}
-
-.withdraw-section .section-label i {
-    color: var(--orange);
-}
-
-/* Withdraw Section in Profile */
-.withdraw-section-in-profile {
-    margin-top: 24px;
-    padding: 20px;
-    background: var(--bg-card);
-    border-radius: 12px;
-    border: 1px solid var(--border-subtle);
-}
-
-.withdraw-section-in-profile .withdraw-methods-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
-    margin-bottom: 14px;
-}
-
-.withdraw-section-in-profile .withdraw-method-item {
-    padding: 12px;
-    border-radius: 8px;
-    border: 2px solid var(--border-subtle);
-    background: var(--bg-primary);
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.8rem;
-    font-weight: 700;
-}
-
-.withdraw-section-in-profile .withdraw-method-item:hover {
-    border-color: var(--accent);
-}
-
-.withdraw-section-in-profile .withdraw-method-item.active {
-    border-color: var(--accent);
-    background: rgba(99,102,241,0.1);
-}
-
-.withdraw-section-in-profile .withdraw-input-group {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-}
-
-.withdraw-section-in-profile .withdraw-input-group input {
-    flex: 1;
-    padding: 12px 16px;
-    border-radius: 8px;
-    border: 1px solid var(--border-subtle);
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    outline: none;
-    min-width: 120px;
-}
-
-.withdraw-section-in-profile .withdraw-input-group input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-glow);
-}
-
-.withdraw-section-in-profile .withdraw-input-group .withdraw-btn {
-    padding: 12px 24px;
-    background: linear-gradient(135deg, var(--orange), #ea580c);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.withdraw-section-in-profile .withdraw-input-group .withdraw-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.withdraw-section-in-profile .withdraw-info {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    padding: 8px 12px;
-    background: rgba(99,102,241,0.05);
-    border-radius: 8px;
-    margin-bottom: 12px;
-}
-
-.withdraw-section-in-profile .withdraw-history {
+/* History */
+.invoice-history-list {
     margin-top: 14px;
     max-height: 220px;
     overflow-y: auto;
 }
 
-.withdraw-section-in-profile .withdraw-history-item {
+.invoice-history-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -551,44 +282,6 @@
     border: 1px solid var(--border-subtle);
     margin-bottom: 6px;
     font-size: 0.8rem;
-}
-
-.withdraw-section-in-profile .withdraw-history-item .wh-left {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.withdraw-section-in-profile .withdraw-history-item .wh-left .wh-amount {
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.withdraw-section-in-profile .withdraw-history-item .wh-left .wh-method {
-    color: var(--text-muted);
-    font-size: 0.7rem;
-}
-
-.withdraw-section-in-profile .withdraw-history-item .wh-status {
-    font-weight: 700;
-    font-size: 0.7rem;
-    padding: 2px 12px;
-    border-radius: 30px;
-}
-
-.withdraw-section-in-profile .withdraw-history-item .wh-status.pending {
-    background: rgba(251,191,36,0.15);
-    color: #fbbf24;
-}
-
-.withdraw-section-in-profile .withdraw-history-item .wh-status.success {
-    background: rgba(16,185,129,0.15);
-    color: #10b981;
-}
-
-.withdraw-section-in-profile .withdraw-history-item .wh-status.failed {
-    background: rgba(239,68,68,0.15);
-    color: #ef4444;
 }
 
 /* Invoice History Clickable */
@@ -608,12 +301,6 @@
     .payment-methods {
         grid-template-columns: 1fr 1fr;
     }
-    .withdraw-methods-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .withdraw-input-group {
-        flex-direction: column;
-    }
     .payment-actions {
         flex-direction: column;
     }
@@ -624,4 +311,4 @@
     #qrisImageWrapper img {
         max-width: 200px;
     }
-   }
+}
