@@ -1,5 +1,5 @@
 // ============================================================
-// JOELL SHOP - MAIN SCRIPT (FULL WORKING - ALL CLOSE BUTTONS FIXED)
+// JOELL SHOP - MAIN SCRIPT (FULL WORKING)
 // ============================================================
 
 // ============================================================
@@ -779,7 +779,6 @@ window.closePaymentAndOpenWithdraw = function() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ JOELL SHOP Initializing...');
 
-    // ====== 1. RENDER SEMUA PRODUK ======
     renderMenus();
     renderTopupGames();
     updateCartUI();
@@ -787,7 +786,7 @@ document.addEventListener('DOMContentLoaded', function() {
     renderOrdersList();
     renderProfilePage();
 
-    // ====== 2. CLICK EVENT UNTUK MENU CARD ======
+    // ===== CLICK EVENT UNTUK MENU CARD =====
     document.querySelectorAll('.grid-menu').forEach(grid => {
         grid.addEventListener('click', function(e) {
             const card = e.target.closest('.menu-card');
@@ -805,7 +804,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ====== 3. ADD TO CART BUTTON ======
+    // ===== ADD TO CART BUTTON =====
     const addBtn = document.getElementById('addToCartBtn');
     if (addBtn) {
         addBtn.addEventListener('click', function() {
@@ -815,7 +814,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 4. BUY NOW BUTTON ======
+    // ===== BUY NOW BUTTON =====
     const buyBtn = document.getElementById('buyNowBtn');
     if (buyBtn) {
         buyBtn.addEventListener('click', function() {
@@ -826,7 +825,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 5. CHECKOUT BUTTON ======
+    // ===== CHECKOUT BUTTON =====
     const checkoutBtn = document.getElementById('checkoutBtn');
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', function() {
@@ -851,22 +850,34 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 6. CHECKOUT FORM ======
+    // ===== CHECKOUT FORM - AUTO INVOICE =====
     const checkoutForm = document.getElementById('checkoutForm');
     if (checkoutForm) {
-        checkoutForm.addEventListener('submit', function(e) {
+        checkoutForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            if (!cart.length) return;
+            if (!cart.length) {
+                showToast('Error', 'Keranjang kosong', 'error');
+                return;
+            }
             
-            const orderId = 'JOELL-' + Math.random().toString(36).substr(2, 4).toUpperCase() + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
+            const name = document.getElementById('coName').value.trim();
+            const email = document.getElementById('coEmail').value.trim();
+            const phone = document.getElementById('coPhone').value.trim();
+            
+            if (!name || !email || !phone) {
+                showToast('Error', 'Harap lengkapi semua data', 'error');
+                return;
+            }
+            
             const total = cart.reduce((a, i) => a + i.price * i.qty, 0);
+            const orderId = 'JOELL-' + Math.random().toString(36).substr(2, 4).toUpperCase() + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
             
             const order = {
                 id: orderId,
                 userId: currentUser ? currentUser.id : 'guest',
-                userName: document.getElementById('coName').value || '',
-                userEmail: document.getElementById('coEmail').value || '',
-                userPhone: document.getElementById('coPhone').value || '',
+                userName: name,
+                userEmail: email,
+                userPhone: phone,
                 address: document.getElementById('coAddress').value || '',
                 payment: 'online',
                 items: [...cart],
@@ -883,7 +894,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 chat: [
                     { 
                         from: 'admin', 
-                        text: `Halo ${document.getElementById('coName').value || 'Pelanggan'}! Terima kasih telah memesan. Silakan selesaikan pembayaran Anda.`,
+                        text: `Halo ${name}! Terima kasih telah memesan. Silakan selesaikan pembayaran Anda.`,
                         time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) 
                     }
                 ]
@@ -900,20 +911,26 @@ document.addEventListener('DOMContentLoaded', function() {
             
             document.getElementById('checkoutOverlay').classList.remove('open');
             
-            if (typeof window.openPaymentModal === 'function') {
-                setTimeout(() => {
+            // ===== BUKA PAYMENT & AUTO BUAT INVOICE =====
+            showToast('⏳ Membuat Invoice...', 'Silakan tunggu sebentar', 'info', 2000);
+            
+            setTimeout(async function() {
+                if (typeof window.openPaymentModal === 'function') {
                     window.openPaymentModal(order);
-                }, 300);
-            } else {
-                showToast('Pesanan Dibuat', `ID: ${orderId}. Selesaikan pembayaran.`, 'success', 5000);
-                navigateTo('orders');
-                setTimeout(() => openOrderChat(orderId), 500);
-            }
+                }
+                
+                setTimeout(async function() {
+                    if (total > 0 && typeof window.createInvoice === 'function') {
+                        await window.createInvoice(total);
+                    }
+                }, 800);
+            }, 500);
+            
             renderOrdersList();
         });
     }
 
-    // ====== 7. CLEAR CART ======
+    // ===== CLEAR CART =====
     const clearBtn = document.getElementById('clearCartBtn');
     if (clearBtn) {
         clearBtn.addEventListener('click', function() {
@@ -929,7 +946,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 8. PROMO BUTTON ======
+    // ===== PROMO BUTTON =====
     const promoBtn = document.getElementById('promoBtn');
     if (promoBtn) {
         promoBtn.addEventListener('click', function() {
@@ -950,7 +967,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 9. THEME TOGGLE ======
+    // ===== THEME TOGGLE =====
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         const savedTheme = localStorage.getItem('joellTheme') || 'dark';
@@ -966,7 +983,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 10. LOGIN BUTTON ======
+    // ===== LOGIN BUTTON =====
     const loginBtn = document.getElementById('loginBtn');
     if (loginBtn) {
         loginBtn.addEventListener('click', function() {
@@ -974,7 +991,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 11. ADMIN LOGIN ======
+    // ===== ADMIN LOGIN =====
     const adminLoginBtn = document.getElementById('adminLoginBtn');
     if (adminLoginBtn) {
         adminLoginBtn.addEventListener('click', function() {
@@ -992,7 +1009,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 12. ADMIN BACK BUTTON ======
+    // ===== ADMIN BACK BUTTON =====
     const adminBackBtn = document.getElementById('adminBackBtn');
     if (adminBackBtn) {
         adminBackBtn.addEventListener('click', function() {
@@ -1004,7 +1021,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 13. LOGO CLICK FOR ADMIN ======
+    // ===== LOGO CLICK FOR ADMIN =====
     const logoArea = document.getElementById('logoArea');
     if (logoArea) {
         logoArea.addEventListener('click', function() {
@@ -1017,7 +1034,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 14. NAVIGATION ======
+    // ===== NAVIGATION =====
     document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1032,7 +1049,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ====== 15. BACK TO TOP ======
+    // ===== BACK TO TOP =====
     const backToTop = document.getElementById('backToTop');
     if (backToTop) {
         window.addEventListener('scroll', function() {
@@ -1043,7 +1060,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 16. TRACKING BUTTON ======
+    // ===== TRACKING BUTTON =====
     const trackBtn = document.getElementById('trackBtn');
     if (trackBtn) {
         trackBtn.addEventListener('click', function() {
@@ -1058,18 +1075,17 @@ document.addEventListener('DOMContentLoaded', function() {
             
             document.getElementById('trackOrderId').textContent = '#' + order.id;
             const statusConfig = {
-                'pending': { label: 'Menunggu', color: 'var(--gold)', bg: 'rgba(251,191,36,0.15)', border: 'rgba(251,191,36,0.2)' },
-                'read': { label: 'Dibaca Admin', color: 'var(--accent-light)', bg: 'rgba(99,102,241,0.15)', border: 'rgba(99,102,241,0.2)' },
-                'processing': { label: 'Sedang Diproses', color: 'var(--accent-secondary)', bg: 'rgba(6,182,212,0.15)', border: 'rgba(6,182,212,0.2)' },
-                'shipped': { label: 'Dikirim', color: 'var(--purple)', bg: 'rgba(168,85,247,0.15)', border: 'rgba(168,85,247,0.2)' },
-                'completed': { label: 'Selesai', color: 'var(--green)', bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.2)' }
+                'pending': { label: 'Menunggu', color: 'var(--gold)', bg: 'rgba(251,191,36,0.15)' },
+                'read': { label: 'Dibaca Admin', color: 'var(--accent-light)', bg: 'rgba(99,102,241,0.15)' },
+                'processing': { label: 'Sedang Diproses', color: 'var(--accent-secondary)', bg: 'rgba(6,182,212,0.15)' },
+                'shipped': { label: 'Dikirim', color: 'var(--purple)', bg: 'rgba(168,85,247,0.15)' },
+                'completed': { label: 'Selesai', color: 'var(--green)', bg: 'rgba(16,185,129,0.15)' }
             };
             const cfg = statusConfig[order.status] || statusConfig['pending'];
             const badge = document.getElementById('trackStatusBadge');
             badge.innerHTML = `<i class="fas fa-circle"></i> ${cfg.label}`;
             badge.style.background = cfg.bg;
             badge.style.color = cfg.color;
-            badge.style.border = `1px solid ${cfg.border}`;
             
             document.getElementById('trackProducts').textContent = order.items.map(i => `${i.name} (${i.variant}) x${i.qty}`).join(', ');
             document.getElementById('trackDate').textContent = new Date(order.createdAt).toLocaleString('id-ID');
@@ -1103,7 +1119,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 17. SERVER STATUS REFRESH ======
+    // ===== SERVER STATUS REFRESH =====
     const refreshStatusBtn = document.getElementById('refreshStatus');
     if (refreshStatusBtn) {
         refreshStatusBtn.addEventListener('click', function() {
@@ -1121,7 +1137,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 18. ORDER CHAT SEND ======
+    // ===== ORDER CHAT SEND =====
     const orderChatSend = document.getElementById('orderChatSend');
     if (orderChatSend) {
         orderChatSend.addEventListener('click', function() {
@@ -1143,7 +1159,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 19. ADMIN CHAT SEND ======
+    // ===== ADMIN CHAT SEND =====
     const adminChatSend = document.getElementById('adminChatSend');
     if (adminChatSend) {
         adminChatSend.addEventListener('click', function() {
@@ -1165,7 +1181,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 20. REFRESH ADMIN ORDERS ======
+    // ===== REFRESH ADMIN ORDERS =====
     const refreshAdmin = document.getElementById('btnRefreshAdmin');
     if (refreshAdmin) {
         refreshAdmin.addEventListener('click', function() {
@@ -1174,22 +1190,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ============================================================
-    // ====== FIX: SEMUA TOMBOL CLOSE (X) DI MODAL ======
+    // ===== FIX: SEMUA TOMBOL CLOSE (X) DI MODAL =====
     // ============================================================
-    
-    // 20. CLOSE ALL MODALS WITH X BUTTON
     document.querySelectorAll('.modal-close, .detail-close, .cart-close').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            
-            // Cari parent modal/overlay terdekat
             var overlay = this.closest('.modal-overlay, .detail-overlay, .cart-overlay');
             if (overlay) {
                 overlay.classList.remove('open');
             }
-            
-            // Khusus untuk cart
             var cartPanel = this.closest('.cart-panel');
             if (cartPanel) {
                 var cartOverlay = document.getElementById('cartOverlay');
@@ -1198,7 +1208,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 21. CLOSE MODAL SAAT KLIK BACKGROUND
     document.querySelectorAll('.modal-overlay, .detail-overlay, .cart-overlay').forEach(function(overlay) {
         overlay.addEventListener('click', function(e) {
             if (e.target === this) {
@@ -1207,7 +1216,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 22. ESCAPE KEY UNTUK TUTUP MODAL
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             document.querySelectorAll('.modal-overlay.open, .detail-overlay.open, .cart-overlay.open').forEach(function(el) {
@@ -1216,72 +1224,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 23. TOMBOL CLOSE KHUSUS UNTUK SETIAP MODAL
-    var loginClose = document.getElementById('loginCloseBtn');
-    if (loginClose) {
-        loginClose.addEventListener('click', function() {
-            document.getElementById('loginOverlay').classList.remove('open');
-        });
-    }
+    // ===== TOMBOL CLOSE KHUSUS =====
+    const closeButtons = ['loginCloseBtn', 'profileCloseBtn', 'checkoutCloseBtn', 'detailCloseBtn', 
+                          'topupCloseBtn', 'paymentCloseBtn', 'orderChatCloseBtn', 'adminChatCloseBtn', 'cartCloseBtn'];
+    closeButtons.forEach(function(id) {
+        var btn = document.getElementById(id);
+        if (btn) {
+            btn.addEventListener('click', function() {
+                var overlay = this.closest('.modal-overlay, .detail-overlay, .cart-overlay');
+                if (overlay) overlay.classList.remove('open');
+                if (id === 'paymentCloseBtn' && window.timerInterval) clearInterval(window.timerInterval);
+            });
+        }
+    });
 
-    var profileClose = document.getElementById('profileCloseBtn');
-    if (profileClose) {
-        profileClose.addEventListener('click', function() {
-            document.getElementById('profileOverlay').classList.remove('open');
-        });
-    }
-
-    var checkoutClose = document.getElementById('checkoutCloseBtn');
-    if (checkoutClose) {
-        checkoutClose.addEventListener('click', function() {
-            document.getElementById('checkoutOverlay').classList.remove('open');
-        });
-    }
-
-    var detailClose = document.getElementById('detailCloseBtn');
-    if (detailClose) {
-        detailClose.addEventListener('click', function() {
-            document.getElementById('detailOverlay').classList.remove('open');
-        });
-    }
-
-    var topupClose = document.getElementById('topupCloseBtn');
-    if (topupClose) {
-        topupClose.addEventListener('click', function() {
-            document.getElementById('topupOverlay').classList.remove('open');
-        });
-    }
-
-    var paymentClose = document.getElementById('paymentCloseBtn');
-    if (paymentClose) {
-        paymentClose.addEventListener('click', function() {
-            document.getElementById('paymentOverlay').classList.remove('open');
-            if (window.timerInterval) clearInterval(window.timerInterval);
-        });
-    }
-
-    var orderChatClose = document.getElementById('orderChatCloseBtn');
-    if (orderChatClose) {
-        orderChatClose.addEventListener('click', function() {
-            document.getElementById('orderChatOverlay').classList.remove('open');
-        });
-    }
-
-    var adminChatClose = document.getElementById('adminChatCloseBtn');
-    if (adminChatClose) {
-        adminChatClose.addEventListener('click', function() {
-            document.getElementById('adminChatOverlay').classList.remove('open');
-        });
-    }
-
-    var cartClose = document.getElementById('cartCloseBtn');
-    if (cartClose) {
-        cartClose.addEventListener('click', function() {
-            document.getElementById('cartOverlay').classList.remove('open');
-        });
-    }
-
-    // ====== 24. PROFILE SAVE & LOGOUT ======
+    // ===== PROFILE SAVE & LOGOUT =====
     var profileSaveBtn = document.getElementById('profileSaveBtn');
     if (profileSaveBtn) {
         profileSaveBtn.addEventListener('click', function() {
@@ -1311,7 +1268,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ====== 25. COUNTDOWN TIMER ======
+    // ===== COUNTDOWN TIMER =====
     function updateCountdown() {
         const now = new Date();
         const diff = CONFIG.flashSaleEnd - now;
@@ -1378,6 +1335,186 @@ function updateUnreadBadges() {
         } else {
             adminBadge.style.display = 'none';
         }
+    }
+}
+
+// ============================================================
+// HANDLE CHAT FILE UPLOAD
+// ============================================================
+function handleChatFileUpload(input, senderType) {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+        showToast('Error', 'Gambar terlalu besar (Maks 10MB)', 'error');
+        input.value = '';
+        return;
+    }
+
+    const orderId = senderType === 'user' ? currentOrderChatId : currentAdminChatId;
+    if (!orderId) {
+        showToast('Error', 'Sesi chat tidak ditemukan.', 'error');
+        input.value = '';
+        return;
+    }
+
+    const orderIndex = orders.findIndex(o => o.id === orderId);
+    if (orderIndex === -1) {
+        showToast('Error', 'Data pesanan tidak ditemukan.', 'error');
+        input.value = '';
+        return;
+    }
+
+    showToast('Chat', 'Sedang mengirim gambar...', 'info');
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+        fetch('https://api.imgur.com/3/image', {
+            method: 'POST',
+            headers: { 'Authorization': 'Client-ID ' + CONFIG.imgurClientId },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+        })
+        .then(result => {
+            if (result.success && result.data && result.data.link) {
+                const newMessage = {
+                    from: senderType,
+                    text: '',
+                    image: result.data.link,
+                    time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+                };
+
+                if (!orders[orderIndex].chat) orders[orderIndex].chat = [];
+                orders[orderIndex].chat.push(newMessage);
+
+                localStorage.setItem('joellOrders', JSON.stringify(orders));
+                syncOrdersToCloud();
+
+                if (senderType === 'user') renderOrderChatMessages();
+                else renderAdminChatMessages();
+
+                showToast('Berhasil', 'Gambar berhasil dikirim!', 'success');
+            } else {
+                throw new Error('Gagal mendapatkan link gambar.');
+            }
+        })
+        .catch(error => {
+            console.error("Image Upload Error:", error);
+            showToast('Error', 'Gagal kirim gambar: ' + error.message, 'error', 5000);
+        });
+    } catch (error) {
+        showToast('Error', 'Gagal kirim gambar: ' + error.message, 'error', 5000);
+    } finally {
+        input.value = '';
+    }
+}
+
+function handleAdminDocUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const orderId = currentAdminChatId;
+    if (!orderId) {
+        showToast('Error', 'ID Pesanan tidak ditemukan.', 'error');
+        input.value = '';
+        return;
+    }
+    
+    const orderIndex = orders.findIndex(o => o.id === orderId);
+    if (orderIndex === -1) {
+        showToast('Error', 'Data pesanan tidak ditemukan.', 'error');
+        input.value = '';
+        return;
+    }
+
+    if (file.size <= 500 * 1024) {
+        showToast('Admin', 'Mengkonversi file ke base64...', 'info');
+        try {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                const newMessage = {
+                    from: 'admin',
+                    text: `📄 File: ${file.name}`,
+                    file: base64,
+                    fileName: file.name,
+                    time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+                };
+                
+                if (!orders[orderIndex].chat) orders[orderIndex].chat = [];
+                orders[orderIndex].chat.push(newMessage);
+                
+                localStorage.setItem('joellOrders', JSON.stringify(orders));
+                syncOrdersToCloud();
+                renderAdminChatMessages();
+                showToast('Berhasil', 'File berhasil dikirim (Base64)!', 'success');
+            };
+            reader.readAsDataURL(file);
+        } catch (err) {
+            showToast('Error', 'Gagal memproses file.', 'error');
+        } finally {
+            input.value = '';
+        }
+        return;
+    }
+
+    if (file.size > 20 * 1024 * 1024) {
+        showToast('Error', 'File terlalu besar. Maksimal 20MB.', 'error');
+        input.value = '';
+        return;
+    }
+
+    showToast('Admin', 'Sedang mengupload file...', 'info');
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+        fetch('https://file.io/?expires=1w&autoDelete=false', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`Server error: ${response.status}`);
+            return response.json();
+        })
+        .then(result => {
+            if (result.success || result.link) {
+                const fileUrl = result.link || result.url || result.file;
+                if (!fileUrl) throw new Error('URL file tidak ditemukan.');
+                
+                const newMessage = {
+                    from: 'admin',
+                    text: `📄 File: ${file.name}`,
+                    file: fileUrl,
+                    fileName: file.name,
+                    time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+                };
+                
+                if (!orders[orderIndex].chat) orders[orderIndex].chat = [];
+                orders[orderIndex].chat.push(newMessage);
+                
+                localStorage.setItem('joellOrders', JSON.stringify(orders));
+                syncOrdersToCloud();
+                renderAdminChatMessages();
+                showToast('Berhasil', 'File berhasil dikirim!', 'success');
+            } else {
+                throw new Error(result.message || 'Gagal mengunggah file.');
+            }
+        })
+        .catch(error => {
+            console.error("File Upload Error:", error);
+            showToast('Error', 'Gagal upload: ' + error.message, 'error', 5000);
+        });
+    } catch (error) {
+        showToast('Error', 'Gagal upload: ' + error.message, 'error', 5000);
+    } finally {
+        input.value = '';
     }
 }
 
