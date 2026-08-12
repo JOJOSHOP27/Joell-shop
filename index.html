@@ -734,7 +734,7 @@
                 </div>
 
                 <div class="payment-actions">
-                    <button class="btn-pay" id="createInvoiceBtn"><i class="fas fa-qrcode"></i> Buat Invoice</button>
+                    <button class="btn-pay" id="createInvoiceBtn" style="display:none;"><i class="fas fa-qrcode"></i> Buat Invoice</button>
                     <button class="btn-check-status" id="checkStatusBtn" style="display:none;"><i class="fas fa-sync-alt"></i> Cek Status</button>
                     <button class="btn-copy-link" id="copyPaymentLinkBtn" style="display:none;"><i class="fas fa-copy"></i> Salin Link</button>
                 </div>
@@ -806,15 +806,39 @@
 <script src="payment-api.js"></script>
 
 <script>
+    // ============================================================
+    // AUTO INVOICE - QRIS LANGSUNG TAMPIL TANPA KLIK
+    // ============================================================
     document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ JOELL SHOP Initialized');
+        
         if (typeof renderMenus === 'function') renderMenus();
         if (typeof renderTopupGames === 'function') renderTopupGames();
         if (typeof updateCartUI === 'function') updateCartUI();
         if (typeof updateUserUI === 'function') updateUserUI();
         if (typeof renderOrdersList === 'function') renderOrdersList();
         if (typeof renderProfilePage === 'function') renderProfilePage();
-        console.log('✅ All systems ready!');
+        
+        // Override openPaymentModal untuk auto buat invoice
+        if (typeof window.openPaymentModal === 'function') {
+            const originalOpenPayment = window.openPaymentModal;
+            window.openPaymentModal = function(orderData) {
+                originalOpenPayment(orderData);
+                
+                // Auto buat invoice setelah modal terbuka
+                setTimeout(function() {
+                    const totalEl = document.getElementById('paymentOrderTotal');
+                    if (totalEl) {
+                        const total = parseInt(totalEl.textContent.replace(/[^0-9]/g, ''));
+                        if (total > 0 && typeof window.createInvoice === 'function') {
+                            window.createInvoice(total);
+                        }
+                    }
+                }, 800);
+            };
+        }
+        
+        console.log('✅ All systems ready! QRIS auto-show enabled!');
     });
 </script>
 </body>
