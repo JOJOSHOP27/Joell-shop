@@ -119,43 +119,6 @@
                         <span>Keluar Akun</span>
                     </div>
                 </div>
-
-                <div class="withdraw-section-in-profile" style="margin-top:24px;padding:20px;background:var(--bg-card);border-radius:12px;border:1px solid var(--border-subtle);">
-                    <h3 style="font-size:1rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;border-left:3px solid var(--orange);padding-left:12px;">
-                        <i class="fas fa-money-bill-wave" style="color:var(--orange);"></i> Tarik Saldo
-                    </h3>
-                    
-                    <div class="payment-balance-display" style="margin-bottom:12px;">
-                        <div>
-                            <div class="balance-label">Saldo Anda</div>
-                            <div class="balance-amount" id="profileBalanceAmount">Rp 0</div>
-                        </div>
-                        <button class="balance-refresh" onclick="fetchBalance()" title="Refresh Saldo">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-
-                    <div style="font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">Pilih Metode Penarikan</div>
-                    <div class="withdraw-methods-grid" id="profileWithdrawMethods">
-                        <p style="color:var(--text-muted);text-align:center;grid-column:1/-1;padding:16px;">Memuat metode penarikan...</p>
-                    </div>
-                    <div class="withdraw-info" id="profileWithdrawInfo">Silakan pilih metode penarikan di atas</div>
-
-                    <div class="withdraw-input-group">
-                        <input type="number" id="profileWithdrawAmount" placeholder="Jumlah (min 10.000)" min="10000">
-                        <input type="text" id="profileWithdrawAccount" placeholder="Nomor Rekening / E-Wallet">
-                        <button class="withdraw-btn" id="profileWithdrawBtn" style="background:linear-gradient(135deg,var(--orange),#ea580c);">
-                            <i class="fas fa-arrow-up"></i> Tarik
-                        </button>
-                    </div>
-
-                    <div style="font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-top:16px;margin-bottom:8px;">
-                        <i class="fas fa-history"></i> Riwayat Penarikan
-                    </div>
-                    <div class="withdraw-history" id="profileWithdrawHistory">
-                        <p style="color:var(--text-muted);font-size:0.8rem;text-align:center;">Belum ada riwayat penarikan</p>
-                    </div>
-                </div>
             </div>
 
             <div id="guestProfileView" class="cart-empty" style="padding: 60px 20px;">
