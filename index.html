@@ -272,43 +272,6 @@
                         <span>Keluar Akun</span>
                     </div>
                 </div>
-
-                <div class="withdraw-section-in-profile" style="margin-top:24px;padding:20px;background:var(--bg-card);border-radius:12px;border:1px solid var(--border-subtle);">
-                    <h3 style="font-size:1rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;border-left:3px solid var(--orange);padding-left:12px;">
-                        <i class="fas fa-money-bill-wave" style="color:var(--orange);"></i> Tarik Saldo
-                    </h3>
-                    
-                    <div class="payment-balance-display" style="margin-bottom:12px;">
-                        <div>
-                            <div class="balance-label">Saldo Anda</div>
-                            <div class="balance-amount" id="profileBalanceAmount">Rp 0</div>
-                        </div>
-                        <button class="balance-refresh" onclick="fetchBalance()" title="Refresh Saldo">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-
-                    <div style="font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">Pilih Metode Penarikan</div>
-                    <div class="withdraw-methods-grid" id="profileWithdrawMethods">
-                        <p style="color:var(--text-muted);text-align:center;grid-column:1/-1;padding:16px;">Memuat metode penarikan...</p>
-                    </div>
-                    <div class="withdraw-info" id="profileWithdrawInfo">Silakan pilih metode penarikan di atas</div>
-
-                    <div class="withdraw-input-group">
-                        <input type="number" id="profileWithdrawAmount" placeholder="Jumlah (min 10.000)" min="10000">
-                        <input type="text" id="profileWithdrawAccount" placeholder="Nomor Rekening / E-Wallet">
-                        <button class="withdraw-btn" id="profileWithdrawBtn" style="background:linear-gradient(135deg,var(--orange),#ea580c);">
-                            <i class="fas fa-arrow-up"></i> Tarik
-                        </button>
-                    </div>
-
-                    <div style="font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-top:16px;margin-bottom:8px;">
-                        <i class="fas fa-history"></i> Riwayat Penarikan
-                    </div>
-                    <div class="withdraw-history" id="profileWithdrawHistory">
-                        <p style="color:var(--text-muted);font-size:0.8rem;text-align:center;">Belum ada riwayat penarikan</p>
-                    </div>
-                </div>
             </div>
 
             <div id="guestProfileView" class="cart-empty" style="padding: 60px 20px;">
@@ -660,19 +623,6 @@
         <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;">Selesaikan pembayaran pesanan Anda</p>
         
         <div class="payment-section">
-            <div class="section-label"><i class="fas fa-wallet"></i> Saldo Akun</div>
-            <div class="payment-balance-display" id="balanceDisplay">
-                <div>
-                    <div class="balance-label">Saldo Anda</div>
-                    <div class="balance-amount" id="balanceAmount">Rp 0</div>
-                </div>
-                <button class="balance-refresh" id="balanceRefreshBtn" title="Refresh Saldo">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class="payment-section">
             <div class="section-label"><i class="fas fa-shopping-bag"></i> Ringkasan Pesanan</div>
             <div class="order-summary-box">
                 <div id="paymentOrderItems"></div>
@@ -694,9 +644,11 @@
             <div id="paymentQrisSection">
                 <div class="payment-qris-container" id="qrisContainer">
                     <div class="qris-placeholder" id="qrisPlaceholder">
-                        <i class="fas fa-qrcode"></i>
-                        <p>Klik tombol "Buat Invoice" untuk mendapatkan QRIS</p>
-                        <small>Pastikan koneksi internet stabil</small>
+                        <div style="text-align:center;">
+                            <i class="fas fa-qrcode" style="font-size:3rem;color:var(--accent-light);display:block;margin-bottom:8px;"></i>
+                            <p style="font-weight:700;color:var(--text-primary);margin-bottom:4px;">Siap Membuat Invoice</p>
+                            <small style="color:var(--text-muted);display:block;">Klik tombol di bawah untuk generate QRIS</small>
+                        </div>
                     </div>
                     <div id="qrisImageWrapper" style="display:none;">
                         <img id="qrisImage" src="" alt="QRIS Code" loading="lazy">
@@ -734,7 +686,7 @@
                 </div>
 
                 <div class="payment-actions">
-                    <button class="btn-pay" id="createInvoiceBtn" style="display:none;"><i class="fas fa-qrcode"></i> Buat Invoice</button>
+                    <button class="btn-pay" id="createInvoiceBtn"><i class="fas fa-qrcode"></i> Buat Invoice</button>
                     <button class="btn-check-status" id="checkStatusBtn" style="display:none;"><i class="fas fa-sync-alt"></i> Cek Status</button>
                     <button class="btn-copy-link" id="copyPaymentLinkBtn" style="display:none;"><i class="fas fa-copy"></i> Salin Link</button>
                 </div>
@@ -767,20 +719,13 @@
         </div>
 
         <div class="payment-section" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border-subtle);">
-            <div class="section-label"><i class="fas fa-file-invoice"></i> Riwayat Invoice</div>
+            <div class="section-label"><i class="fas fa-file-invoice"></i> Riwayat Invoice Saya</div>
             <div class="invoice-history-list" id="invoiceHistoryList">
                 <div style="text-align:center;padding:20px;color:var(--text-muted);">
                     <i class="fas fa-file-invoice" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.5;"></i>
                     <p>Belum ada invoice</p>
                 </div>
             </div>
-        </div>
-
-        <div style="margin-top:12px;text-align:center;padding-top:12px;border-top:1px solid var(--border-subtle);">
-            <button onclick="closePaymentAndOpenWithdraw()" 
-                    style="background:none;border:none;color:var(--accent-light);cursor:pointer;font-size:0.85rem;font-weight:600;transition:all 0.3s ease;padding:8px 16px;border-radius:30px;">
-                <i class="fas fa-money-bill-wave"></i> Ingin Tarik Saldo? Klik di sini
-            </button>
         </div>
     </div>
 </div>
@@ -806,49 +751,15 @@
 <script src="payment-api.js"></script>
 
 <script>
-    // ============================================================
-    // AUTO INVOICE - QRIS LANGSUNG TAMPIL TANPA KLIK (FIXED v2.5)
-    // ============================================================
     document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ JOELL SHOP Initialized');
-
         if (typeof renderMenus === 'function') renderMenus();
         if (typeof renderTopupGames === 'function') renderTopupGames();
         if (typeof updateCartUI === 'function') updateCartUI();
         if (typeof updateUserUI === 'function') updateUserUI();
         if (typeof renderOrdersList === 'function') renderOrdersList();
         if (typeof renderProfilePage === 'function') renderProfilePage();
-
-        // FIXED: Gunakan MutationObserver agar tidak bentrok dengan payment-api.js
-        const paymentOverlay = document.getElementById('paymentOverlay');
-        if (paymentOverlay) {
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                        if (paymentOverlay.classList.contains('open')) {
-                            if (!window._autoInvoiceTriggered) {
-                                window._autoInvoiceTriggered = true;
-                                setTimeout(function() {
-                                    const totalEl = document.getElementById('paymentOrderTotal');
-                                    const createBtn = document.getElementById('createInvoiceBtn');
-                                    if (totalEl && createBtn && createBtn.style.display !== 'none') {
-                                        const total = parseInt(totalEl.textContent.replace(/[^0-9]/g, ''));
-                                        if (total > 0 && typeof window.createInvoice === 'function') {
-                                            window.createInvoice(total);
-                                        }
-                                    }
-                                }, 600);
-                            }
-                        } else {
-                            window._autoInvoiceTriggered = false;
-                        }
-                    }
-                });
-            });
-            observer.observe(paymentOverlay, { attributes: true });
-        }
-
-        console.log('✅ All systems ready! QRIS auto-show enabled!');
+        console.log('✅ All systems ready!');
     });
 </script>
 </body>
